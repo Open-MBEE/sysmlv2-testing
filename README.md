@@ -61,9 +61,9 @@ not adjudicated by guesswork; the one `inapplicable` is sysml-toolkit's
 constraint evaluation. Every one of those is a real adapter run against a
 real pinned binary — nothing here is a fixture standing in for a result.
 
-A fourth implementation, the OMG's own
-[Pilot Implementation](https://github.com/Systems-Modeling/SysML-v2-Pilot-Implementation),
-is registered in the ledger; its adapter (`adapters/pilot_implementation.py`,
+The third implementation, the OMG's own
+[Pilot Implementation](https://github.com/Systems-Modeling/SysML-v2-Pilot-Implementation)
+(Java), is registered in the ledger; its adapter (`adapters/pilot_implementation.py`,
 `adapters/pilot_glue/Main.java`) drives its headless
 `org.omg.sysml.interactive.SysMLInteractive` engine. Wiring it up needs a
 one-time local Maven/Tycho build, `toolchain/get-pilot-jar.sh` — **which
