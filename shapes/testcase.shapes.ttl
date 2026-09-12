@@ -1,0 +1,45 @@
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix svt: <https://w3id.org/sysmlv2-testing#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+svt:TestCaseShape a sh:NodeShape ;
+    sh:targetClass svt:TestCase ;
+    sh:property svt:TestCaseDescriptionShape, svt:TestCaseHasInputFileShape,
+        svt:TestCaseMethodShape, svt:TestCaseExpectedShape,
+        svt:TestCaseEvalExpressionShape, svt:TestCaseEvalSubjectShape .
+
+svt:TestCaseDescriptionShape a sh:PropertyShape ;
+    sh:path svt:description ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+    sh:message "a TestCase must have exactly one svt:description" .
+
+svt:TestCaseHasInputFileShape a sh:PropertyShape ;
+    sh:path svt:hasInputFile ;
+    sh:minCount 1 ;
+    sh:datatype xsd:string ;
+    sh:message "a TestCase must name at least one svt:hasInputFile" .
+
+svt:TestCaseMethodShape a sh:PropertyShape ;
+    sh:path svt:method ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:in ( "structural-check" "constraint-eval" "state-execution" ) ;
+    sh:message "svt:method must be exactly one of: structural-check, constraint-eval, state-execution" .
+
+svt:TestCaseExpectedShape a sh:PropertyShape ;
+    sh:path svt:expected ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+    sh:message "svt:expected, when present, must be a single literal (absence means: not yet settled, runs record cantTell)" .
+
+svt:TestCaseEvalExpressionShape a sh:PropertyShape ;
+    sh:path svt:evalExpression ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string .
+
+svt:TestCaseEvalSubjectShape a sh:PropertyShape ;
+    sh:path svt:evalSubject ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string .

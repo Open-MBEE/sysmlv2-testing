@@ -1,0 +1,7 @@
+@prefix svt: <https://w3id.org/sysmlv2-testing#> .
+@prefix svtid: <https://w3id.org/sysmlv2-testing/id/> .
+
+svtid:implementation-broken a svt:Implementation ;
+    svt:repositoryURL "https://example.org/broken" ;
+    svt:primaryLanguage "Go" .
+# missing svt:name -- violates svt:ImplementationShape

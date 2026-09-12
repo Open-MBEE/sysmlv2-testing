@@ -1,0 +1,129 @@
+@prefix earl: <http://www.w3.org/ns/earl#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix svt: <https://w3id.org/sysmlv2-testing#> .
+@prefix svtid: <https://w3id.org/sysmlv2-testing/id/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+svtid:agent-svt-cli
+    a earl:Software,
+        prov:SoftwareAgent ;
+    rdfs:label "sysmlv2-testing CLI (svt)" .
+
+svtid:invocation-7782cc4470cbe486
+    a svt:Invocation ;
+    prov:startedAtTime "2026-09-12T20:28:56+00:00"^^xsd:dateTime ;
+    svt:command "Connection.load_from_content(<input files>, strict=False)" ;
+    svt:exitCode "0"^^xsd:integer .
+
+svtid:invocation-8ac4e25783dc3168
+    a svt:Invocation ;
+    prov:startedAtTime "2026-09-12T20:28:56+00:00"^^xsd:dateTime ;
+    svt:command "Connection.load_from_content(<input files>, strict=False)" ;
+    svt:exitCode "0"^^xsd:integer .
+
+svtid:invocation-cc5b8fcfac9b1eb4
+    a svt:Invocation ;
+    prov:startedAtTime "2026-09-12T20:28:57+00:00"^^xsd:dateTime ;
+    svt:command "Connection.load_from_content(<input files>, strict=False)" ;
+    svt:exitCode "1"^^xsd:integer .
+
+svtid:invocation-f52c77c63fbcdada
+    a svt:Invocation ;
+    prov:startedAtTime "2026-09-12T20:28:58+00:00"^^xsd:dateTime ;
+    svt:command "Model.eval('source.controlled and target.controlled', subject='Usage::l')" ;
+    svt:exitCode "0"^^xsd:integer .
+
+svtid:invocation-f749b78bf127dd59
+    a svt:Invocation ;
+    prov:startedAtTime "2026-09-12T20:28:57+00:00"^^xsd:dateTime ;
+    svt:command "Connection.load_from_content(<input files>, strict=False)" ;
+    svt:exitCode "0"^^xsd:integer .
+
+svtid:result-7782cc4470cbe486
+    a earl:TestResult ;
+    earl:info """exit_code=0
+stdout: clean
+stderr: """ ;
+    earl:outcome earl:passed .
+
+svtid:result-8ac4e25783dc3168
+    a earl:TestResult ;
+    earl:info """exit_code=0
+stdout: clean
+stderr: """ ;
+    earl:outcome earl:passed .
+
+svtid:result-cc5b8fcfac9b1eb4
+    a earl:TestResult ;
+    earl:info """exit_code=1
+stdout: 
+stderr: error: Redefining feature must be an end feature
+warning: Duplicate of inherited member name 'source' from BinaryConnection
+error: Redefining feature must be an end feature
+warning: Duplicate of inherited member name 'target' from BinaryConnection""" ;
+    earl:outcome earl:cantTell .
+
+svtid:result-f52c77c63fbcdada
+    a earl:TestResult ;
+    earl:info """exit_code=0
+stdout: false
+stderr: """ ;
+    earl:outcome earl:passed .
+
+svtid:result-f749b78bf127dd59
+    a earl:TestResult ;
+    earl:info """exit_code=0
+stdout: clean
+stderr: """ ;
+    earl:outcome earl:passed .
+
+svtid:run-7782cc4470cbe486
+    a svt:TestRun ;
+    earl:assertedBy svtid:agent-svt-cli ;
+    earl:mode earl:automatic ;
+    earl:result svtid:result-7782cc4470cbe486 ;
+    earl:subject svtid:version-f69111dc2adf2203 ;
+    earl:test svtid:testcase-redefinition-ambiguity-2 ;
+    prov:startedAtTime "2026-09-12T20:28:56+00:00"^^xsd:dateTime ;
+    svt:hasInvocation svtid:invocation-7782cc4470cbe486 .
+
+svtid:run-8ac4e25783dc3168
+    a svt:TestRun ;
+    earl:assertedBy svtid:agent-svt-cli ;
+    earl:mode earl:automatic ;
+    earl:result svtid:result-8ac4e25783dc3168 ;
+    earl:subject svtid:version-f69111dc2adf2203 ;
+    earl:test svtid:testcase-redefinition-ambiguity-3plus ;
+    prov:startedAtTime "2026-09-12T20:28:56+00:00"^^xsd:dateTime ;
+    svt:hasInvocation svtid:invocation-8ac4e25783dc3168 .
+
+svtid:run-cc5b8fcfac9b1eb4
+    a svt:TestRun ;
+    earl:assertedBy svtid:agent-svt-cli ;
+    earl:mode earl:automatic ;
+    earl:result svtid:result-cc5b8fcfac9b1eb4 ;
+    earl:subject svtid:version-f69111dc2adf2203 ;
+    earl:test svtid:testcase-end-feature-redefinition-bare ;
+    prov:startedAtTime "2026-09-12T20:28:57+00:00"^^xsd:dateTime ;
+    svt:hasInvocation svtid:invocation-cc5b8fcfac9b1eb4 .
+
+svtid:run-f52c77c63fbcdada
+    a svt:TestRun ;
+    earl:assertedBy svtid:agent-svt-cli ;
+    earl:mode earl:automatic ;
+    earl:result svtid:result-f52c77c63fbcdada ;
+    earl:subject svtid:version-f69111dc2adf2203 ;
+    earl:test svtid:testcase-constraint-eval-declaration-site ;
+    prov:startedAtTime "2026-09-12T20:28:58+00:00"^^xsd:dateTime ;
+    svt:hasInvocation svtid:invocation-f52c77c63fbcdada .
+
+svtid:run-f749b78bf127dd59
+    a svt:TestRun ;
+    earl:assertedBy svtid:agent-svt-cli ;
+    earl:mode earl:automatic ;
+    earl:result svtid:result-f749b78bf127dd59 ;
+    earl:subject svtid:version-f69111dc2adf2203 ;
+    earl:test svtid:testcase-end-feature-redefinition-explicit ;
+    prov:startedAtTime "2026-09-12T20:28:57+00:00"^^xsd:dateTime ;
+    svt:hasInvocation svtid:invocation-f749b78bf127dd59 .

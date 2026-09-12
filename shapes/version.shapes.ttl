@@ -1,0 +1,69 @@
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix svt: <https://w3id.org/sysmlv2-testing#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+svt:VersionShape a sh:NodeShape ;
+    sh:targetClass svt:Version ;
+    sh:property svt:VersionOfImplementationShape, svt:VersionCommitHashShape,
+        svt:VersionArtifactDigestShape, svt:VersionLabelShape, svt:VersionSourceURLShape .
+
+svt:VersionOfImplementationShape a sh:PropertyShape ;
+    sh:path svt:ofImplementation ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:nodeKind sh:IRI ;
+    sh:class svt:Implementation ;
+    sh:message "a Version must belong to exactly one svt:Implementation" .
+
+svt:VersionCommitHashShape a sh:PropertyShape ;
+    sh:path svt:commitHash ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+    sh:pattern "^[0-9a-f]{7,40}$" ;
+    sh:message "svt:commitHash must be a lowercase-hex git SHA (7-40 chars), required and exactly one" .
+
+svt:VersionArtifactDigestShape a sh:PropertyShape ;
+    sh:path svt:artifactDigest ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+    sh:pattern "^[0-9a-f]{64}$" ;
+    sh:message "svt:artifactDigest, when present, must be a lowercase-hex sha256 (64 chars)" .
+
+svt:VersionLabelShape a sh:PropertyShape ;
+    sh:path svt:versionLabel ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string .
+
+svt:VersionSourceURLShape a sh:PropertyShape ;
+    sh:path svt:sourceURL ;
+    sh:maxCount 1 .
+
+svt:StabilityDesignationShape a sh:NodeShape ;
+    sh:targetClass svt:StabilityDesignation ;
+    sh:property svt:StabilityDesignatesShape, svt:StabilityForImplementationShape,
+        svt:StabilityStartedAtTimeShape .
+
+svt:StabilityDesignatesShape a sh:PropertyShape ;
+    sh:path svt:designates ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:nodeKind sh:IRI ;
+    sh:class svt:Version ;
+    sh:message "a StabilityDesignation must designate exactly one svt:Version" .
+
+svt:StabilityForImplementationShape a sh:PropertyShape ;
+    sh:path svt:forImplementation ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:nodeKind sh:IRI ;
+    sh:class svt:Implementation ;
+    sh:message "a StabilityDesignation must name exactly one svt:Implementation" .
+
+svt:StabilityStartedAtTimeShape a sh:PropertyShape ;
+    sh:path prov:startedAtTime ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:dateTime ;
+    sh:message "a StabilityDesignation must record exactly one prov:startedAtTime (append-only history depends on this)" .

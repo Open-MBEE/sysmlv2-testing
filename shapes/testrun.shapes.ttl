@@ -1,0 +1,75 @@
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix svt: <https://w3id.org/sysmlv2-testing#> .
+@prefix earl: <http://www.w3.org/ns/earl#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+svt:TestRunShape a sh:NodeShape ;
+    sh:targetClass svt:TestRun ;
+    sh:property svt:TestRunTestShape, svt:TestRunSubjectShape, svt:TestRunAssertedByShape,
+        svt:TestRunModeShape, svt:TestRunResultShape, svt:TestRunStartedAtTimeShape,
+        svt:TestRunHasInvocationShape .
+
+svt:TestRunTestShape a sh:PropertyShape ;
+    sh:path earl:test ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:nodeKind sh:IRI ;
+    sh:class svt:TestCase ;
+    sh:message "a TestRun must have exactly one earl:test, pointing at a svt:TestCase" .
+
+svt:TestRunSubjectShape a sh:PropertyShape ;
+    sh:path earl:subject ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:nodeKind sh:IRI ;
+    sh:class svt:Version ;
+    sh:message "a TestRun must have exactly one earl:subject, pointing at the exact svt:Version tested" .
+
+svt:TestRunAssertedByShape a sh:PropertyShape ;
+    sh:path earl:assertedBy ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:nodeKind sh:IRI ;
+    sh:message "a TestRun must have exactly one earl:assertedBy" .
+
+svt:TestRunModeShape a sh:PropertyShape ;
+    sh:path earl:mode ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:in ( earl:automatic earl:manual ) ;
+    sh:message "earl:mode must be earl:automatic or earl:manual" .
+
+svt:TestRunResultShape a sh:PropertyShape ;
+    sh:path earl:result ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:nodeKind sh:IRI ;
+    sh:class earl:TestResult ;
+    sh:message "a TestRun must have exactly one earl:result" .
+
+svt:TestRunStartedAtTimeShape a sh:PropertyShape ;
+    sh:path prov:startedAtTime ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:dateTime ;
+    sh:message "a TestRun must record exactly one prov:startedAtTime" .
+
+svt:TestRunHasInvocationShape a sh:PropertyShape ;
+    sh:path svt:hasInvocation ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:nodeKind sh:IRI ;
+    sh:class svt:Invocation ;
+    sh:message "a TestRun must have exactly one svt:hasInvocation, pointing at the svt:Invocation that produced it" .
+
+svt:TestResultShape a sh:NodeShape ;
+    sh:targetClass earl:TestResult ;
+    sh:property svt:TestResultOutcomeShape .
+
+svt:TestResultOutcomeShape a sh:PropertyShape ;
+    sh:path earl:outcome ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:in ( earl:passed earl:failed earl:cantTell earl:inapplicable earl:untested ) ;
+    sh:message "earl:outcome must be exactly one of the five canonical EARL outcomes" .

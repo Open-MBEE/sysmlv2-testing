@@ -1,0 +1,21 @@
+@prefix svt: <https://w3id.org/sysmlv2-testing#> .
+@prefix svtid: <https://w3id.org/sysmlv2-testing/id/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# The two OMG spec PDFs this ledger cites. The files themselves live at
+# sources/local/ and are gitignored (OMG copyright) — this register is the
+# committed, verifiable stand-in: anyone who supplies their own copy of the
+# same formal document can confirm it's the same edition via sha256.
+
+svtid:spec-formal-26-03-02 a svt:SpecDocument ;
+    rdfs:label "SysML v2.0 Language Specification" ;
+    svt:docNumber "formal/26-03-02" ;
+    svt:localPath "sources/local/formal-26-03-02.pdf" ;
+    svt:sha256 "46e6c0476a6f1f34f367d57e039d56659bff75e41d2e4b3d37ca4cadea84a83a" .
+
+svtid:spec-formal-26-03-04 a svt:SpecDocument ;
+    rdfs:label "Systems Modeling API and Services Specification" ;
+    svt:docNumber "formal/26-03-04" ;
+    svt:localPath "sources/local/formal-26-03-04.pdf" ;
+    svt:sha256 "1a93ffb9214573ec38b00b89f7ce4c7b7ff6559ccbff534a6a97e08e1f145e0a" .

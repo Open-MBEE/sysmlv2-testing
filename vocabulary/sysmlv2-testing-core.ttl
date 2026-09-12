@@ -1,0 +1,212 @@
+@prefix svt: <https://w3id.org/sysmlv2-testing#> .
+@prefix earl: <http://www.w3.org/ns/earl#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# sysmlv2-testing core vocabulary.
+#
+# Four classes, every one a subclass of a W3C EARL or PROV-O class — this
+# vocabulary never redefines what EARL/PROV-O already mean, it only adds the
+# SysML-v2-testing-specific properties those classes carry. See AGENTS.md
+# for the pipeline these four classes support: run a pinned tool against a
+# TestCase's input, capture raw output, compare it to an expected literal
+# with a scripted comparator, log the result as a TestRun.
+
+<https://w3id.org/sysmlv2-testing#> a owl:Ontology ;
+    rdfs:label "sysmlv2-testing core vocabulary" ;
+    rdfs:comment "Classes and properties for a testing ledger tracking SysML v2 implementations, built as a thin extension of EARL and PROV-O." .
+
+#################################################################
+# svt:Implementation
+#################################################################
+
+svt:Implementation a owl:Class ;
+    rdfs:subClassOf prov:SoftwareAgent, earl:TestSubject ;
+    rdfs:label "Implementation" ;
+    rdfs:comment "A SysML v2 tool under test (e.g. the Pilot Implementation, OpenSysML, sysml-toolkit)." .
+
+svt:name a owl:DatatypeProperty ;
+    rdfs:domain svt:Implementation ;
+    rdfs:range xsd:string ;
+    rdfs:label "name" .
+
+svt:repositoryURL a owl:DatatypeProperty ;
+    rdfs:domain svt:Implementation ;
+    rdfs:range xsd:anyURI ;
+    rdfs:label "repository URL" .
+
+svt:primaryLanguage a owl:DatatypeProperty ;
+    rdfs:domain svt:Implementation ;
+    rdfs:range xsd:string ;
+    rdfs:label "primary language" .
+
+svt:hasVersion a owl:ObjectProperty ;
+    rdfs:domain svt:Implementation ;
+    rdfs:range svt:Version ;
+    rdfs:label "has version" .
+
+#################################################################
+# svt:Version
+#################################################################
+
+svt:Version a owl:Class ;
+    rdfs:subClassOf prov:Entity ;
+    rdfs:label "Version" ;
+    rdfs:comment "One precise, git-hash-identified point in an Implementation's history." .
+
+svt:ofImplementation a owl:ObjectProperty ;
+    rdfs:domain svt:Version ;
+    rdfs:range svt:Implementation ;
+    owl:inverseOf svt:hasVersion ;
+    rdfs:label "of implementation" .
+
+svt:commitHash a owl:DatatypeProperty ;
+    rdfs:domain svt:Version ;
+    rdfs:range xsd:string ;
+    rdfs:label "commit hash" ;
+    rdfs:comment "The exact git SHA this Version identifies. Required — see shapes/version.shapes.ttl." .
+
+svt:versionLabel a owl:DatatypeProperty ;
+    rdfs:domain svt:Version ;
+    rdfs:range xsd:string ;
+    rdfs:label "version label" ;
+    rdfs:comment "A human tag or date string (e.g. \"v0.6.0\" or \"2026-08\"); not a substitute for commitHash." .
+
+svt:sourceURL a owl:DatatypeProperty ;
+    rdfs:domain svt:Version ;
+    rdfs:range xsd:anyURI ;
+    rdfs:label "source URL" .
+
+svt:artifactDigest a owl:DatatypeProperty ;
+    rdfs:domain svt:Version ;
+    rdfs:range xsd:string ;
+    rdfs:label "artifact digest" ;
+    rdfs:comment "sha256 of a built or downloaded binary/jar pinned for this Version, distinct from commitHash." .
+
+#################################################################
+# svt:StabilityDesignation — append-only; never overwrite a Version's
+# "current stable" status, add a new designation with a later timestamp.
+#################################################################
+
+svt:StabilityDesignation a owl:Class ;
+    rdfs:subClassOf prov:Activity ;
+    rdfs:label "Stability designation" ;
+    rdfs:comment "An append-only record that a Version was, as of prov:startedAtTime, the designated-stable release of an Implementation. \"Current stable\" is a query (latest startedAtTime per Implementation), never a mutable field. (prov:startedAtTime, not prov:generatedAtTime -- the latter's rdfs:domain is prov:Entity, and this is a prov:Activity; PROV-O declares Entity and Activity disjoint.)" .
+
+svt:designates a owl:ObjectProperty ;
+    rdfs:domain svt:StabilityDesignation ;
+    rdfs:range svt:Version ;
+    rdfs:label "designates" .
+
+svt:forImplementation a owl:ObjectProperty ;
+    rdfs:domain svt:StabilityDesignation ;
+    rdfs:range svt:Implementation ;
+    rdfs:label "for implementation" .
+
+#################################################################
+# svt:TestCase
+#################################################################
+
+svt:TestCase a owl:Class ;
+    rdfs:subClassOf earl:TestCriterion ;
+    rdfs:label "Test case" ;
+    rdfs:comment "A concrete input -> expected-behavior claim: \"when you run this input through an implementation, it should produce this.\"" .
+
+svt:description a owl:DatatypeProperty ;
+    rdfs:domain svt:TestCase ;
+    rdfs:range xsd:string ;
+    rdfs:label "description" .
+
+svt:hasInputFile a owl:DatatypeProperty ;
+    rdfs:domain svt:TestCase ;
+    rdfs:range xsd:string ;
+    rdfs:label "has input file" ;
+    rdfs:comment "A path (relative to ledger/fixtures/<testcase-id>/) of one file in this test case's input set. Multivalued — a test case's input may be several files." .
+
+svt:method a owl:DatatypeProperty ;
+    rdfs:domain svt:TestCase ;
+    rdfs:range xsd:string ;
+    rdfs:label "method" ;
+    rdfs:comment "Which scripted comparator applies: structural-check | constraint-eval | state-execution. See shapes/testcase.shapes.ttl for the closed set." .
+
+svt:expected a owl:DatatypeProperty ;
+    rdfs:domain svt:TestCase ;
+    rdfs:range xsd:string ;
+    rdfs:label "expected" ;
+    rdfs:comment "The literal value the method's comparator checks captured output against. Absent when the correct behavior is not yet settled (e.g. pending a spec-text read) — a TestRun against such a TestCase mechanically records earl:cantTell, never a guess." .
+
+svt:evalExpression a owl:DatatypeProperty ;
+    rdfs:domain svt:TestCase ;
+    rdfs:range xsd:string ;
+    rdfs:label "eval expression" ;
+    rdfs:comment "For method=constraint-eval: the boolean expression to evaluate." .
+
+svt:evalSubject a owl:DatatypeProperty ;
+    rdfs:domain svt:TestCase ;
+    rdfs:range xsd:string ;
+    rdfs:label "eval subject" ;
+    rdfs:comment "For method=constraint-eval or state-execution: the fully-qualified usage/connection name the evaluation is performed against (subject_symbol_id)." .
+
+svt:groundedIn a owl:ObjectProperty ;
+    rdfs:domain svt:TestCase ;
+    rdfs:label "grounded in" ;
+    rdfs:comment "Optional link to a citation record in sources/sources.ttl backing this test case's expected value." .
+
+#################################################################
+# svt:SpecDocument — the sources register (sources/sources.ttl). Held
+# locally (sources/local/, gitignored); this record is what's committed.
+#################################################################
+
+svt:SpecDocument a owl:Class ;
+    rdfs:subClassOf prov:Entity ;
+    rdfs:label "Spec document" ;
+    rdfs:comment "A registered citation for a spec PDF held locally but not committed (OMG copyright) — its sha256 lets anyone confirm their own copy is the same edition." .
+
+svt:docNumber a owl:DatatypeProperty ;
+    rdfs:domain svt:SpecDocument ;
+    rdfs:range xsd:string ;
+    rdfs:label "doc number" ;
+    rdfs:comment "The OMG formal document number, e.g. \"formal/26-03-02\"." .
+
+svt:sha256 a owl:DatatypeProperty ;
+    rdfs:domain svt:SpecDocument ;
+    rdfs:range xsd:string ;
+    rdfs:label "sha256" .
+
+svt:localPath a owl:DatatypeProperty ;
+    rdfs:domain svt:SpecDocument ;
+    rdfs:range xsd:string ;
+    rdfs:label "local path" ;
+    rdfs:comment "Path under sources/local/ where this file lives once fetched — gitignored, not committed." .
+
+#################################################################
+# svt:TestRun
+#################################################################
+
+svt:TestRun a owl:Class ;
+    rdfs:subClassOf earl:Assertion, prov:Activity ;
+    rdfs:label "Test run" ;
+    rdfs:comment "One earl:Assertion: a TestCase was run against a specific Version, and this is what actually happened. earl:test, earl:subject, earl:assertedBy, earl:mode and earl:result are inherited from earl:Assertion and used directly, never redefined. Timestamped with prov:startedAtTime, not prov:generatedAtTime (domain prov:Entity; this is a prov:Activity)." .
+
+svt:Invocation a owl:Class ;
+    rdfs:subClassOf prov:Activity ;
+    rdfs:label "Invocation" ;
+    rdfs:comment "The exact command, exit code and environment of one adapter subprocess call, kept for reproducibility. Timestamped with prov:startedAtTime, for the same reason as TestRun." .
+
+svt:hasInvocation a owl:ObjectProperty ;
+    rdfs:domain svt:TestRun ;
+    rdfs:range svt:Invocation ;
+    rdfs:label "has invocation" ;
+    rdfs:comment "Links a TestRun to the Invocation that produced it. Deliberately not prov:wasGeneratedBy: that property's rdfs:domain is prov:Entity, and both a TestRun and an Invocation are prov:Activity -- a domain-specific object property is the correct fit, not a borrowed one that doesn't." .
+
+svt:command a owl:DatatypeProperty ;
+    rdfs:domain svt:Invocation ;
+    rdfs:range xsd:string ;
+    rdfs:label "command" .
+
+svt:exitCode a owl:DatatypeProperty ;
+    rdfs:domain svt:Invocation ;
+    rdfs:range xsd:integer ;
+    rdfs:label "exit code" .

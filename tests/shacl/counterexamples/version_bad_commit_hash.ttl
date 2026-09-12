@@ -1,0 +1,12 @@
+@prefix svt: <https://w3id.org/sysmlv2-testing#> .
+@prefix svtid: <https://w3id.org/sysmlv2-testing/id/> .
+
+svtid:implementation-ok a svt:Implementation ;
+    svt:name "ok" ;
+    svt:repositoryURL "https://example.org/ok" ;
+    svt:primaryLanguage "Go" .
+
+svtid:version-broken a svt:Version ;
+    svt:ofImplementation svtid:implementation-ok ;
+    svt:commitHash "not-a-hex-sha!" .
+# commitHash isn't lowercase-hex -- violates svt:VersionShape

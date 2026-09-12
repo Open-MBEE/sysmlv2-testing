@@ -1,0 +1,8 @@
+@prefix svt: <https://w3id.org/sysmlv2-testing#> .
+@prefix svtid: <https://w3id.org/sysmlv2-testing/id/> .
+
+svtid:testcase-broken a svt:TestCase ;
+    svt:description "a test case with an invalid method" ;
+    svt:hasInputFile "input.sysml" ;
+    svt:method "not-a-real-method" .
+# svt:method isn't in the closed set -- violates svt:TestCaseShape

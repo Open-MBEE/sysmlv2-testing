@@ -1,0 +1,6 @@
+@prefix earl: <http://www.w3.org/ns/earl#> .
+@prefix svtid: <https://w3id.org/sysmlv2-testing/id/> .
+
+svtid:result-broken a earl:TestResult ;
+    earl:outcome earl:notARealOutcome .
+# outcome isn't one of the five canonical EARL values -- violates svt:TestResultShape

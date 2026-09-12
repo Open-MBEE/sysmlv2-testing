@@ -1,0 +1,66 @@
+@prefix earl: <http://www.w3.org/ns/earl#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix svt: <https://w3id.org/sysmlv2-testing#> .
+@prefix svtid: <https://w3id.org/sysmlv2-testing/id/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+svtid:implementation-opensysml
+    a svt:Implementation ;
+    svt:hasVersion svtid:version-f69111dc2adf2203 ;
+    svt:name "opensysml" ;
+    svt:primaryLanguage "Go" ;
+    svt:repositoryURL "https://github.com/Open-MBEE/OpenSysML"^^xsd:anyURI .
+
+svtid:implementation-pilot-implementation
+    a svt:Implementation ;
+    svt:hasVersion svtid:version-26283fd33076c9d6 ;
+    svt:name "pilot-implementation" ;
+    svt:primaryLanguage "Java" ;
+    svt:repositoryURL "https://github.com/Systems-Modeling/SysML-v2-Pilot-Implementation"^^xsd:anyURI .
+
+svtid:implementation-sysml-toolkit
+    a svt:Implementation ;
+    svt:hasVersion svtid:version-cdc8cdb3385265b0 ;
+    svt:name "sysml-toolkit" ;
+    svt:primaryLanguage "Rust" ;
+    svt:repositoryURL "https://github.com/Open-MBEE/sysml-toolkit"^^xsd:anyURI .
+
+svtid:stability-0b5f22025799d91e
+    a svt:StabilityDesignation ;
+    prov:startedAtTime "2026-09-12T20:28:34+00:00"^^xsd:dateTime ;
+    svt:designates svtid:version-cdc8cdb3385265b0 ;
+    svt:forImplementation svtid:implementation-sysml-toolkit .
+
+svtid:stability-80447eae7ea1d796
+    a svt:StabilityDesignation ;
+    prov:startedAtTime "2026-09-12T20:28:34+00:00"^^xsd:dateTime ;
+    svt:designates svtid:version-f69111dc2adf2203 ;
+    svt:forImplementation svtid:implementation-opensysml .
+
+svtid:stability-ed12f863eecc337f
+    a svt:StabilityDesignation ;
+    prov:startedAtTime "2026-09-12T20:28:34+00:00"^^xsd:dateTime ;
+    svt:designates svtid:version-26283fd33076c9d6 ;
+    svt:forImplementation svtid:implementation-pilot-implementation .
+
+svtid:version-26283fd33076c9d6
+    a svt:Version ;
+    svt:commitHash "692170b71867353b8f90341e61556f49a5beb0e5" ;
+    svt:ofImplementation svtid:implementation-pilot-implementation ;
+    svt:sourceURL "https://github.com/Systems-Modeling/SysML-v2-Pilot-Implementation/commit/692170b71867353b8f90341e61556f49a5beb0e5"^^xsd:anyURI ;
+    svt:versionLabel "2026-08+" .
+
+svtid:version-cdc8cdb3385265b0
+    a svt:Version ;
+    svt:commitHash "3a13c64adb93f1d069ce021c598318587126044a" ;
+    svt:ofImplementation svtid:implementation-sysml-toolkit ;
+    svt:sourceURL "https://github.com/Open-MBEE/sysml-toolkit/releases/tag/v0.6.0"^^xsd:anyURI ;
+    svt:versionLabel "v0.6.0" .
+
+svtid:version-f69111dc2adf2203
+    a svt:Version ;
+    svt:commitHash "2b6c1cf6c31266396899a90d3290cfbdf44019b9" ;
+    svt:ofImplementation svtid:implementation-opensysml ;
+    svt:sourceURL "https://github.com/Open-MBEE/OpenSysML/releases/tag/v0.4.0"^^xsd:anyURI ;
+    svt:versionLabel "v0.4.0" .

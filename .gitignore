@@ -1,0 +1,19 @@
+# The two OMG spec PDFs are copyrighted — held locally, never committed.
+# sources/sources.ttl (committed) records their sha256 so anyone can verify
+# their own copy is the same edition.
+sources/local/*.pdf
+
+# Python / uv
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Pinned toolchain caches (binaries/jars fetched or built by toolchain/*.sh —
+# reproducible from a Version's commitHash/artifactDigest, never committed)
+.cache/
+toolchain/bin/
+adapters/pilot_glue/*.class
+adapters/pilot_glue/*.jar
+
+/tmp-gate-out*
