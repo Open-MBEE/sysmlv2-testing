@@ -3,7 +3,7 @@
 ## What this repo is
 
 A testing ledger for SysML v2 implementations: a knowledge graph (W3C EARL
-+ PROV-O) recording which `Implementation` × `Version` was run against
+and PROV-O) recording which `Implementation` × `Version` was run against
 which `TestCase`, and what actually happened. It is a **pipeline, not a
 platform** — see the diagram in `README.md`. Keep it that way. Do not add
 a dashboard, a web UI, or a query service; a ledger explorer is explicitly
