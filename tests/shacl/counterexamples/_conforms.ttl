@@ -18,11 +18,23 @@ svtid:stability-ok a svt:StabilityDesignation ;
     svt:forImplementation svtid:implementation-ok ;
     prov:startedAtTime "2026-01-01T00:00:00"^^xsd:dateTime .
 
+svtid:spec-ok a svt:SpecDocument ;
+    svt:docNumber "formal/0000-00-00" ;
+    svt:localPath "sources/local/ok.pdf" ;
+    svt:sha256 "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855" .
+
+svtid:citation-ok a svt:SpecCitation ;
+    svt:citesDocument svtid:spec-ok ;
+    svt:section "1 Ok" ;
+    svt:page "1" ;
+    svt:quote "ok is ok" .
+
 svtid:testcase-ok a svt:TestCase ;
     svt:description "ok" ;
     svt:hasInputFile "input.sysml" ;
     svt:method "structural-check" ;
-    svt:expected "clean" .
+    svt:expected "clean" ;
+    svt:groundedIn svtid:citation-ok .
 
 svtid:agent-ok a earl:Software .
 

@@ -1,21 +1,59 @@
+@prefix earl: <http://www.w3.org/ns/earl#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix svt: <https://w3id.org/sysmlv2-testing#> .
 @prefix svtid: <https://w3id.org/sysmlv2-testing/id/> .
-@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-# The two OMG spec PDFs this ledger cites. The files themselves live at
-# sources/local/ and are gitignored (OMG copyright) — this register is the
-# committed, verifiable stand-in: anyone who supplies their own copy of the
-# same formal document can confirm it's the same edition via sha256.
+svtid:citation-assert-constraint-per-usage-evaluation
+    a svt:SpecCitation ;
+    svt:citesDocument svtid:spec-formal-2026-03-02 ;
+    svt:page "125; 446" ;
+    svt:quote "(7.20.1, p.125) A constraint usage that is a feature of another definition or usage may also directly reference features of its containing context, in which case it may be used to effectively constrain the values of those features. (8.4.16.3, p.446) In general, a ConstraintCheck of a ConstraintUsage at a certain point in time produces a Boolean result indicating whether the modeled constraint holds or not at that point in time. [...] Therefore, a ConstraintCheck of a non-negated AssertConstraintUsage must have a true result -- that is, the constraint modeled by the AssertConstraintUsage is asserted to always hold." ;
+    svt:rationale "An assert constraint declared on a connection definition (Link) and evaluated for a specific usage (l) must be checked against l's own containing-context feature values (l's actual bound source/target), not the definition's own declaration-site defaults -- the ConstraintCheck is a check of the constraint in the context it is used. This grounds expected=false for connection l : Link { end :>> source = a; end :>> target = b; } where a.controlled=true, b.controlled=false: evaluated against l's real bindings, 'source.controlled and target.controlled' is false. sysml-toolkit's verify/query mechanism instead evaluates the constraint using Link's own default-bound values regardless of which usage is asked about (BrandFootprintML ISSUES-PROPOSED.md #1) -- a real conformance gap, which is exactly why the sysml-toolkit adapter for this method raises UnsupportedMethod rather than faking a result." ;
+    svt:section "7.20.1 Constraints Overview; 8.4.16.3 Assert Constraint Usages" .
 
-svtid:spec-formal-26-03-02 a svt:SpecDocument ;
-    rdfs:label "SysML v2.0 Language Specification" ;
-    svt:docNumber "formal/26-03-02" ;
+svtid:citation-check-feature-end-redefinition
+    a svt:SpecCitation ;
+    svt:citesDocument svtid:spec-formal-2026-03-02 ;
+    svt:page "412-413" ;
+    svt:quote "A ConnectionUsage is a PartUsage and a ConnectorAsUsage, which is a kind of KerML Connector. [...] Further, the checkFeatureEndRedefinition constraint requires that the end Features of a ConnectionUsage redefine of corresponding end Features of its connectionDefinitions (see [KerML, 8.4.4.5]). Example: connection b : B subsets Connections::binaryConnections { end ref source references f1 redefines B::source; end ref target references f2 redefines B::target; }" ;
+    svt:rationale "Combined with the isEnd grammar rule (citation-end-usage-prefix-grammar): a feature written as bare ':>> source = a;' (no 'end' keyword) has isEnd = false, so it cannot satisfy checkFeatureEndRedefinition when redefining an end Feature such as BinaryLinkObject::source. This grounds rejecting the bare form and accepting only the explicit 'end :>> source = a;' form -- i.e. OpenSysML's rejection of end-feature-redefinition-bare is spec-conformant, and sysml-toolkit's silent acceptance of it is a real conformance gap, not an unresolved disagreement." ;
+    svt:section "8.4.9.2 Connection Usages" .
+
+svtid:citation-end-usage-prefix-grammar
+    a svt:SpecCitation ;
+    svt:citesDocument svtid:spec-formal-2026-03-02 ;
+    svt:page "168-169" ;
+    svt:quote "EndUsagePrefix : Usage = isEnd ?= 'end' ( ownedRelationship += OwnedCrossFeatureMember )?" ;
+    svt:rationale "isEnd is set true only when the literal 'end' keyword is parsed. A feature written without 'end' therefore has isEnd = false." ;
+    svt:section "8.2.2.6.2 Usages (Textual Notation)" .
+
+svtid:citation-remove-redefined-features
+    a svt:SpecCitation ;
+    svt:citesDocument svtid:spec-kerml-1-1-beta2 ;
+    svt:page "146" ;
+    svt:quote "removeRedefinedFeatures(memberships : Membership [0..*]) : Membership [0..*] -- Return a subset of memberships, removing those Memberships whose memberElements are Features and for which either of the following two conditions holds: 1. The memberElement of the Membership is included in redefined Features of another Membership in memberships. 2. One of the redefined Features of the Membership is a directly redefinedFeature of an ownedFeature of this Type. [...] body: let reducedMemberships : Sequence(Membership) = memberships->reject(mem1 | memberships->excluding(mem1)-> exists(mem2 | allRedefinedFeaturesOf(mem2)-> includes(mem1.memberElement))) in let redefinedFeatures : Set(Feature) = ownedFeature.redefinition.redefinedFeature->asSet() in reducedMemberships->reject(mem | allRedefinedFeaturesOf(mem)-> exists(feature | redefinedFeatures->includes(feature)))" ;
+    svt:rationale "This is a general set operation over the whole memberships collection (existential quantification, not a pairwise fold) -- it is defined the same way regardless of how many redefining memberships exist. Nothing in this algorithm conditions correctness on sibling count, so 2 vs 3+ anonymous redefinitions of the same base feature should resolve identically. This directly supports expected=clean for both redefinition-ambiguity-2 and redefinition-ambiguity-3plus, and independently corroborates BrandFootprintML's own root-cause hypothesis that sysml-toolkit's drop_redefined_hits (a suspected pairwise fold) diverges from this normative set-based algorithm. Version caveat: this is KerML v1.1 Beta 2 (Release 2026-07), not the v1.0 release the SysML v2.0 Language Specification (formal/2026-03-02, March 2026) cross-references as '[KerML, ...]' -- used as the best locally-held proxy; this is a foundational, long-stable KerML mechanism unlikely to have changed in a way that would flip this conclusion, but the version mismatch is real and noted rather than glossed over." ;
+    svt:section "8.3.3.1.10 Type (removeRedefinedFeatures operation)" .
+
+svtid:spec-formal-2026-03-02
+    a svt:SpecDocument ;
+    rdfs:label "OMG Systems Modeling Language (SysML), Version 2.0, Part 1: Language Specification" ;
+    svt:docNumber "formal/2026-03-02" ;
     svt:localPath "sources/local/formal-26-03-02.pdf" ;
     svt:sha256 "46e6c0476a6f1f34f367d57e039d56659bff75e41d2e4b3d37ca4cadea84a83a" .
 
-svtid:spec-formal-26-03-04 a svt:SpecDocument ;
-    rdfs:label "Systems Modeling API and Services Specification" ;
-    svt:docNumber "formal/26-03-04" ;
+svtid:spec-formal-2026-03-04
+    a svt:SpecDocument ;
+    rdfs:label "Systems Modeling Application Programming Interface (API) and Services, Version 1.0" ;
+    svt:docNumber "formal/2026-03-04" ;
     svt:localPath "sources/local/formal-26-03-04.pdf" ;
     svt:sha256 "1a93ffb9214573ec38b00b89f7ce4c7b7ff6559ccbff534a6a97e08e1f145e0a" .
+
+svtid:spec-kerml-1-1-beta2
+    a svt:SpecDocument ;
+    rdfs:label "Kernel Modeling Language (KerML)" ;
+    svt:docNumber "KerML v1.1 Beta 2 (Release 2026-07) — no OMG document number assigned (beta)" ;
+    svt:localPath "sources/local/kerml-1.1-beta2.pdf" ;
+    svt:sha256 "e8b7f33d9dac1a3fdd4eaa64b052608a989b92c580de91fdadb7038d33df99af" .

@@ -10,25 +10,38 @@ svtid:agent-svt-cli
         prov:SoftwareAgent ;
     rdfs:label "sysmlv2-testing CLI (svt)" .
 
-svtid:invocation-23ecc98801b7f63a
+svtid:invocation-45c96972bf5d9b26
     a svt:Invocation ;
-    prov:startedAtTime "2026-09-12T20:58:40+00:00"^^xsd:dateTime ;
-    svt:command "java -cp /Users/z/Documents/GitHub/sysmlv2-testing/.cache/pilot/692170b71867353b8f90341e61556f49a5beb0e5/interactive-all.jar:/Users/z/Documents/GitHub/sysmlv2-testing/.cache/pilot/692170b71867353b8f90341e61556f49a5beb0e5/classes svt.Main /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/redefinition-ambiguity-3plus/lib.sysml /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/redefinition-ambiguity-3plus/usage-three-ambiguous.sysml" ;
+    prov:startedAtTime "2026-09-12T21:18:57+00:00"^^xsd:dateTime ;
+    svt:command "java -cp /Users/z/Documents/GitHub/sysmlv2-testing/.cache/pilot/692170b71867353b8f90341e61556f49a5beb0e5/interactive-all.jar:/Users/z/Documents/GitHub/sysmlv2-testing/.cache/pilot/692170b71867353b8f90341e61556f49a5beb0e5/classes svt.Main /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/end-feature-redefinition-explicit/lib.sysml /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/end-feature-redefinition-explicit/usage-end-portable.sysml" ;
+    svt:exitCode "1"^^xsd:integer ;
+    svt:inputDigest "9e0a09962391872bdfc341fc7f17a4e3cfed1a5c736d3b50a1318d49072f405c" ;
+    svt:stderr """log4j:WARN No appenders could be found for logger (org.eclipse.xtext.parser.antlr.AbstractInternalAntlrParser).
+log4j:WARN Please initialize the log4j system properly.
+log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
+""" ;
+    svt:stdout """ERRORS:
+ERROR: Must have at least two related elements (line 20)
+""" .
+
+svtid:invocation-4bd58cd9e1419ff7
+    a svt:Invocation ;
+    prov:startedAtTime "2026-09-12T21:18:49+00:00"^^xsd:dateTime ;
+    svt:command "java -cp /Users/z/Documents/GitHub/sysmlv2-testing/.cache/pilot/692170b71867353b8f90341e61556f49a5beb0e5/interactive-all.jar:/Users/z/Documents/GitHub/sysmlv2-testing/.cache/pilot/692170b71867353b8f90341e61556f49a5beb0e5/classes svt.Main /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/redefinition-ambiguity-2/lib.sysml /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/redefinition-ambiguity-2/usage-two-ok.sysml" ;
     svt:exitCode "0"^^xsd:integer ;
-    svt:inputDigest "918e05e1bc6e884e0ccd7463547e4d4fe50086c280ee5e28f5b37c0b614711ca" ;
+    svt:inputDigest "dd8e5e69f050f6548c2e6e2e7cb21b17e84b79019c80fd3ffacb29d95c05e35a" ;
     svt:stderr """log4j:WARN No appenders could be found for logger (org.eclipse.xtext.parser.antlr.AbstractInternalAntlrParser).
 log4j:WARN Please initialize the log4j system properly.
 log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
 """ ;
     svt:stdout """CLEAN
+WARNING: Duplicate of other owned member name (line 18)
 WARNING: Duplicate of other owned member name (line 19)
-WARNING: Duplicate of other owned member name (line 20)
-WARNING: Duplicate of other owned member name (line 21)
 """ .
 
-svtid:invocation-36fb2b3f63c00940
+svtid:invocation-9dfe6a6dd68ddf79
     a svt:Invocation ;
-    prov:startedAtTime "2026-09-12T20:58:43+00:00"^^xsd:dateTime ;
+    prov:startedAtTime "2026-09-12T21:18:54+00:00"^^xsd:dateTime ;
     svt:command "java -cp /Users/z/Documents/GitHub/sysmlv2-testing/.cache/pilot/692170b71867353b8f90341e61556f49a5beb0e5/interactive-all.jar:/Users/z/Documents/GitHub/sysmlv2-testing/.cache/pilot/692170b71867353b8f90341e61556f49a5beb0e5/classes svt.Main /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/end-feature-redefinition-bare/lib.sysml /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/end-feature-redefinition-bare/usage-bare-noncompliant.sysml" ;
     svt:exitCode "1"^^xsd:integer ;
     svt:inputDigest "dbe9caa07da73db2bb98c4e975eff68668bc8f26da33146eb367cb38f3a77fae" ;
@@ -44,95 +57,82 @@ ERROR: Redefining feature must be an end feature (line 22)
 ERROR: Subsetting/redefining feature must be constant if subsetted/redefined feature is constant (line 22)
 """ .
 
-svtid:invocation-4a927f8b5bedce26
+svtid:invocation-f9e3f1d42231e1fb
     a svt:Invocation ;
-    prov:startedAtTime "2026-09-12T20:58:37+00:00"^^xsd:dateTime ;
-    svt:command "java -cp /Users/z/Documents/GitHub/sysmlv2-testing/.cache/pilot/692170b71867353b8f90341e61556f49a5beb0e5/interactive-all.jar:/Users/z/Documents/GitHub/sysmlv2-testing/.cache/pilot/692170b71867353b8f90341e61556f49a5beb0e5/classes svt.Main /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/redefinition-ambiguity-2/lib.sysml /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/redefinition-ambiguity-2/usage-two-ok.sysml" ;
+    prov:startedAtTime "2026-09-12T21:18:52+00:00"^^xsd:dateTime ;
+    svt:command "java -cp /Users/z/Documents/GitHub/sysmlv2-testing/.cache/pilot/692170b71867353b8f90341e61556f49a5beb0e5/interactive-all.jar:/Users/z/Documents/GitHub/sysmlv2-testing/.cache/pilot/692170b71867353b8f90341e61556f49a5beb0e5/classes svt.Main /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/redefinition-ambiguity-3plus/lib.sysml /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/redefinition-ambiguity-3plus/usage-three-ambiguous.sysml" ;
     svt:exitCode "0"^^xsd:integer ;
-    svt:inputDigest "dd8e5e69f050f6548c2e6e2e7cb21b17e84b79019c80fd3ffacb29d95c05e35a" ;
+    svt:inputDigest "918e05e1bc6e884e0ccd7463547e4d4fe50086c280ee5e28f5b37c0b614711ca" ;
     svt:stderr """log4j:WARN No appenders could be found for logger (org.eclipse.xtext.parser.antlr.AbstractInternalAntlrParser).
 log4j:WARN Please initialize the log4j system properly.
 log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
 """ ;
     svt:stdout """CLEAN
-WARNING: Duplicate of other owned member name (line 18)
 WARNING: Duplicate of other owned member name (line 19)
+WARNING: Duplicate of other owned member name (line 20)
+WARNING: Duplicate of other owned member name (line 21)
 """ .
 
-svtid:invocation-9b0f99d8f8049dc6
-    a svt:Invocation ;
-    prov:startedAtTime "2026-09-12T20:58:45+00:00"^^xsd:dateTime ;
-    svt:command "java -cp /Users/z/Documents/GitHub/sysmlv2-testing/.cache/pilot/692170b71867353b8f90341e61556f49a5beb0e5/interactive-all.jar:/Users/z/Documents/GitHub/sysmlv2-testing/.cache/pilot/692170b71867353b8f90341e61556f49a5beb0e5/classes svt.Main /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/end-feature-redefinition-explicit/lib.sysml /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/end-feature-redefinition-explicit/usage-end-portable.sysml" ;
-    svt:exitCode "1"^^xsd:integer ;
-    svt:inputDigest "9e0a09962391872bdfc341fc7f17a4e3cfed1a5c736d3b50a1318d49072f405c" ;
-    svt:stderr """log4j:WARN No appenders could be found for logger (org.eclipse.xtext.parser.antlr.AbstractInternalAntlrParser).
-log4j:WARN Please initialize the log4j system properly.
-log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
-""" ;
-    svt:stdout """ERRORS:
-ERROR: Must have at least two related elements (line 20)
-""" .
-
-svtid:result-23ecc98801b7f63a
-    a earl:TestResult ;
-    earl:info "expected='clean' actual='clean'" ;
-    earl:outcome earl:passed ;
-    svt:actual "clean" .
-
-svtid:result-36fb2b3f63c00940
-    a earl:TestResult ;
-    earl:info "actual='violated'; expected not yet settled" ;
-    earl:outcome earl:cantTell ;
-    svt:actual "violated" .
-
-svtid:result-4a927f8b5bedce26
-    a earl:TestResult ;
-    earl:info "expected='clean' actual='clean'" ;
-    earl:outcome earl:passed ;
-    svt:actual "clean" .
-
-svtid:result-9b0f99d8f8049dc6
+svtid:result-45c96972bf5d9b26
     a earl:TestResult ;
     earl:info "expected='clean' actual='violated'" ;
     earl:outcome earl:failed ;
     svt:actual "violated" .
 
-svtid:run-23ecc98801b7f63a
-    a svt:TestRun ;
-    earl:assertedBy svtid:agent-svt-cli ;
-    earl:mode earl:automatic ;
-    earl:result svtid:result-23ecc98801b7f63a ;
-    earl:subject svtid:version-26283fd33076c9d6 ;
-    earl:test svtid:testcase-redefinition-ambiguity-3plus ;
-    prov:startedAtTime "2026-09-12T20:58:40+00:00"^^xsd:dateTime ;
-    svt:hasInvocation svtid:invocation-23ecc98801b7f63a .
+svtid:result-4bd58cd9e1419ff7
+    a earl:TestResult ;
+    earl:info "expected='clean' actual='clean'" ;
+    earl:outcome earl:passed ;
+    svt:actual "clean" .
 
-svtid:run-36fb2b3f63c00940
-    a svt:TestRun ;
-    earl:assertedBy svtid:agent-svt-cli ;
-    earl:mode earl:automatic ;
-    earl:result svtid:result-36fb2b3f63c00940 ;
-    earl:subject svtid:version-26283fd33076c9d6 ;
-    earl:test svtid:testcase-end-feature-redefinition-bare ;
-    prov:startedAtTime "2026-09-12T20:58:43+00:00"^^xsd:dateTime ;
-    svt:hasInvocation svtid:invocation-36fb2b3f63c00940 .
+svtid:result-9dfe6a6dd68ddf79
+    a earl:TestResult ;
+    earl:info "expected='violated' actual='violated'" ;
+    earl:outcome earl:passed ;
+    svt:actual "violated" .
 
-svtid:run-4a927f8b5bedce26
-    a svt:TestRun ;
-    earl:assertedBy svtid:agent-svt-cli ;
-    earl:mode earl:automatic ;
-    earl:result svtid:result-4a927f8b5bedce26 ;
-    earl:subject svtid:version-26283fd33076c9d6 ;
-    earl:test svtid:testcase-redefinition-ambiguity-2 ;
-    prov:startedAtTime "2026-09-12T20:58:37+00:00"^^xsd:dateTime ;
-    svt:hasInvocation svtid:invocation-4a927f8b5bedce26 .
+svtid:result-f9e3f1d42231e1fb
+    a earl:TestResult ;
+    earl:info "expected='clean' actual='clean'" ;
+    earl:outcome earl:passed ;
+    svt:actual "clean" .
 
-svtid:run-9b0f99d8f8049dc6
+svtid:run-45c96972bf5d9b26
     a svt:TestRun ;
     earl:assertedBy svtid:agent-svt-cli ;
     earl:mode earl:automatic ;
-    earl:result svtid:result-9b0f99d8f8049dc6 ;
+    earl:result svtid:result-45c96972bf5d9b26 ;
     earl:subject svtid:version-26283fd33076c9d6 ;
     earl:test svtid:testcase-end-feature-redefinition-explicit ;
-    prov:startedAtTime "2026-09-12T20:58:45+00:00"^^xsd:dateTime ;
-    svt:hasInvocation svtid:invocation-9b0f99d8f8049dc6 .
+    prov:startedAtTime "2026-09-12T21:18:57+00:00"^^xsd:dateTime ;
+    svt:hasInvocation svtid:invocation-45c96972bf5d9b26 .
+
+svtid:run-4bd58cd9e1419ff7
+    a svt:TestRun ;
+    earl:assertedBy svtid:agent-svt-cli ;
+    earl:mode earl:automatic ;
+    earl:result svtid:result-4bd58cd9e1419ff7 ;
+    earl:subject svtid:version-26283fd33076c9d6 ;
+    earl:test svtid:testcase-redefinition-ambiguity-2 ;
+    prov:startedAtTime "2026-09-12T21:18:49+00:00"^^xsd:dateTime ;
+    svt:hasInvocation svtid:invocation-4bd58cd9e1419ff7 .
+
+svtid:run-9dfe6a6dd68ddf79
+    a svt:TestRun ;
+    earl:assertedBy svtid:agent-svt-cli ;
+    earl:mode earl:automatic ;
+    earl:result svtid:result-9dfe6a6dd68ddf79 ;
+    earl:subject svtid:version-26283fd33076c9d6 ;
+    earl:test svtid:testcase-end-feature-redefinition-bare ;
+    prov:startedAtTime "2026-09-12T21:18:54+00:00"^^xsd:dateTime ;
+    svt:hasInvocation svtid:invocation-9dfe6a6dd68ddf79 .
+
+svtid:run-f9e3f1d42231e1fb
+    a svt:TestRun ;
+    earl:assertedBy svtid:agent-svt-cli ;
+    earl:mode earl:automatic ;
+    earl:result svtid:result-f9e3f1d42231e1fb ;
+    earl:subject svtid:version-26283fd33076c9d6 ;
+    earl:test svtid:testcase-redefinition-ambiguity-3plus ;
+    prov:startedAtTime "2026-09-12T21:18:52+00:00"^^xsd:dateTime ;
+    svt:hasInvocation svtid:invocation-f9e3f1d42231e1fb .

@@ -66,6 +66,32 @@ def _run_section(row) -> str:
     return "\n".join(lines)
 
 
+def _grounding_lines(tc_iri: URIRef, ledger) -> list[str]:
+    """svt:groundedIn is multivalued and deliberately not joined into the
+    SPARQL query (same reason as hasInputFile: it would multiply rows per
+    run) -- read directly, sorted by IRI for determinism."""
+    citations = sorted(ledger.objects(tc_iri, SVT.groundedIn), key=str)
+    if not citations:
+        return ["### Grounding", "", "_none -- this is an unsupported assertion_", ""]
+
+    lines = ["### Grounding", ""]
+    for citation in citations:
+        doc = ledger.value(citation, SVT.citesDocument)
+        doc_number = ledger.value(doc, SVT.docNumber) if doc is not None else None
+        section = ledger.value(citation, SVT.section)
+        page = ledger.value(citation, SVT.page)
+        quote = ledger.value(citation, SVT.quote)
+        rationale = ledger.value(citation, SVT.rationale)
+        lines.append(f"**{section}**, p. {page} ({doc_number})")
+        lines.append("")
+        lines.append(f"> {quote}")
+        lines.append("")
+        if rationale is not None:
+            lines.append(f"*{rationale}*")
+            lines.append("")
+    return lines
+
+
 def _testcase_section(tc_iri: URIRef, rows: list, ledger) -> str:
     slug = _local_slug(tc_iri)
     first = rows[0]
@@ -78,7 +104,9 @@ def _testcase_section(tc_iri: URIRef, rows: list, ledger) -> str:
     else:
         lines.append("- **expected**: _not yet settled_")
 
-    lines += ["", "### Input", ""]
+    lines += [""]
+    lines += _grounding_lines(tc_iri, ledger)
+    lines += ["### Input", ""]
     for name in input_names:
         path = fixtures_dir / name
         content = path.read_text(encoding="utf-8") if path.exists() else "(missing on disk)"

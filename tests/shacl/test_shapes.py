@@ -20,6 +20,7 @@ EXPECTED_VIOLATIONS = {
     "testrun_missing_result": "TestRunResultShape",
     "testresult_bad_outcome": "TestResultOutcomeShape",
     "invocation_bad_digest": "InvocationInputDigestShape",
+    "citation_missing_quote": "SpecCitationQuoteShape",
 }
 
 

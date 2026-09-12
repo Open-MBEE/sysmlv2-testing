@@ -12,16 +12,57 @@ TestCase input files  ->  pinned tool for (Implementation, Version)  ->  raw std
         ->  canonical Turtle, SHACL-validated, appended to the ledger
 ```
 
-No LLM anywhere in the run/compare/log path. See `AGENTS.md` for the full
-contract.
+No LLM anywhere in the run/compare/log path. `expected` values are
+grounded in verbatim-quoted spec citations, not bare assertions — see
+`docs/design-notes.md`. See `AGENTS.md` for the full contract.
+
+## Setup
+
+Nothing below is committed to this repo (copyright, or just too large and
+binary), but two kinds of local acquisition are needed before `svt run`
+does anything real.
+
+### 1. The spec documents
+
+Cited in `sources/sources.ttl` (the citation register — committed) but
+held as gitignored PDFs under `sources/local/` (OMG copyright, not
+redistributable). Currently three; more may be added as this repo grows
+(a new release, an errata pass, a second implementation's own spec):
+
+| `svt document` id | document | where to get it |
+|---|---|---|
+| `formal-2026-03-02` | SysML v2.0 Part 1: Language Specification | https://www.omg.org/spec/SysML/2.0/ |
+| `formal-2026-03-04` | Systems Modeling API and Services v1.0 | https://www.omg.org/spec/SystemsModelingAPI/1.0/ |
+| `kerml-1.1-beta2` | Kernel Modeling Language (KerML) | https://www.omg.org/spec/KerML/ — this repo's copy is v1.1 Beta 2 (2026-07), *not* the v1.0 the March-2026 SysML spec cross-references; noted honestly in that citation's `svt:rationale` rather than assumed identical |
+
+Download your own copy of each, save it at the `svt:localPath` recorded
+for it in `sources/sources.ttl`, and confirm it's the same edition:
+`shasum -a 256 <file>` should match that record's `svt:sha256`. Register
+a new document with `svt document add` — never hand-edit
+`sources/sources.ttl`.
+
+### 2. The implementations under test
+
+| implementation | how to get it locally | env vars `svt run` needs |
+|---|---|---|
+| OpenSysML | nothing to clone — `opensysml==<version>` is a real PyPI package (a project dependency; `uv sync` installs it), and the matching `sysml-grpc` server binary is auto-fetched by `opensysml.binary.ensure_binary(...)` on first use | `OPENSYSML_VERSION` (optional — see `adapters/opensysml.py` for the default) |
+| sysml-toolkit | `toolchain/get-sysml-toolkit.sh` downloads a pinned release binary (**no PyPI wheel exists** — `pip install sysmlv2` gets an unrelated placeholder, never use it) | `SYSMLV2_BIN` (the binary), `SYSMLV2_LIB_DIR` (an OMG SysML v2 standard library directory — e.g. a `SysML-v2-Release` checkout, or `sysml-toolkit`'s own vendored `spec-refs/SysML-v2-Release/sysml.library`) |
+| Pilot Implementation | clone [`Systems-Modeling/SysML-v2-Pilot-Implementation`](https://github.com/Systems-Modeling/SysML-v2-Pilot-Implementation) yourself, then `toolchain/get-pilot-jar.sh` (**needs JDK 21 specifically** — see the script's header for why) | `PILOT_GLUE_CLASSPATH` (the script prints the value to export), `SYSML_LIBRARY_DIR` (the Pilot repo's own `sysml.library/`, trailing slash) |
+
+Once an implementation's tool is available locally, register the exact
+commit you're pinning as a `Version`
+(`svt version add --implementation <slug> --commit <full-sha> ...`)
+before running anything against it — `svt run` looks the version up by
+commit hash, not by "whatever's on PATH."
 
 ## Quick start
 
 ```bash
 uv sync
 uv run svt --help
-uv run svt verify   # SHACL gate over the whole ledger
-uv run svt report   # pass/fail/cantTell/inapplicable/untested census
+uv run svt verify           # SHACL gate over the whole ledger
+uv run svt report           # pass/fail/cantTell/inapplicable/untested census
+uv run svt view             # compile a readable Markdown report (reports/, gitignored)
 ```
 
 To ledger a new test, see
@@ -30,60 +71,76 @@ To ledger a new test, see
 ```bash
 uv run svt implementation add --name <slug> --repo <url> --language <lang>
 uv run svt version add --implementation <slug> --commit <full-git-sha>
+uv run svt document add --id <slug> --doc-number "..." --title "..." \
+  --local-path sources/local/<file>.pdf --sha256 <hex>          # if citing a new source
+uv run svt citation add --id <slug> --document <doc-id> \
+  --section "..." --page "..." --quote "..." [--rationale "..."]
 uv run svt testcase add --id <slug> --description "..." \
-  --input-file <path>... --method structural-check --expected clean
+  --input-file <path>... --method structural-check --expected clean \
+  --grounds <citation-id>
 uv run svt run --testcase <slug> --implementation <slug> --version <commit>
-uv run svt report
+uv run svt view --testcase <slug>
 ```
 
 ## What's in the ledger already
 
 Five seeded test cases (ported from real ad hoc testing — see
-`docs/design-notes.md`), run against real, pinned builds of all three
-implementations: [OpenSysML](https://github.com/Open-MBEE/OpenSysML) (Go),
+`docs/design-notes.md`), every one grounded in a verbatim-quoted spec
+citation, run against real, pinned builds of all three implementations:
+[OpenSysML](https://github.com/Open-MBEE/OpenSysML) (Go),
 [sysml-toolkit](https://github.com/Open-MBEE/sysml-toolkit) (Rust), and the
 OMG's own
 [Pilot Implementation](https://github.com/Systems-Modeling/SysML-v2-Pilot-Implementation)
 (Java, driven headlessly via `org.omg.sysml.interactive.SysMLInteractive`
-through a small Java shim, `adapters/pilot_glue/Main.java` — see
-`toolchain/get-pilot-jar.sh`, which needs **JDK 21 specifically**; JDK 26
-makes its Xtend compilation fail with ~150,000 JRE-type-resolution errors,
-a real, understood incompatibility, not a flaky build):
+through a small Java shim, `adapters/pilot_glue/Main.java`):
 
 ```
 $ uv run svt report
-passed        8
-failed        2
-cantTell      3
+passed        10
+failed        3
+cantTell      0
 inapplicable  1
 untested      0
 ```
 
 Every one of those is a real adapter run against a real pinned build —
-nothing here is a fixture standing in for a result:
+nothing here is a fixture standing in for a result, and nothing is an
+ungrounded coin flip:
 
-- One `failed` is a genuine sysml-toolkit bug: anonymous `:>>` redefinition
-  of a multi-valued reference feature becomes falsely "ambiguous" at 3+
-  occurrences (OpenSysML and the Pilot Implementation both resolve it
-  cleanly).
-- The other `failed` is the Pilot Implementation rejecting the explicit
-  `end :>> source = a;` connection-end redefinition form with "Must have
-  at least two related elements" — a case both OpenSysML and sysml-toolkit
-  accept as clean. A genuine three-way divergence, recorded as-is.
-- The `cantTell`s are an unresolved cross-tool disagreement (bare vs.
-  explicit `end`-feature redefinition) recorded honestly across all three
-  implementations, not adjudicated by guesswork.
+- sysml-toolkit `failed` on `redefinition-ambiguity-3plus`: anonymous
+  `:>>` redefinition of a multi-valued reference feature becomes falsely
+  "ambiguous" at 3+ occurrences. Grounded in KerML's
+  `Type::removeRedefinedFeatures` operation, a general set operation over
+  however many redefining memberships exist (not a pairwise fold) — both
+  other implementations resolve it cleanly, matching the spec.
+- sysml-toolkit `failed` on `end-feature-redefinition-bare`: silently
+  accepts a bare `:>> source = a;` connection-end redefinition (no `end`
+  keyword). Grounded in SysML v2.0 Part 1 §8.4.9.2's
+  `checkFeatureEndRedefinition` constraint + §8.2.2.6.2's `isEnd` grammar
+  rule — a feature only counts as an end feature when the literal `end`
+  is present, so this should be rejected. OpenSysML and the Pilot both
+  reject it correctly.
+- Pilot Implementation `failed` on `end-feature-redefinition-explicit`:
+  rejects the spec's own normative example form (`end :>> source = a;`)
+  with `"Must have at least two related elements"` — a genuine
+  Pilot-specific bug, not a harness artifact (confirmed against two
+  different input-feeding strategies).
 - The `inapplicable` is sysml-toolkit's `verify` mechanism honestly
-  reporting it can't perform a per-usage constraint evaluation.
+  reporting it can't perform a per-usage constraint evaluation (it
+  evaluates a constraint's declaration-site defaults instead).
 
-Per-implementation: `uv run svt report --implementation <slug>`.
+Per-implementation: `uv run svt report --implementation <slug>`. Read any
+test case's full detail — grounding, real input, every implementation's
+real command/exit code/complete stdout and stderr — with
+`uv run svt view --testcase <slug>`.
 
 ## Repo layout
 
 ```
-vocabulary/   the T-box: four classes, all subclassing EARL/PROV-O
+vocabulary/   the T-box: subclasses of EARL/PROV-O only, never redefines them
 shapes/       SHACL shapes gating every write (named, never anonymous)
-sources/      the two OMG spec PDFs' citation register (files gitignored)
+sources/      spec document + citation register (sources.ttl); PDFs held in sources/local/, gitignored
+queries/      the SPARQL query behind `svt view`
 ledger/       the data: implementations, test cases, fixtures, runs
 adapters/     one module per implementation + the scripted comparators
 toolchain/    pinned-binary/build scripts for implementations under test

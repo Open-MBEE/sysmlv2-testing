@@ -28,6 +28,7 @@ from .namespaces import (
     IMPLEMENTATIONS_TTL,
     PROV,
     RUNS_DIR,
+    SOURCES_TTL,
     SVT,
     SVTID,
     TESTCASES_TTL,
@@ -42,9 +43,13 @@ app = typer.Typer(help="svt — the sysmlv2-testing ledger CLI. The CLI is the o
 implementation_app = typer.Typer(help="Register implementations and their versions.")
 version_app = typer.Typer(help="Register versions and stability designations.")
 testcase_app = typer.Typer(help="Register test cases.")
+document_app = typer.Typer(help="Register spec documents (sources/sources.ttl).")
+citation_app = typer.Typer(help="Register spec citations grounding a TestCase's expected value.")
 app.add_typer(implementation_app, name="implementation")
 app.add_typer(version_app, name="version")
 app.add_typer(testcase_app, name="testcase")
+app.add_typer(document_app, name="document")
+app.add_typer(citation_app, name="citation")
 
 AGENT_IRI = URIRef(f"{SVTID}agent-svt-cli")
 METHODS = ("structural-check", "constraint-eval", "state-execution")
@@ -67,7 +72,7 @@ def _gate_and_save(modified: Graph, path: Path) -> None:
     triples — before writing anything. Nothing is written if it fails."""
     shapes = load_shapes()
     union = Graph()
-    for ttl in (IMPLEMENTATIONS_TTL, TESTCASES_TTL):
+    for ttl in (SOURCES_TTL, IMPLEMENTATIONS_TTL, TESTCASES_TTL):
         if ttl.exists() and ttl != path:
             union.parse(ttl, format="turtle")
     if RUNS_DIR.exists():
@@ -161,6 +166,77 @@ def version_set_stable(
     typer.echo(str(designation_iri))
 
 
+@document_app.command("add")
+def document_add(
+    id_: str = typer.Option(..., "--id", help="slug, e.g. formal-2026-03-02"),
+    doc_number: str = typer.Option(
+        ..., "--doc-number", help="exactly as printed on the document's own cover page"
+    ),
+    title: str = typer.Option(..., "--title"),
+    local_path: str = typer.Option(..., "--local-path"),
+    sha256: str = typer.Option(..., "--sha256"),
+) -> None:
+    g = load_graph(SOURCES_TTL)
+    iri = ids.slug_id("spec", id_)
+    g.add((iri, RDF.type, SVT.SpecDocument))
+    g.add((iri, RDFS.label, Literal(title)))
+    g.add((iri, SVT.docNumber, Literal(doc_number)))
+    g.add((iri, SVT.localPath, Literal(local_path)))
+    g.add((iri, SVT.sha256, Literal(sha256)))
+    _gate_and_save(g, SOURCES_TTL)
+    typer.echo(str(iri))
+
+
+@citation_app.command("add")
+def citation_add(
+    id_: str = typer.Option(..., "--id"),
+    document: str = typer.Option(..., "--document", help="the spec document's --id"),
+    section: str = typer.Option(..., "--section"),
+    page: str = typer.Option(..., "--page"),
+    quote: str = typer.Option(..., "--quote", help="verbatim -- never paraphrased"),
+    rationale: Optional[str] = typer.Option(None, "--rationale"),
+) -> None:
+    doc_iri = ids.slug_id("spec", document)
+    existing = load_graph(SOURCES_TTL)
+    if (doc_iri, RDF.type, SVT.SpecDocument) not in existing:
+        typer.echo(
+            f"error: unknown document {document!r} (register it first with `svt document add`)",
+            err=True,
+        )
+        raise typer.Exit(2)
+    g = load_graph(SOURCES_TTL)
+    iri = ids.slug_id("citation", id_)
+    g.add((iri, RDF.type, SVT.SpecCitation))
+    g.add((iri, SVT.citesDocument, doc_iri))
+    g.add((iri, SVT.section, Literal(section)))
+    g.add((iri, SVT.page, Literal(page)))
+    g.add((iri, SVT.quote, Literal(quote)))
+    if rationale is not None:
+        g.add((iri, SVT.rationale, Literal(rationale)))
+    _gate_and_save(g, SOURCES_TTL)
+    typer.echo(str(iri))
+
+
+def _resolved_citation_iris(grounds: List[str]) -> List[URIRef]:
+    """Every --grounds id must already exist as a svt:SpecCitation -- a
+    dangling citation reference is worse than no citation at all."""
+    if not grounds:
+        return []
+    sources = load_graph(SOURCES_TTL)
+    iris = []
+    for citation_id in grounds:
+        iri = ids.slug_id("citation", citation_id)
+        if (iri, RDF.type, SVT.SpecCitation) not in sources:
+            typer.echo(
+                f"error: unknown citation {citation_id!r} "
+                "(register it first with `svt citation add`)",
+                err=True,
+            )
+            raise typer.Exit(2)
+        iris.append(iri)
+    return iris
+
+
 @testcase_app.command("add")
 def testcase_add(
     id_: str = typer.Option(..., "--id"),
@@ -170,10 +246,14 @@ def testcase_add(
     expected: Optional[str] = typer.Option(None, "--expected"),
     eval_expression: Optional[str] = typer.Option(None, "--eval-expression"),
     eval_subject: Optional[str] = typer.Option(None, "--eval-subject"),
+    grounds: List[str] = typer.Option(
+        [], "--grounds", help="a svt:SpecCitation --id backing --expected; repeatable"
+    ),
 ) -> None:
     if method not in METHODS:
         typer.echo(f"error: --method must be one of {', '.join(METHODS)}", err=True)
         raise typer.Exit(2)
+    citation_iris = _resolved_citation_iris(grounds)
     g = load_graph(TESTCASES_TTL)
     iri = ids.slug_id("testcase", id_)
     g.add((iri, RDF.type, SVT.TestCase))
@@ -185,6 +265,8 @@ def testcase_add(
         g.add((iri, SVT.evalExpression, Literal(eval_expression)))
     if eval_subject is not None:
         g.add((iri, SVT.evalSubject, Literal(eval_subject)))
+    for citation_iri in citation_iris:
+        g.add((iri, SVT.groundedIn, citation_iri))
 
     fixtures_dir = fixtures_dir_for(id_)
     fixtures_dir.mkdir(parents=True, exist_ok=True)
@@ -192,6 +274,67 @@ def testcase_add(
         dest = fixtures_dir / src.name
         dest.write_bytes(src.read_bytes())
         g.add((iri, SVT.hasInputFile, Literal(src.name)))
+    _gate_and_save(g, TESTCASES_TTL)
+    typer.echo(str(iri))
+
+
+@testcase_app.command("ground")
+def testcase_ground(
+    id_: str = typer.Option(..., "--id"),
+    grounds: List[str] = typer.Option(
+        ..., "--grounds", help="a svt:SpecCitation --id; repeatable"
+    ),
+) -> None:
+    """Append svt:groundedIn citations to an existing TestCase (there is no
+    `testcase add` update path, and re-adding would duplicate fixtures)."""
+    citation_iris = _resolved_citation_iris(grounds)
+    g = load_graph(TESTCASES_TTL)
+    iri = ids.slug_id("testcase", id_)
+    if (iri, RDF.type, SVT.TestCase) not in g:
+        typer.echo(f"error: unknown testcase {id_!r}", err=True)
+        raise typer.Exit(2)
+    for citation_iri in citation_iris:
+        g.add((iri, SVT.groundedIn, citation_iri))
+    _gate_and_save(g, TESTCASES_TTL)
+    typer.echo(str(iri))
+
+
+@testcase_app.command("set-description")
+def testcase_set_description(
+    id_: str = typer.Option(..., "--id"),
+    description: str = typer.Option(..., "--description"),
+) -> None:
+    """Correct a TestCase's svt:description in place -- e.g. once grounding
+    settles a claim the original prose called unresolved."""
+    g = load_graph(TESTCASES_TTL)
+    iri = ids.slug_id("testcase", id_)
+    if (iri, RDF.type, SVT.TestCase) not in g:
+        typer.echo(f"error: unknown testcase {id_!r}", err=True)
+        raise typer.Exit(2)
+    g.remove((iri, SVT.description, None))
+    g.add((iri, SVT.description, Literal(description)))
+    _gate_and_save(g, TESTCASES_TTL)
+    typer.echo(str(iri))
+
+
+@testcase_app.command("set-expected")
+def testcase_set_expected(
+    id_: str = typer.Option(..., "--id"),
+    expected: str = typer.Option(..., "--expected"),
+) -> None:
+    """Correct a TestCase's svt:expected in place (remove-then-add on that
+    one predicate). Unlike `version set-stable`, this is not meant to
+    preserve history -- it's fixing a claim that was wrong, e.g. once a
+    real spec citation settles what should have been asserted all along.
+    Existing TestRuns against this TestCase are computed under the old
+    value and become stale; regenerate them (see AGENTS.md)."""
+    g = load_graph(TESTCASES_TTL)
+    iri = ids.slug_id("testcase", id_)
+    if (iri, RDF.type, SVT.TestCase) not in g:
+        typer.echo(f"error: unknown testcase {id_!r}", err=True)
+        raise typer.Exit(2)
+    g.remove((iri, SVT.expected, None))
+    g.add((iri, SVT.expected, Literal(expected)))
     _gate_and_save(g, TESTCASES_TTL)
     typer.echo(str(iri))
 

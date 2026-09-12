@@ -34,3 +34,10 @@ def test_render_report_includes_real_input_and_raw_output_not_just_a_verdict():
 def test_unknown_testcase_yields_no_matching_section():
     report = render_report("not-a-real-testcase-id")
     assert "no matching test case found" in report
+
+
+def test_report_shows_the_grounding_not_just_a_bare_expected_value():
+    report = render_report("redefinition-ambiguity-3plus")
+    assert "### Grounding" in report
+    # the verbatim quote, not just a citation ID or page number
+    assert "removeRedefinedFeatures" in report

@@ -6,7 +6,8 @@ svt:TestCaseShape a sh:NodeShape ;
     sh:targetClass svt:TestCase ;
     sh:property svt:TestCaseDescriptionShape, svt:TestCaseHasInputFileShape,
         svt:TestCaseMethodShape, svt:TestCaseExpectedShape,
-        svt:TestCaseEvalExpressionShape, svt:TestCaseEvalSubjectShape .
+        svt:TestCaseEvalExpressionShape, svt:TestCaseEvalSubjectShape,
+        svt:TestCaseGroundedInShape .
 
 svt:TestCaseDescriptionShape a sh:PropertyShape ;
     sh:path svt:description ;
@@ -43,3 +44,9 @@ svt:TestCaseEvalSubjectShape a sh:PropertyShape ;
     sh:path svt:evalSubject ;
     sh:maxCount 1 ;
     sh:datatype xsd:string .
+
+svt:TestCaseGroundedInShape a sh:PropertyShape ;
+    sh:path svt:groundedIn ;
+    sh:nodeKind sh:IRI ;
+    sh:class svt:SpecCitation ;
+    sh:message "svt:groundedIn, when present, must point at a svt:SpecCitation (multivalued -- a claim can need more than one excerpt)" .

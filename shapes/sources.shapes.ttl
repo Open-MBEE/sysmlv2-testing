@@ -1,0 +1,70 @@
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix svt: <https://w3id.org/sysmlv2-testing#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+svt:SpecDocumentShape a sh:NodeShape ;
+    sh:targetClass svt:SpecDocument ;
+    sh:property svt:SpecDocumentDocNumberShape, svt:SpecDocumentSha256Shape,
+        svt:SpecDocumentLocalPathShape .
+
+svt:SpecDocumentDocNumberShape a sh:PropertyShape ;
+    sh:path svt:docNumber ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+    sh:message "a SpecDocument must have exactly one svt:docNumber" .
+
+svt:SpecDocumentSha256Shape a sh:PropertyShape ;
+    sh:path svt:sha256 ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+    sh:pattern "^[0-9a-f]{64}$" ;
+    sh:message "svt:sha256 must be a lowercase-hex sha256 (64 chars), required and exactly one" .
+
+svt:SpecDocumentLocalPathShape a sh:PropertyShape ;
+    sh:path svt:localPath ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+    sh:message "a SpecDocument must have exactly one svt:localPath" .
+
+svt:SpecCitationShape a sh:NodeShape ;
+    sh:targetClass svt:SpecCitation ;
+    sh:property svt:SpecCitationCitesDocumentShape, svt:SpecCitationSectionShape,
+        svt:SpecCitationPageShape, svt:SpecCitationQuoteShape, svt:SpecCitationRationaleShape .
+
+svt:SpecCitationCitesDocumentShape a sh:PropertyShape ;
+    sh:path svt:citesDocument ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:nodeKind sh:IRI ;
+    sh:class svt:SpecDocument ;
+    sh:message "a SpecCitation must cite exactly one svt:SpecDocument" .
+
+svt:SpecCitationSectionShape a sh:PropertyShape ;
+    sh:path svt:section ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+    sh:message "a SpecCitation must have exactly one svt:section" .
+
+svt:SpecCitationPageShape a sh:PropertyShape ;
+    sh:path svt:page ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+    sh:message "a SpecCitation must have exactly one svt:page" .
+
+svt:SpecCitationQuoteShape a sh:PropertyShape ;
+    sh:path svt:quote ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+    sh:message "a SpecCitation must have exactly one svt:quote (the verbatim cited text)" .
+
+svt:SpecCitationRationaleShape a sh:PropertyShape ;
+    sh:path svt:rationale ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+    sh:message "svt:rationale, when present, must be a single literal" .

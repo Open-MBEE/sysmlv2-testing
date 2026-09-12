@@ -151,12 +151,14 @@ svt:evalSubject a owl:DatatypeProperty ;
 
 svt:groundedIn a owl:ObjectProperty ;
     rdfs:domain svt:TestCase ;
+    rdfs:range svt:SpecCitation ;
     rdfs:label "grounded in" ;
-    rdfs:comment "Optional link to a citation record in sources/sources.ttl backing this test case's expected value." .
+    rdfs:comment "Multivalued: the SpecCitation(s) backing this TestCase's svt:expected value. A TestCase with no groundedIn is an unsupported assertion -- ground it or leave expected unset (which mechanically records cantTell, never a guess dressed up as a claim)." .
 
 #################################################################
-# svt:SpecDocument — the sources register (sources/sources.ttl). Held
-# locally (sources/local/, gitignored); this record is what's committed.
+# svt:SpecDocument, svt:SpecCitation — the sources register
+# (sources/sources.ttl). The PDFs themselves are held locally
+# (sources/local/, gitignored); these records are what's committed.
 #################################################################
 
 svt:SpecDocument a owl:Class ;
@@ -168,7 +170,7 @@ svt:docNumber a owl:DatatypeProperty ;
     rdfs:domain svt:SpecDocument ;
     rdfs:range xsd:string ;
     rdfs:label "doc number" ;
-    rdfs:comment "The OMG formal document number, e.g. \"formal/26-03-02\"." .
+    rdfs:comment "The OMG formal document number, exactly as printed on the document's own cover page, e.g. \"formal/2026-03-02\" -- verify against the PDF, don't guess the format." .
 
 svt:sha256 a owl:DatatypeProperty ;
     rdfs:domain svt:SpecDocument ;
@@ -180,6 +182,40 @@ svt:localPath a owl:DatatypeProperty ;
     rdfs:range xsd:string ;
     rdfs:label "local path" ;
     rdfs:comment "Path under sources/local/ where this file lives once fetched — gitignored, not committed." .
+
+svt:SpecCitation a owl:Class ;
+    rdfs:subClassOf prov:Entity ;
+    rdfs:label "Spec citation" ;
+    rdfs:comment "One verbatim excerpt of a SpecDocument, cited to ground a TestCase's svt:expected value. The quote is materialized here (not just a page reference) so the grounding is inspectable without re-opening the PDF -- same verbatim-canon-in-the-model discipline as cds and og-caie-spec." .
+
+svt:citesDocument a owl:ObjectProperty ;
+    rdfs:domain svt:SpecCitation ;
+    rdfs:range svt:SpecDocument ;
+    rdfs:label "cites document" .
+
+svt:section a owl:DatatypeProperty ;
+    rdfs:domain svt:SpecCitation ;
+    rdfs:range xsd:string ;
+    rdfs:label "section" ;
+    rdfs:comment "The cited document's own section number and title, e.g. \"8.4.9.2 Connection Usages\"." .
+
+svt:page a owl:DatatypeProperty ;
+    rdfs:domain svt:SpecCitation ;
+    rdfs:range xsd:string ;
+    rdfs:label "page" ;
+    rdfs:comment "The document's own printed page number(s), e.g. \"412-413\" -- not the PDF's physical page index, which can differ because of front matter." .
+
+svt:quote a owl:DatatypeProperty ;
+    rdfs:domain svt:SpecCitation ;
+    rdfs:range xsd:string ;
+    rdfs:label "quote" ;
+    rdfs:comment "The verbatim cited text. Never paraphrased." .
+
+svt:rationale a owl:DatatypeProperty ;
+    rdfs:domain svt:SpecCitation ;
+    rdfs:range xsd:string ;
+    rdfs:label "rationale" ;
+    rdfs:comment "Optional: connecting reasoning from the quote to the TestCase's expected value, used only when the quote alone doesn't state it outright (e.g. combining two rules, or an honest caveat about what the local sources do and don't settle). Never used to paper over a citation that isn't really there." .
 
 #################################################################
 # svt:TestRun

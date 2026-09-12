@@ -19,6 +19,7 @@ from .namespaces import (
     PREFIXES,
     RUNS_DIR,
     SHAPES_DIR,
+    SOURCES_TTL,
     TESTCASES_TTL,
     VOCABULARY_DIR,
 )
@@ -52,10 +53,11 @@ def load_shapes() -> Graph:
 
 
 def load_full_ledger() -> Graph:
-    """Every triple the ledger currently holds: implementations, test cases,
-    and every implementation's recorded runs."""
+    """Every triple the ledger currently holds: sources (spec documents +
+    citations), implementations, test cases, and every implementation's
+    recorded runs."""
     g = Graph()
-    for ttl in (IMPLEMENTATIONS_TTL, TESTCASES_TTL):
+    for ttl in (SOURCES_TTL, IMPLEMENTATIONS_TTL, TESTCASES_TTL):
         if ttl.exists():
             g.parse(ttl, format="turtle")
     if RUNS_DIR.exists():

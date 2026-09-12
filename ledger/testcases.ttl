@@ -11,13 +11,17 @@ svtid:testcase-constraint-eval-declaration-site
     svt:evalExpression "source.controlled and target.controlled" ;
     svt:evalSubject "Usage::l" ;
     svt:expected "false" ;
+    svt:groundedIn svtid:citation-assert-constraint-per-usage-evaluation ;
     svt:hasInputFile "lib.sysml",
         "usage.sysml" ;
     svt:method "constraint-eval" .
 
 svtid:testcase-end-feature-redefinition-bare
     a svt:TestCase ;
-    svt:description "Bare ':>> source'/':>> target' redefinition of a connection's end feature (no explicit 'end' keyword). Whether this is legal SysML v2 is not yet settled between implementations -- left ungrounded on purpose." ;
+    svt:description "Bare ':>> source'/':>> target' redefinition of a connection's end feature (no explicit 'end' keyword). Grounded: SysML v2.0 Part 1 s8.4.9.2's checkFeatureEndRedefinition constraint plus the isEnd grammar rule (s8.2.2.6.2) require the literal 'end' keyword on a feature that redefines an end feature -- this form should be rejected." ;
+    svt:expected "violated" ;
+    svt:groundedIn svtid:citation-check-feature-end-redefinition,
+        svtid:citation-end-usage-prefix-grammar ;
     svt:hasInputFile "lib.sysml",
         "usage-bare-noncompliant.sysml" ;
     svt:method "structural-check" .
@@ -26,6 +30,8 @@ svtid:testcase-end-feature-redefinition-explicit
     a svt:TestCase ;
     svt:description "Explicit 'end :>> source'/'end :>> target' redefinition of a connection's end feature -- the uncontroversial, portable form." ;
     svt:expected "clean" ;
+    svt:groundedIn svtid:citation-check-feature-end-redefinition,
+        svtid:citation-end-usage-prefix-grammar ;
     svt:hasInputFile "lib.sysml",
         "usage-end-portable.sysml" ;
     svt:method "structural-check" .
@@ -34,6 +40,7 @@ svtid:testcase-redefinition-ambiguity-2
     a svt:TestCase ;
     svt:description "Two anonymous ':>> items' redefinitions of a multi-valued reference feature should both resolve to the inherited base feature Container::items." ;
     svt:expected "clean" ;
+    svt:groundedIn svtid:citation-remove-redefined-features ;
     svt:hasInputFile "lib.sysml",
         "usage-two-ok.sysml" ;
     svt:method "structural-check" .
@@ -42,6 +49,7 @@ svtid:testcase-redefinition-ambiguity-3plus
     a svt:TestCase ;
     svt:description "Three anonymous ':>> items' redefinitions of a multi-valued reference feature should all resolve to the inherited base feature Container::items, same as with two -- sibling count should not matter." ;
     svt:expected "clean" ;
+    svt:groundedIn svtid:citation-remove-redefined-features ;
     svt:hasInputFile "lib.sysml",
         "usage-three-ambiguous.sysml" ;
     svt:method "structural-check" .

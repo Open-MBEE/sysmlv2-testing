@@ -10,45 +10,27 @@ svtid:agent-svt-cli
         prov:SoftwareAgent ;
     rdfs:label "sysmlv2-testing CLI (svt)" .
 
-svtid:invocation-18be1bba0b588a9c
+svtid:invocation-4f6aa0fb2bc3df1f
     a svt:Invocation ;
-    prov:startedAtTime "2026-09-12T20:58:26+00:00"^^xsd:dateTime ;
-    svt:command "/Users/z/Documents/GitHub/sysml-toolkit/target/release/sysmlv2 check --lib /Users/z/Documents/GitHub/sysml-toolkit/spec-refs/SysML-v2-Release/sysml.library --strict /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/redefinition-ambiguity-2/lib.sysml /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/redefinition-ambiguity-2/usage-two-ok.sysml" ;
-    svt:exitCode "0"^^xsd:integer ;
-    svt:inputDigest "dd8e5e69f050f6548c2e6e2e7cb21b17e84b79019c80fd3ffacb29d95c05e35a" ;
-    svt:stderr "" ;
-    svt:stdout "" .
-
-svtid:invocation-676591fd0a82da3b
-    a svt:Invocation ;
-    prov:startedAtTime "2026-09-12T20:58:27+00:00"^^xsd:dateTime ;
-    svt:command "/Users/z/Documents/GitHub/sysml-toolkit/target/release/sysmlv2 check --lib /Users/z/Documents/GitHub/sysml-toolkit/spec-refs/SysML-v2-Release/sysml.library --strict /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/end-feature-redefinition-bare/lib.sysml /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/end-feature-redefinition-bare/usage-bare-noncompliant.sysml" ;
-    svt:exitCode "0"^^xsd:integer ;
-    svt:inputDigest "dbe9caa07da73db2bb98c4e975eff68668bc8f26da33146eb367cb38f3a77fae" ;
-    svt:stderr "" ;
-    svt:stdout "" .
-
-svtid:invocation-7a054db1f9dabe91
-    a svt:Invocation ;
-    prov:startedAtTime "2026-09-12T20:58:28+00:00"^^xsd:dateTime ;
+    prov:startedAtTime "2026-09-12T21:18:34+00:00"^^xsd:dateTime ;
     svt:command "(unsupported)" ;
     svt:exitCode "-1"^^xsd:integer ;
     svt:inputDigest "bba86b0291f9536718ccec38a52c692089862f2cfb5a24dd31ec4dc5adce9903" ;
     svt:stderr "sysml-toolkit has no working constraint-eval mechanism (see ISSUES-PROPOSED.md #1: verify/query evaluate a constraint's declaration-site defaults, not a usage's actual bindings)" ;
     svt:stdout "" .
 
-svtid:invocation-ecee6b608a3ac6dc
+svtid:invocation-968932ee86faa164
     a svt:Invocation ;
-    prov:startedAtTime "2026-09-12T20:58:27+00:00"^^xsd:dateTime ;
-    svt:command "/Users/z/Documents/GitHub/sysml-toolkit/target/release/sysmlv2 check --lib /Users/z/Documents/GitHub/sysml-toolkit/spec-refs/SysML-v2-Release/sysml.library --strict /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/end-feature-redefinition-explicit/lib.sysml /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/end-feature-redefinition-explicit/usage-end-portable.sysml" ;
+    prov:startedAtTime "2026-09-12T21:18:32+00:00"^^xsd:dateTime ;
+    svt:command "/Users/z/Documents/GitHub/sysml-toolkit/target/release/sysmlv2 check --lib /Users/z/Documents/GitHub/sysml-toolkit/spec-refs/SysML-v2-Release/sysml.library --strict /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/redefinition-ambiguity-2/lib.sysml /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/redefinition-ambiguity-2/usage-two-ok.sysml" ;
     svt:exitCode "0"^^xsd:integer ;
-    svt:inputDigest "9e0a09962391872bdfc341fc7f17a4e3cfed1a5c736d3b50a1318d49072f405c" ;
+    svt:inputDigest "dd8e5e69f050f6548c2e6e2e7cb21b17e84b79019c80fd3ffacb29d95c05e35a" ;
     svt:stderr "" ;
     svt:stdout "" .
 
-svtid:invocation-ede642c95526f460
+svtid:invocation-a8a1ca16a95a2126
     a svt:Invocation ;
-    prov:startedAtTime "2026-09-12T20:58:26+00:00"^^xsd:dateTime ;
+    prov:startedAtTime "2026-09-12T21:18:33+00:00"^^xsd:dateTime ;
     svt:command "/Users/z/Documents/GitHub/sysml-toolkit/target/release/sysmlv2 check --lib /Users/z/Documents/GitHub/sysml-toolkit/spec-refs/SysML-v2-Release/sysml.library --strict /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/redefinition-ambiguity-3plus/lib.sysml /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/redefinition-ambiguity-3plus/usage-three-ambiguous.sysml" ;
     svt:exitCode "1"^^xsd:integer ;
     svt:inputDigest "918e05e1bc6e884e0ccd7463547e4d4fe50086c280ee5e28f5b37c0b614711ca" ;
@@ -71,81 +53,99 @@ error: ambiguous reference `items` resolves to multiple memberships
 """ ;
     svt:stdout "" .
 
-svtid:result-18be1bba0b588a9c
-    a earl:TestResult ;
-    earl:info "expected='clean' actual='clean'" ;
-    earl:outcome earl:passed ;
-    svt:actual "clean" .
+svtid:invocation-ef17eab2e438270f
+    a svt:Invocation ;
+    prov:startedAtTime "2026-09-12T21:18:34+00:00"^^xsd:dateTime ;
+    svt:command "/Users/z/Documents/GitHub/sysml-toolkit/target/release/sysmlv2 check --lib /Users/z/Documents/GitHub/sysml-toolkit/spec-refs/SysML-v2-Release/sysml.library --strict /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/end-feature-redefinition-explicit/lib.sysml /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/end-feature-redefinition-explicit/usage-end-portable.sysml" ;
+    svt:exitCode "0"^^xsd:integer ;
+    svt:inputDigest "9e0a09962391872bdfc341fc7f17a4e3cfed1a5c736d3b50a1318d49072f405c" ;
+    svt:stderr "" ;
+    svt:stdout "" .
 
-svtid:result-676591fd0a82da3b
-    a earl:TestResult ;
-    earl:info "actual='clean'; expected not yet settled" ;
-    earl:outcome earl:cantTell ;
-    svt:actual "clean" .
+svtid:invocation-f19dbd0d109d687e
+    a svt:Invocation ;
+    prov:startedAtTime "2026-09-12T21:18:33+00:00"^^xsd:dateTime ;
+    svt:command "/Users/z/Documents/GitHub/sysml-toolkit/target/release/sysmlv2 check --lib /Users/z/Documents/GitHub/sysml-toolkit/spec-refs/SysML-v2-Release/sysml.library --strict /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/end-feature-redefinition-bare/lib.sysml /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/end-feature-redefinition-bare/usage-bare-noncompliant.sysml" ;
+    svt:exitCode "0"^^xsd:integer ;
+    svt:inputDigest "dbe9caa07da73db2bb98c4e975eff68668bc8f26da33146eb367cb38f3a77fae" ;
+    svt:stderr "" ;
+    svt:stdout "" .
 
-svtid:result-7a054db1f9dabe91
+svtid:result-4f6aa0fb2bc3df1f
     a earl:TestResult ;
     earl:info "sysml-toolkit has no working constraint-eval mechanism (see ISSUES-PROPOSED.md #1: verify/query evaluate a constraint's declaration-site defaults, not a usage's actual bindings)" ;
     earl:outcome earl:inapplicable .
 
-svtid:result-ecee6b608a3ac6dc
+svtid:result-968932ee86faa164
     a earl:TestResult ;
     earl:info "expected='clean' actual='clean'" ;
     earl:outcome earl:passed ;
     svt:actual "clean" .
 
-svtid:result-ede642c95526f460
+svtid:result-a8a1ca16a95a2126
     a earl:TestResult ;
     earl:info "expected='clean' actual='violated'" ;
     earl:outcome earl:failed ;
     svt:actual "violated" .
 
-svtid:run-18be1bba0b588a9c
-    a svt:TestRun ;
-    earl:assertedBy svtid:agent-svt-cli ;
-    earl:mode earl:automatic ;
-    earl:result svtid:result-18be1bba0b588a9c ;
-    earl:subject svtid:version-cdc8cdb3385265b0 ;
-    earl:test svtid:testcase-redefinition-ambiguity-2 ;
-    prov:startedAtTime "2026-09-12T20:58:26+00:00"^^xsd:dateTime ;
-    svt:hasInvocation svtid:invocation-18be1bba0b588a9c .
+svtid:result-ef17eab2e438270f
+    a earl:TestResult ;
+    earl:info "expected='clean' actual='clean'" ;
+    earl:outcome earl:passed ;
+    svt:actual "clean" .
 
-svtid:run-676591fd0a82da3b
-    a svt:TestRun ;
-    earl:assertedBy svtid:agent-svt-cli ;
-    earl:mode earl:automatic ;
-    earl:result svtid:result-676591fd0a82da3b ;
-    earl:subject svtid:version-cdc8cdb3385265b0 ;
-    earl:test svtid:testcase-end-feature-redefinition-bare ;
-    prov:startedAtTime "2026-09-12T20:58:27+00:00"^^xsd:dateTime ;
-    svt:hasInvocation svtid:invocation-676591fd0a82da3b .
+svtid:result-f19dbd0d109d687e
+    a earl:TestResult ;
+    earl:info "expected='violated' actual='clean'" ;
+    earl:outcome earl:failed ;
+    svt:actual "clean" .
 
-svtid:run-7a054db1f9dabe91
+svtid:run-4f6aa0fb2bc3df1f
     a svt:TestRun ;
     earl:assertedBy svtid:agent-svt-cli ;
     earl:mode earl:automatic ;
-    earl:result svtid:result-7a054db1f9dabe91 ;
+    earl:result svtid:result-4f6aa0fb2bc3df1f ;
     earl:subject svtid:version-cdc8cdb3385265b0 ;
     earl:test svtid:testcase-constraint-eval-declaration-site ;
-    prov:startedAtTime "2026-09-12T20:58:28+00:00"^^xsd:dateTime ;
-    svt:hasInvocation svtid:invocation-7a054db1f9dabe91 .
+    prov:startedAtTime "2026-09-12T21:18:34+00:00"^^xsd:dateTime ;
+    svt:hasInvocation svtid:invocation-4f6aa0fb2bc3df1f .
 
-svtid:run-ecee6b608a3ac6dc
+svtid:run-968932ee86faa164
     a svt:TestRun ;
     earl:assertedBy svtid:agent-svt-cli ;
     earl:mode earl:automatic ;
-    earl:result svtid:result-ecee6b608a3ac6dc ;
+    earl:result svtid:result-968932ee86faa164 ;
     earl:subject svtid:version-cdc8cdb3385265b0 ;
-    earl:test svtid:testcase-end-feature-redefinition-explicit ;
-    prov:startedAtTime "2026-09-12T20:58:27+00:00"^^xsd:dateTime ;
-    svt:hasInvocation svtid:invocation-ecee6b608a3ac6dc .
+    earl:test svtid:testcase-redefinition-ambiguity-2 ;
+    prov:startedAtTime "2026-09-12T21:18:32+00:00"^^xsd:dateTime ;
+    svt:hasInvocation svtid:invocation-968932ee86faa164 .
 
-svtid:run-ede642c95526f460
+svtid:run-a8a1ca16a95a2126
     a svt:TestRun ;
     earl:assertedBy svtid:agent-svt-cli ;
     earl:mode earl:automatic ;
-    earl:result svtid:result-ede642c95526f460 ;
+    earl:result svtid:result-a8a1ca16a95a2126 ;
     earl:subject svtid:version-cdc8cdb3385265b0 ;
     earl:test svtid:testcase-redefinition-ambiguity-3plus ;
-    prov:startedAtTime "2026-09-12T20:58:26+00:00"^^xsd:dateTime ;
-    svt:hasInvocation svtid:invocation-ede642c95526f460 .
+    prov:startedAtTime "2026-09-12T21:18:33+00:00"^^xsd:dateTime ;
+    svt:hasInvocation svtid:invocation-a8a1ca16a95a2126 .
+
+svtid:run-ef17eab2e438270f
+    a svt:TestRun ;
+    earl:assertedBy svtid:agent-svt-cli ;
+    earl:mode earl:automatic ;
+    earl:result svtid:result-ef17eab2e438270f ;
+    earl:subject svtid:version-cdc8cdb3385265b0 ;
+    earl:test svtid:testcase-end-feature-redefinition-explicit ;
+    prov:startedAtTime "2026-09-12T21:18:34+00:00"^^xsd:dateTime ;
+    svt:hasInvocation svtid:invocation-ef17eab2e438270f .
+
+svtid:run-f19dbd0d109d687e
+    a svt:TestRun ;
+    earl:assertedBy svtid:agent-svt-cli ;
+    earl:mode earl:automatic ;
+    earl:result svtid:result-f19dbd0d109d687e ;
+    earl:subject svtid:version-cdc8cdb3385265b0 ;
+    earl:test svtid:testcase-end-feature-redefinition-bare ;
+    prov:startedAtTime "2026-09-12T21:18:33+00:00"^^xsd:dateTime ;
+    svt:hasInvocation svtid:invocation-f19dbd0d109d687e .

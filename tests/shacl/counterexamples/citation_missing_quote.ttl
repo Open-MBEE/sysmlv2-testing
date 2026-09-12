@@ -1,0 +1,13 @@
+@prefix svt: <https://w3id.org/sysmlv2-testing#> .
+@prefix svtid: <https://w3id.org/sysmlv2-testing/id/> .
+
+svtid:spec-ok a svt:SpecDocument ;
+    svt:docNumber "formal/0000-00-00" ;
+    svt:localPath "sources/local/ok.pdf" ;
+    svt:sha256 "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855" .
+
+svtid:citation-broken a svt:SpecCitation ;
+    svt:citesDocument svtid:spec-ok ;
+    svt:section "1 Ok" ;
+    svt:page "1" .
+# missing svt:quote -- violates svt:SpecCitationShape
