@@ -10,120 +10,130 @@ svtid:agent-svt-cli
         prov:SoftwareAgent ;
     rdfs:label "sysmlv2-testing CLI (svt)" .
 
-svtid:invocation-7782cc4470cbe486
+svtid:invocation-0af5fdef5710f6de
     a svt:Invocation ;
-    prov:startedAtTime "2026-09-12T20:28:56+00:00"^^xsd:dateTime ;
+    prov:startedAtTime "2026-09-12T20:58:29+00:00"^^xsd:dateTime ;
     svt:command "Connection.load_from_content(<input files>, strict=False)" ;
-    svt:exitCode "0"^^xsd:integer .
+    svt:exitCode "1"^^xsd:integer ;
+    svt:inputDigest "dbe9caa07da73db2bb98c4e975eff68668bc8f26da33146eb367cb38f3a77fae" ;
+    svt:stderr """error <content>:21:9-21:16: Redefining feature must be an end feature
+warning <content>:21:9-21:15: Duplicate of inherited member name 'source' from BinaryConnection
+error <content>:22:9-22:16: Redefining feature must be an end feature
+warning <content>:22:9-22:15: Duplicate of inherited member name 'target' from BinaryConnection""" ;
+    svt:stdout "" .
 
-svtid:invocation-8ac4e25783dc3168
+svtid:invocation-2267dc4996029516
     a svt:Invocation ;
-    prov:startedAtTime "2026-09-12T20:28:56+00:00"^^xsd:dateTime ;
+    prov:startedAtTime "2026-09-12T20:58:29+00:00"^^xsd:dateTime ;
     svt:command "Connection.load_from_content(<input files>, strict=False)" ;
-    svt:exitCode "0"^^xsd:integer .
+    svt:exitCode "0"^^xsd:integer ;
+    svt:inputDigest "9e0a09962391872bdfc341fc7f17a4e3cfed1a5c736d3b50a1318d49072f405c" ;
+    svt:stderr "" ;
+    svt:stdout "clean" .
 
-svtid:invocation-cc5b8fcfac9b1eb4
+svtid:invocation-b87ed3850ba0372d
     a svt:Invocation ;
-    prov:startedAtTime "2026-09-12T20:28:57+00:00"^^xsd:dateTime ;
+    prov:startedAtTime "2026-09-12T20:58:28+00:00"^^xsd:dateTime ;
     svt:command "Connection.load_from_content(<input files>, strict=False)" ;
-    svt:exitCode "1"^^xsd:integer .
+    svt:exitCode "0"^^xsd:integer ;
+    svt:inputDigest "918e05e1bc6e884e0ccd7463547e4d4fe50086c280ee5e28f5b37c0b614711ca" ;
+    svt:stderr "" ;
+    svt:stdout "clean" .
 
-svtid:invocation-f52c77c63fbcdada
+svtid:invocation-e28d2429ab60f954
     a svt:Invocation ;
-    prov:startedAtTime "2026-09-12T20:28:58+00:00"^^xsd:dateTime ;
+    prov:startedAtTime "2026-09-12T20:58:28+00:00"^^xsd:dateTime ;
+    svt:command "Connection.load_from_content(<input files>, strict=False)" ;
+    svt:exitCode "0"^^xsd:integer ;
+    svt:inputDigest "dd8e5e69f050f6548c2e6e2e7cb21b17e84b79019c80fd3ffacb29d95c05e35a" ;
+    svt:stderr "" ;
+    svt:stdout "clean" .
+
+svtid:invocation-e757d3a6676ea655
+    a svt:Invocation ;
+    prov:startedAtTime "2026-09-12T20:58:30+00:00"^^xsd:dateTime ;
     svt:command "Model.eval('source.controlled and target.controlled', subject='Usage::l')" ;
-    svt:exitCode "0"^^xsd:integer .
+    svt:exitCode "0"^^xsd:integer ;
+    svt:inputDigest "bba86b0291f9536718ccec38a52c692089862f2cfb5a24dd31ec4dc5adce9903" ;
+    svt:stderr "" ;
+    svt:stdout "false" .
 
-svtid:invocation-f749b78bf127dd59
-    a svt:Invocation ;
-    prov:startedAtTime "2026-09-12T20:28:57+00:00"^^xsd:dateTime ;
-    svt:command "Connection.load_from_content(<input files>, strict=False)" ;
-    svt:exitCode "0"^^xsd:integer .
-
-svtid:result-7782cc4470cbe486
+svtid:result-0af5fdef5710f6de
     a earl:TestResult ;
-    earl:info """exit_code=0
-stdout: clean
-stderr: """ ;
-    earl:outcome earl:passed .
+    earl:info "actual='violated'; expected not yet settled" ;
+    earl:outcome earl:cantTell ;
+    svt:actual "violated" .
 
-svtid:result-8ac4e25783dc3168
+svtid:result-2267dc4996029516
     a earl:TestResult ;
-    earl:info """exit_code=0
-stdout: clean
-stderr: """ ;
-    earl:outcome earl:passed .
+    earl:info "expected='clean' actual='clean'" ;
+    earl:outcome earl:passed ;
+    svt:actual "clean" .
 
-svtid:result-cc5b8fcfac9b1eb4
+svtid:result-b87ed3850ba0372d
     a earl:TestResult ;
-    earl:info """exit_code=1
-stdout: 
-stderr: error: Redefining feature must be an end feature
-warning: Duplicate of inherited member name 'source' from BinaryConnection
-error: Redefining feature must be an end feature
-warning: Duplicate of inherited member name 'target' from BinaryConnection""" ;
-    earl:outcome earl:cantTell .
+    earl:info "expected='clean' actual='clean'" ;
+    earl:outcome earl:passed ;
+    svt:actual "clean" .
 
-svtid:result-f52c77c63fbcdada
+svtid:result-e28d2429ab60f954
     a earl:TestResult ;
-    earl:info """exit_code=0
-stdout: false
-stderr: """ ;
-    earl:outcome earl:passed .
+    earl:info "expected='clean' actual='clean'" ;
+    earl:outcome earl:passed ;
+    svt:actual "clean" .
 
-svtid:result-f749b78bf127dd59
+svtid:result-e757d3a6676ea655
     a earl:TestResult ;
-    earl:info """exit_code=0
-stdout: clean
-stderr: """ ;
-    earl:outcome earl:passed .
+    earl:info "expected='false' actual='false'" ;
+    earl:outcome earl:passed ;
+    svt:actual "false" .
 
-svtid:run-7782cc4470cbe486
+svtid:run-0af5fdef5710f6de
     a svt:TestRun ;
     earl:assertedBy svtid:agent-svt-cli ;
     earl:mode earl:automatic ;
-    earl:result svtid:result-7782cc4470cbe486 ;
-    earl:subject svtid:version-f69111dc2adf2203 ;
-    earl:test svtid:testcase-redefinition-ambiguity-2 ;
-    prov:startedAtTime "2026-09-12T20:28:56+00:00"^^xsd:dateTime ;
-    svt:hasInvocation svtid:invocation-7782cc4470cbe486 .
-
-svtid:run-8ac4e25783dc3168
-    a svt:TestRun ;
-    earl:assertedBy svtid:agent-svt-cli ;
-    earl:mode earl:automatic ;
-    earl:result svtid:result-8ac4e25783dc3168 ;
-    earl:subject svtid:version-f69111dc2adf2203 ;
-    earl:test svtid:testcase-redefinition-ambiguity-3plus ;
-    prov:startedAtTime "2026-09-12T20:28:56+00:00"^^xsd:dateTime ;
-    svt:hasInvocation svtid:invocation-8ac4e25783dc3168 .
-
-svtid:run-cc5b8fcfac9b1eb4
-    a svt:TestRun ;
-    earl:assertedBy svtid:agent-svt-cli ;
-    earl:mode earl:automatic ;
-    earl:result svtid:result-cc5b8fcfac9b1eb4 ;
+    earl:result svtid:result-0af5fdef5710f6de ;
     earl:subject svtid:version-f69111dc2adf2203 ;
     earl:test svtid:testcase-end-feature-redefinition-bare ;
-    prov:startedAtTime "2026-09-12T20:28:57+00:00"^^xsd:dateTime ;
-    svt:hasInvocation svtid:invocation-cc5b8fcfac9b1eb4 .
+    prov:startedAtTime "2026-09-12T20:58:29+00:00"^^xsd:dateTime ;
+    svt:hasInvocation svtid:invocation-0af5fdef5710f6de .
 
-svtid:run-f52c77c63fbcdada
+svtid:run-2267dc4996029516
     a svt:TestRun ;
     earl:assertedBy svtid:agent-svt-cli ;
     earl:mode earl:automatic ;
-    earl:result svtid:result-f52c77c63fbcdada ;
-    earl:subject svtid:version-f69111dc2adf2203 ;
-    earl:test svtid:testcase-constraint-eval-declaration-site ;
-    prov:startedAtTime "2026-09-12T20:28:58+00:00"^^xsd:dateTime ;
-    svt:hasInvocation svtid:invocation-f52c77c63fbcdada .
-
-svtid:run-f749b78bf127dd59
-    a svt:TestRun ;
-    earl:assertedBy svtid:agent-svt-cli ;
-    earl:mode earl:automatic ;
-    earl:result svtid:result-f749b78bf127dd59 ;
+    earl:result svtid:result-2267dc4996029516 ;
     earl:subject svtid:version-f69111dc2adf2203 ;
     earl:test svtid:testcase-end-feature-redefinition-explicit ;
-    prov:startedAtTime "2026-09-12T20:28:57+00:00"^^xsd:dateTime ;
-    svt:hasInvocation svtid:invocation-f749b78bf127dd59 .
+    prov:startedAtTime "2026-09-12T20:58:29+00:00"^^xsd:dateTime ;
+    svt:hasInvocation svtid:invocation-2267dc4996029516 .
+
+svtid:run-b87ed3850ba0372d
+    a svt:TestRun ;
+    earl:assertedBy svtid:agent-svt-cli ;
+    earl:mode earl:automatic ;
+    earl:result svtid:result-b87ed3850ba0372d ;
+    earl:subject svtid:version-f69111dc2adf2203 ;
+    earl:test svtid:testcase-redefinition-ambiguity-3plus ;
+    prov:startedAtTime "2026-09-12T20:58:28+00:00"^^xsd:dateTime ;
+    svt:hasInvocation svtid:invocation-b87ed3850ba0372d .
+
+svtid:run-e28d2429ab60f954
+    a svt:TestRun ;
+    earl:assertedBy svtid:agent-svt-cli ;
+    earl:mode earl:automatic ;
+    earl:result svtid:result-e28d2429ab60f954 ;
+    earl:subject svtid:version-f69111dc2adf2203 ;
+    earl:test svtid:testcase-redefinition-ambiguity-2 ;
+    prov:startedAtTime "2026-09-12T20:58:28+00:00"^^xsd:dateTime ;
+    svt:hasInvocation svtid:invocation-e28d2429ab60f954 .
+
+svtid:run-e757d3a6676ea655
+    a svt:TestRun ;
+    earl:assertedBy svtid:agent-svt-cli ;
+    earl:mode earl:automatic ;
+    earl:result svtid:result-e757d3a6676ea655 ;
+    earl:subject svtid:version-f69111dc2adf2203 ;
+    earl:test svtid:testcase-constraint-eval-declaration-site ;
+    prov:startedAtTime "2026-09-12T20:58:30+00:00"^^xsd:dateTime ;
+    svt:hasInvocation svtid:invocation-e757d3a6676ea655 .

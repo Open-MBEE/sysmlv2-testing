@@ -23,6 +23,9 @@ svtid:agent-ok a earl:Software .
 svtid:invocation-ok a svt:Invocation ;
     svt:command "sysmlv2 check --strict input.sysml" ;
     svt:exitCode 0 ;
+    svt:stdout "clean" ;
+    svt:stderr "" ;
+    svt:inputDigest "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855" ;
     prov:startedAtTime "2026-01-01T00:00:00"^^xsd:dateTime .
 
 svtid:run-broken a svt:TestRun ;

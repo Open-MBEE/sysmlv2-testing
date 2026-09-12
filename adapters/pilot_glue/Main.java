@@ -4,6 +4,8 @@ import org.omg.sysml.interactive.SysMLInteractive;
 import org.omg.sysml.interactive.SysMLInteractiveResult;
 import org.eclipse.xtext.validation.Issue;
 
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -33,7 +35,10 @@ import java.util.List;
  *
  * Prints "CLEAN" and exits 0 if there is no error-severity issue;
  * otherwise prints every issue and exits 1. This plain text is captured
- * verbatim by adapters/pilot_implementation.py as the RawResult.
+ * verbatim by adapters/pilot_implementation.py as the RawResult -- kept
+ * free of loadLibrary's own "Reading .../*.sysml..." log lines (suppressed
+ * below) so the precise output is the actual diagnostic result, not
+ * library-loading noise.
  */
 public class Main {
     public static void main(String[] args) throws Exception {
@@ -45,7 +50,17 @@ public class Main {
         SysMLInteractive instance = SysMLInteractive.createInstance();
         String libraryDir = System.getenv("SYSML_LIBRARY_DIR");
         if (libraryDir != null && !libraryDir.isEmpty()) {
-            instance.loadLibrary(libraryDir);
+            // loadLibrary prints one "Reading ..." line per stdlib file (of
+            // which there are hundreds) directly to System.out -- real
+            // signal, but not about this run's test case, so it's
+            // suppressed here and restored immediately after.
+            PrintStream realOut = System.out;
+            System.setOut(new PrintStream(OutputStream.nullOutputStream()));
+            try {
+                instance.loadLibrary(libraryDir);
+            } finally {
+                System.setOut(realOut);
+            }
         }
 
         StringBuilder content = new StringBuilder();

@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import hashlib
 import re
+from pathlib import Path
 
 from rdflib import URIRef
 
@@ -37,3 +38,13 @@ def mint(kind: str, key: str) -> URIRef:
     no natural human key, minted from a content-derived ``key``."""
     digest = hashlib.sha256(key.encode("utf-8")).hexdigest()[:16]
     return URIRef(f"{SVTID}{kind}-{digest}")
+
+
+def sha256_of_files(paths: list[Path]) -> str:
+    """sha256 over the exact bytes of ``paths``, concatenated in the given
+    order. Used to pin an Invocation's svt:inputDigest -- callers must pass
+    paths in a stable order (``cli.py`` always sorts by filename first)."""
+    h = hashlib.sha256()
+    for path in paths:
+        h.update(path.read_bytes())
+    return h.hexdigest()

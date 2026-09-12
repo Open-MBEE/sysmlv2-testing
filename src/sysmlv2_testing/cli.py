@@ -243,16 +243,21 @@ def run_cmd(
         raise typer.Exit(2)
     mod = importlib.import_module(module_name)
 
+    # Pins precisely which input bytes this run saw, independent of
+    # whatever the fixture files look like later -- the "precise input"
+    # half of the ledger's evidence (see AGENTS.md).
+    input_digest = ids.sha256_of_files(input_files)
+
     ts = _now()
     invocation_key = f"{testcase}|{implementation}|{version}|{ts}"
     try:
         raw = mod.ADAPTER.run(spec)
     except UnsupportedMethod as exc:
-        outcome, info = "inapplicable", str(exc)
-        command, exit_code = "(unsupported)", -1
+        outcome, actual, info = "inapplicable", None, str(exc)
+        command, exit_code, stdout, stderr = "(unsupported)", -1, "", str(exc)
     else:
-        outcome, info = compare(method, expected, raw)
-        command, exit_code = raw.command, raw.exit_code
+        outcome, actual, info = compare(method, expected, raw)
+        command, exit_code, stdout, stderr = raw.command, raw.exit_code, raw.stdout, raw.stderr
 
     run_iri = ids.mint("run", invocation_key)
     invocation_iri = ids.mint("invocation", invocation_key)
@@ -277,9 +282,14 @@ def run_cmd(
     g.add((result_iri, RDF.type, EARL.TestResult))
     g.add((result_iri, EARL.outcome, URIRef(str(EARL) + outcome)))
     g.add((result_iri, EARL.info, Literal(info)))
+    if actual is not None:
+        g.add((result_iri, SVT.actual, Literal(actual)))
     g.add((invocation_iri, RDF.type, SVT.Invocation))
     g.add((invocation_iri, SVT.command, Literal(command)))
     g.add((invocation_iri, SVT.exitCode, Literal(exit_code, datatype=XSD.integer)))
+    g.add((invocation_iri, SVT.stdout, Literal(stdout)))
+    g.add((invocation_iri, SVT.stderr, Literal(stderr)))
+    g.add((invocation_iri, SVT.inputDigest, Literal(input_digest)))
     g.add((invocation_iri, PROV.startedAtTime, ts))
 
     _gate_and_save(g, runs_ttl(implementation))
@@ -338,6 +348,27 @@ def verify_cmd() -> None:
         typer.echo("VERDICT: FAIL", err=True)
         raise typer.Exit(1)
     typer.echo("VERDICT: PASS")
+
+
+@app.command("view")
+def view_cmd(
+    testcase: Optional[str] = typer.Option(
+        None, "--testcase", help="Report just this test case; omit for every test case."
+    ),
+) -> None:
+    """Compile a deterministic Markdown report (one SPARQL query + the
+    fixture files) so a human can actually read the ledger's precise
+    input/output evidence. Ephemeral: written under reports/ (gitignored),
+    fully reproducible from the ledger + fixtures at any time."""
+    from .view import render_report  # noqa: PLC0415
+
+    content = render_report(testcase)
+    reports_dir = ROOT / "reports"
+    reports_dir.mkdir(parents=True, exist_ok=True)
+    name = f"testcase-{testcase}.md" if testcase is not None else "all.md"
+    path = reports_dir / name
+    path.write_text(content, encoding="utf-8")
+    typer.echo(str(path))
 
 
 if __name__ == "__main__":

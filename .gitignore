@@ -17,3 +17,7 @@ adapters/pilot_glue/*.class
 adapters/pilot_glue/*.jar
 
 /tmp-gate-out*
+
+# `svt view` output -- compiled Markdown reports, fully reproducible from
+# the ledger + fixtures at any time. Ephemeral by design, never committed.
+reports/

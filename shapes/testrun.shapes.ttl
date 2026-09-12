@@ -65,7 +65,7 @@ svt:TestRunHasInvocationShape a sh:PropertyShape ;
 
 svt:TestResultShape a sh:NodeShape ;
     sh:targetClass earl:TestResult ;
-    sh:property svt:TestResultOutcomeShape .
+    sh:property svt:TestResultOutcomeShape, svt:TestResultActualShape .
 
 svt:TestResultOutcomeShape a sh:PropertyShape ;
     sh:path earl:outcome ;
@@ -73,3 +73,63 @@ svt:TestResultOutcomeShape a sh:PropertyShape ;
     sh:maxCount 1 ;
     sh:in ( earl:passed earl:failed earl:cantTell earl:inapplicable earl:untested ) ;
     sh:message "earl:outcome must be exactly one of the five canonical EARL outcomes" .
+
+svt:TestResultActualShape a sh:PropertyShape ;
+    sh:path svt:actual ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+    sh:message "svt:actual, when present, must be a single literal" .
+
+# svt:Invocation: named shapes, per the repo's convention -- every field
+# here is required and typed so it's queryable on its own, not just baked
+# into a single earl:info blob (see AGENTS.md's "precise input, precise
+# output" discipline).
+
+svt:InvocationShape a sh:NodeShape ;
+    sh:targetClass svt:Invocation ;
+    sh:property svt:InvocationCommandShape, svt:InvocationExitCodeShape,
+        svt:InvocationStdoutShape, svt:InvocationStderrShape,
+        svt:InvocationInputDigestShape, svt:InvocationStartedAtTimeShape .
+
+svt:InvocationCommandShape a sh:PropertyShape ;
+    sh:path svt:command ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+    sh:message "an Invocation must record exactly one svt:command" .
+
+svt:InvocationExitCodeShape a sh:PropertyShape ;
+    sh:path svt:exitCode ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:integer ;
+    sh:message "an Invocation must record exactly one svt:exitCode" .
+
+svt:InvocationStdoutShape a sh:PropertyShape ;
+    sh:path svt:stdout ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+    sh:message "an Invocation must record exactly one svt:stdout (may be an empty string, but must be present -- never omitted in favor of a summary elsewhere)" .
+
+svt:InvocationStderrShape a sh:PropertyShape ;
+    sh:path svt:stderr ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+    sh:message "an Invocation must record exactly one svt:stderr (may be an empty string, but must be present)" .
+
+svt:InvocationInputDigestShape a sh:PropertyShape ;
+    sh:path svt:inputDigest ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+    sh:pattern "^[0-9a-f]{64}$" ;
+    sh:message "svt:inputDigest must be a lowercase-hex sha256 (64 chars), required and exactly one" .
+
+svt:InvocationStartedAtTimeShape a sh:PropertyShape ;
+    sh:path prov:startedAtTime ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:dateTime ;
+    sh:message "an Invocation must record exactly one prov:startedAtTime" .

@@ -47,7 +47,14 @@ class OpenSysMLAdapter(Adapter):
         model = conn.load_from_content(content, strict=False)
         if model.ok:
             return RawResult(command=command, exit_code=0, stdout="clean", stderr="")
-        messages = "\n".join(f"{d.severity}: {d.message}" for d in model.diagnostics)
+        # Full precise detail the client actually returns per diagnostic --
+        # not just severity+message, so the captured stderr is as precise
+        # as the tool's own Diagnostic object, not a summary of it.
+        messages = "\n".join(
+            f"{d.severity} {d.file}:{d.start_line}:{d.start_column}-"
+            f"{d.end_line}:{d.end_column}: {d.message}"
+            for d in model.diagnostics
+        )
         return RawResult(command=command, exit_code=1, stdout="", stderr=messages)
 
     def _constraint_eval(self, conn, content: str, spec: TestCaseSpec) -> RawResult:

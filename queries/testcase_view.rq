@@ -1,0 +1,48 @@
+# One row per (TestCase, TestRun) pair -- the data behind `svt view`.
+#
+# Explicit ORDER BY makes row order (and therefore the compiled Markdown
+# report) fully deterministic given the graph's state: same ledger, same
+# report, byte for byte. Never remove the ORDER BY.
+#
+# ?testcase is left unbound for an all-test-cases report; src/sysmlv2_testing/view.py
+# binds it (via initBindings) for a single-test-case report. svt:hasInputFile
+# is deliberately NOT joined here (it's multivalued -- joining it here would
+# multiply rows per input file); view.py reads it separately, the same way
+# cli.py's run_cmd does.
+
+PREFIX svt: <https://w3id.org/sysmlv2-testing#>
+PREFIX earl: <http://www.w3.org/ns/earl#>
+PREFIX prov: <http://www.w3.org/ns/prov#>
+
+SELECT ?testcase ?description ?method ?expected
+       ?implementation ?implName ?version ?commitHash ?versionLabel
+       ?run ?outcome ?actual ?info
+       ?invocation ?command ?exitCode ?stdout ?stderr ?inputDigest ?startedAtTime
+WHERE {
+  ?testcase a svt:TestCase ;
+            svt:description ?description ;
+            svt:method ?method .
+  OPTIONAL { ?testcase svt:expected ?expected }
+
+  OPTIONAL {
+    ?run a svt:TestRun ;
+         earl:test ?testcase ;
+         earl:subject ?version ;
+         earl:result ?result ;
+         svt:hasInvocation ?invocation ;
+         prov:startedAtTime ?startedAtTime .
+    ?version svt:ofImplementation ?implementation ;
+             svt:commitHash ?commitHash .
+    OPTIONAL { ?version svt:versionLabel ?versionLabel }
+    ?implementation svt:name ?implName .
+    ?result earl:outcome ?outcome .
+    OPTIONAL { ?result svt:actual ?actual }
+    OPTIONAL { ?result earl:info ?info }
+    ?invocation svt:command ?command ;
+                svt:exitCode ?exitCode ;
+                svt:stdout ?stdout ;
+                svt:stderr ?stderr ;
+                svt:inputDigest ?inputDigest .
+  }
+}
+ORDER BY ?testcase ?implName ?commitHash ?startedAtTime

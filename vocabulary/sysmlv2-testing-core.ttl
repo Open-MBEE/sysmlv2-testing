@@ -210,3 +210,27 @@ svt:exitCode a owl:DatatypeProperty ;
     rdfs:domain svt:Invocation ;
     rdfs:range xsd:integer ;
     rdfs:label "exit code" .
+
+svt:stdout a owl:DatatypeProperty ;
+    rdfs:domain svt:Invocation ;
+    rdfs:range xsd:string ;
+    rdfs:label "stdout" ;
+    rdfs:comment "The complete, verbatim stdout captured from the adapter's subprocess/call. Never summarized or truncated -- this, not earl:info, is the precise evidentiary record." .
+
+svt:stderr a owl:DatatypeProperty ;
+    rdfs:domain svt:Invocation ;
+    rdfs:range xsd:string ;
+    rdfs:label "stderr" ;
+    rdfs:comment "The complete, verbatim stderr captured from the adapter's subprocess/call. Never summarized or truncated." .
+
+svt:inputDigest a owl:DatatypeProperty ;
+    rdfs:domain svt:Invocation ;
+    rdfs:range xsd:string ;
+    rdfs:label "input digest" ;
+    rdfs:comment "sha256 over the exact bytes of the TestCase's input files (concatenated in sorted-filename order) as actually fed to the tool -- pins precisely which input bytes this Invocation ran against, independent of whatever state the fixture files are in later." .
+
+svt:actual a owl:DatatypeProperty ;
+    rdfs:domain earl:TestResult ;
+    rdfs:range xsd:string ;
+    rdfs:label "actual" ;
+    rdfs:comment "The literal value the method's comparator (adapters/compare.py) actually computed from the captured output, before comparing it to the TestCase's svt:expected. Lets a reader see exactly what was compared without re-deriving it from raw stdout." .

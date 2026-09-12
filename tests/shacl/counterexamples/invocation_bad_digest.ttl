@@ -1,0 +1,13 @@
+@prefix svt: <https://w3id.org/sysmlv2-testing#> .
+@prefix svtid: <https://w3id.org/sysmlv2-testing/id/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+svtid:invocation-broken a svt:Invocation ;
+    svt:command "sysmlv2 check --strict input.sysml" ;
+    svt:exitCode 0 ;
+    svt:stdout "clean" ;
+    svt:stderr "" ;
+    svt:inputDigest "not-a-sha256!" ;
+    prov:startedAtTime "2026-01-01T00:00:00"^^xsd:dateTime .
+# inputDigest isn't a lowercase-hex sha256 -- violates svt:InvocationShape

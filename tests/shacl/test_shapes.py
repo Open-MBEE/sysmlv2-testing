@@ -19,6 +19,7 @@ EXPECTED_VIOLATIONS = {
     "testcase_bad_method": "TestCaseMethodShape",
     "testrun_missing_result": "TestRunResultShape",
     "testresult_bad_outcome": "TestResultOutcomeShape",
+    "invocation_bad_digest": "InvocationInputDigestShape",
 }
 
 
