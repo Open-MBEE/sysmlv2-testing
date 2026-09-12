@@ -39,39 +39,44 @@ uv run svt report
 ## What's in the ledger already
 
 Five seeded test cases (ported from real ad hoc testing — see
-`docs/design-notes.md`), run against real, pinned builds of
-[OpenSysML](https://github.com/Open-MBEE/OpenSysML) and
-[sysml-toolkit](https://github.com/Open-MBEE/sysml-toolkit):
+`docs/design-notes.md`), run against real, pinned builds of all three
+implementations: [OpenSysML](https://github.com/Open-MBEE/OpenSysML) (Go),
+[sysml-toolkit](https://github.com/Open-MBEE/sysml-toolkit) (Rust), and the
+OMG's own
+[Pilot Implementation](https://github.com/Systems-Modeling/SysML-v2-Pilot-Implementation)
+(Java, driven headlessly via `org.omg.sysml.interactive.SysMLInteractive`
+through a small Java shim, `adapters/pilot_glue/Main.java` — see
+`toolchain/get-pilot-jar.sh`, which needs **JDK 21 specifically**; JDK 26
+makes its Xtend compilation fail with ~150,000 JRE-type-resolution errors,
+a real, understood incompatibility, not a flaky build):
 
 ```
 $ uv run svt report
-passed        6
-failed        1
-cantTell      2
+passed        8
+failed        2
+cantTell      3
 inapplicable  1
 untested      0
 ```
 
-The one real `failed` is a genuine sysml-toolkit bug (anonymous `:>>`
-redefinition of a multi-valued reference feature becomes falsely
-"ambiguous" at 3+ occurrences — OpenSysML resolves it cleanly); the two
-`cantTell`s are an unresolved cross-tool disagreement recorded honestly,
-not adjudicated by guesswork; the one `inapplicable` is sysml-toolkit's
-`verify` mechanism honestly reporting it can't perform a per-usage
-constraint evaluation. Every one of those is a real adapter run against a
-real pinned binary — nothing here is a fixture standing in for a result.
+Every one of those is a real adapter run against a real pinned build —
+nothing here is a fixture standing in for a result:
 
-The third implementation, the OMG's own
-[Pilot Implementation](https://github.com/Systems-Modeling/SysML-v2-Pilot-Implementation)
-(Java), is registered in the ledger; its adapter (`adapters/pilot_implementation.py`,
-`adapters/pilot_glue/Main.java`) drives its headless
-`org.omg.sysml.interactive.SysMLInteractive` engine. Wiring it up needs a
-one-time local Maven/Tycho build, `toolchain/get-pilot-jar.sh` — **which
-needs JDK 21 specifically**. Confirmed on the machine this was built on: a
-JDK 26 makes the Pilot's Xtend compilation fail with ~150,000 JRE-type-
-resolution errors (Xtend/Xbase's classpath indexing doesn't handle that
-JDK's layout) — a real, understood incompatibility, not a flaky build. See
-the script's header before running it.
+- One `failed` is a genuine sysml-toolkit bug: anonymous `:>>` redefinition
+  of a multi-valued reference feature becomes falsely "ambiguous" at 3+
+  occurrences (OpenSysML and the Pilot Implementation both resolve it
+  cleanly).
+- The other `failed` is the Pilot Implementation rejecting the explicit
+  `end :>> source = a;` connection-end redefinition form with "Must have
+  at least two related elements" — a case both OpenSysML and sysml-toolkit
+  accept as clean. A genuine three-way divergence, recorded as-is.
+- The `cantTell`s are an unresolved cross-tool disagreement (bare vs.
+  explicit `end`-feature redefinition) recorded honestly across all three
+  implementations, not adjudicated by guesswork.
+- The `inapplicable` is sysml-toolkit's `verify` mechanism honestly
+  reporting it can't perform a per-usage constraint evaluation.
+
+Per-implementation: `uv run svt report --implementation <slug>`.
 
 ## Repo layout
 

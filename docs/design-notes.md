@@ -28,6 +28,20 @@ The adapter shapes (`structural-check`, `constraint-eval`,
 `sysmlv2 check --strict`, `opensysml`'s `Connection.eval(...)`, and
 `Connection.execute_state(...)` against real models.
 
+## A new finding surfaced by wiring up the Pilot Implementation
+
+Once the Pilot's adapter was actually built and run (see
+`toolchain/get-pilot-jar.sh`), it rejected `end-feature-redefinition-explicit`
+— `connection l : Link { end :>> source = a; end :>> target = b; }` — with
+`"Must have at least two related elements"`, a case both OpenSysML and
+sysml-toolkit accept as clean. Confirmed this is the Pilot's own behavior,
+not a harness artifact: tried feeding it the two fixture files both as
+separate indexed resources and as one concatenated compilation unit
+(`adapters/pilot_glue/Main.java`'s current, simpler approach); both give
+the same verdict. Recorded as a real three-way divergence — `expected` for
+that test case stays `clean` (both other implementations agree it should
+be), so the Pilot's run there is an honest `failed`, not adjudicated away.
+
 ## Why `expected` is sometimes unset
 
 Two of the seeded test cases (the "bare `end` redefinition" pair) record a

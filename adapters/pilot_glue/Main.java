@@ -19,12 +19,20 @@ import java.util.List;
  *        checkout). Required for any input that imports the standard
  *        library (ScalarValues, Connections, etc).
  *
- * Files are processed in order, each as its own resource added to the
- * running index (SysMLInteractive.process(content, true)) -- so a later
- * file resolves names declared in an earlier one, matching how a real
- * multi-file SysML v2 model is actually checked. Prints "CLEAN" and exits 0
- * if no file has an error-severity issue; otherwise prints every issue
- * found (across all files) and exits 1. This plain text is captured
+ * All files are concatenated into a single compilation unit and processed
+ * in one SysMLInteractive.process(content, true) call -- matching how the
+ * opensysml adapter feeds a multi-file TestCase to OpenSysML (one
+ * concatenated content string), so a "does this multi-file model check
+ * clean" comparison means the same thing across adapters. (An earlier
+ * version processed each file as its own indexed resource in sequence;
+ * confirmed both ways give the same verdict on every seeded test case, so
+ * this is a consistency/simplicity choice, not a bug fix -- in particular,
+ * the Pilot Implementation's "Must have at least two related elements"
+ * error on end-feature-redefinition-explicit is the Pilot's own behavior
+ * either way, not a harness artifact.)
+ *
+ * Prints "CLEAN" and exits 0 if there is no error-severity issue;
+ * otherwise prints every issue and exits 1. This plain text is captured
  * verbatim by adapters/pilot_implementation.py as the RawResult.
  */
 public class Main {
@@ -40,21 +48,22 @@ public class Main {
             instance.loadLibrary(libraryDir);
         }
 
-        boolean anyErrors = false;
-        List<String> lines = new ArrayList<>();
+        StringBuilder content = new StringBuilder();
         for (String path : args) {
-            String content = new String(Files.readAllBytes(Paths.get(path)));
-            SysMLInteractiveResult result = instance.process(content, true);
-            if (result.getException() != null) {
-                anyErrors = true;
-                lines.add(path + ": EXCEPTION: " + result.getException());
-                continue;
-            }
-            if (result.hasErrors()) {
-                anyErrors = true;
-            }
+            content.append(new String(Files.readAllBytes(Paths.get(path))));
+            content.append("\n");
+        }
+
+        List<String> lines = new ArrayList<>();
+        boolean anyErrors;
+        SysMLInteractiveResult result = instance.process(content.toString(), true);
+        if (result.getException() != null) {
+            anyErrors = true;
+            lines.add("EXCEPTION: " + result.getException());
+        } else {
+            anyErrors = result.hasErrors();
             for (Issue issue : result.getIssues()) {
-                lines.add(path + ": " + issue.getSeverity() + ": " + issue.getMessage()
+                lines.add(issue.getSeverity() + ": " + issue.getMessage()
                         + " (line " + issue.getLineNumber() + ")");
             }
         }
