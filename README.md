@@ -65,9 +65,13 @@ A fourth implementation, the OMG's own
 [Pilot Implementation](https://github.com/Systems-Modeling/SysML-v2-Pilot-Implementation),
 is registered in the ledger; its adapter (`adapters/pilot_implementation.py`,
 `adapters/pilot_glue/Main.java`) drives its headless
-`org.omg.sysml.interactive.SysMLInteractive` engine, but wiring it up needs
-a one-time local Maven/Tycho build (`toolchain/get-pilot-jar.sh`) that is
-still being worked out for this commit — see that script's header.
+`org.omg.sysml.interactive.SysMLInteractive` engine. Wiring it up needs a
+one-time local Maven/Tycho build, `toolchain/get-pilot-jar.sh` — **which
+needs JDK 21 specifically**. Confirmed on the machine this was built on: a
+JDK 26 makes the Pilot's Xtend compilation fail with ~150,000 JRE-type-
+resolution errors (Xtend/Xbase's classpath indexing doesn't handle that
+JDK's layout) — a real, understood incompatibility, not a flaky build. See
+the script's header before running it.
 
 ## Repo layout
 

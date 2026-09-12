@@ -2,10 +2,19 @@
 # Build the Pilot Implementation's headless SysMLInteractive fat jar at a
 # pinned commit, then compile adapters/pilot_glue/Main.java against it.
 #
-# Requires: JDK 21, a local clone of
-# Systems-Modeling/SysML-v2-Pilot-Implementation (this is a Maven/Tycho
+# Requires: JDK 21 specifically (a local clone of
+# Systems-Modeling/SysML-v2-Pilot-Implementation, this is a Maven/Tycho
 # reactor build -- the first run downloads a real amount of Eclipse p2
 # metadata and can take a while).
+#
+# JDK 21, not "whatever JDK you have": confirmed on this machine that a
+# JDK 26 (`brew install openjdk`) makes org.omg.sysml's Xtend compilation
+# fail with ~150,000 "resource is empty: java:/Objects/..." /
+# "resolution of uriFragment '|N' failed" errors -- Xtend/Xbase's JRE
+# TypeReferences indexing doesn't handle that JDK's layout. This is a real,
+# understood incompatibility, not a flaky build; retrying with the same
+# JDK will not help. Point JAVA_HOME at a JDK 21 (e.g.
+# `brew install openjdk@21`) before running this script.
 #
 # Usage:
 #   PILOT_REPO=/path/to/SysML-v2-Pilot-Implementation \
