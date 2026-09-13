@@ -12,9 +12,14 @@ Two of the seven steps below are **governance-gated to a human, not an
 agent** (see AGENTS.md's "Construction vs. validation"): step 3
 (validate) and step 7 (decide on an issue). An agent must never perform
 either on its own behalf, even to "finish the demo" -- that would defeat
-the entire point of the gate. So this walkthrough is, honestly, a
-two-session document: an agent gets it to the point where a human's
-judgment is the only thing missing, and a human finishes it.
+the entire point of the gate. When asked to run step 3 directly (even
+with the human's own real name supplied), the honest answer was to
+decline and hand back the one-line command instead -- see the
+transcript this walkthrough came from. So this is, honestly, a
+two-session document in practice: an agent got it to the point where a
+human's judgment was the only thing missing (steps 1-2), a human ran
+step 3 himself, and the agent picked back up for the purely mechanical
+steps 4-5. Step 7 is still the human's alone.
 
 ## Why this exists
 
@@ -116,15 +121,9 @@ e8b7f33d9dac1a3fdd4eaa64b052608a989b92c580de91fdadb7038d33df99af  sources/local/
 # stale or substituted copy.
 ```
 
-### Step 3 — Human validates *(pending -- this is Z's step)*
+### Step 3 — Human validates *(done -- by Zargham)*
 
-```bash
-uv run svt testcase validate --id membership-visibility-private-rejected --by <your name>
-```
-
-The cited page (KerML p.22) was sent alongside this document for you to
-read directly. Confirmed already, mechanically: `svt run` refuses this
-TestCase right now --
+Before this ran, `svt run` refused the TestCase outright:
 
 ```
 $ uv run svt run --testcase membership-visibility-private-rejected \
@@ -132,29 +131,45 @@ $ uv run svt run --testcase membership-visibility-private-rejected \
 error: testcase 'membership-visibility-private-rejected' has no svt:Validation record -- ...
 ```
 
--- proof the gate is really blocking, not just documenting, this claim
-until you've read the spec text yourself and run the command above.
+-- proof the gate was really blocking, not just documenting, this claim.
+Z read the KerML p.22 page image sent alongside this walkthrough and ran
+the validation himself, in his own terminal (the CLI's `svt` entry point
+only exists inside the project's `uv`-managed venv -- `uv run svt ...`,
+not bare `svt ...`):
 
-### Step 4 — Trigger the run *(after step 3)*
-
-```bash
-uv run svt run --testcase membership-visibility-private-rejected \
-  --implementation pilot-implementation \
-  --version 692170b71867353b8f90341e61556f49a5beb0e5
+```
+$ uv run svt testcase validate --id membership-visibility-private-rejected --by Zargham
+https://w3id.org/sysmlv2-testing/id/validation-4402332ac9d82d9e
 ```
 
-Real captured stdout/stderr/exit code get logged into
-`ledger/runs/pilot-implementation.ttl` via `svt:Invocation`, compared by
-`adapters/compare.py`, and recorded as a `TestRun` -- no LLM in this
-step, ever (see AGENTS.md).
+### Step 4 — Trigger the run *(done)*
 
-### Step 5 — Report
+```
+$ uv run svt run --testcase membership-visibility-private-rejected \
+  --implementation pilot-implementation \
+  --version 692170b71867353b8f90341e61556f49a5beb0e5
+passed	https://w3id.org/sysmlv2-testing/id/run-b15d27028dbaff49
+```
+
+The real captured evidence, now in `ledger/runs/pilot-implementation.ttl`:
+exit code 1, stdout `ERROR: Couldn't resolve reference to Type
+'Lib::Widget'. (line 6)` -- exactly the ad hoc probe from step 1,
+now logged through the real pipeline (no LLM in this step, ever --
+`adapters/compare.py` decided `passed` because `actual == expected ==
+"violated"`, not me).
+
+### Step 5 — Report *(done)*
 
 ```bash
 uv run svt view --testcase membership-visibility-private-rejected
 ```
 
-### Step 6 — Human review + operator annotation *(after step 4)*
+Shows `VALIDATION: confirmed by Zargham (2026-09-13T02:00:39+00:00)`,
+the grounding, the real fixture, and the run's full real command/exit
+code/stdout/stderr -- see `reports/testcase-membership-visibility-private-rejected.md`
+(gitignored, regenerate any time with the command above).
+
+### Step 6 — Human review + operator annotation *(next -- your call)*
 
 ```bash
 uv run svt testrun annotate \
@@ -243,5 +258,7 @@ explicit cleanup pass, not something to silently patch mid-walkthrough:
 - This walkthrough's own TestCase: SHACL-valid, fixture file present and
   matching, citation's document sha256 verified against the actual PDF
   on disk, claim checked ad hoc against the Pilot Implementation before
-  ever entering the ledger, and `svt run` confirmed to refuse it pending
-  validation.
+  ever entering the ledger; `svt run` confirmed to refuse it before
+  validation and to actually run and record `passed` (real captured
+  `ERROR: Couldn't resolve reference to Type 'Lib::Widget'.`, matching
+  `expected: violated`) after Zargham validated it himself.

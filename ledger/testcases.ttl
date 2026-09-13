@@ -5,6 +5,10 @@
 @prefix svtid: <https://w3id.org/sysmlv2-testing/id/> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
+svtid:person-zargham
+    a prov:Person ;
+    rdfs:label "Zargham" .
+
 svtid:resolutioncheck-174697fa0b754215
     a svt:ResolutionCheck ;
     svt:expectedTarget "Lib::Container::items" ;
@@ -126,3 +130,9 @@ svtid:testcase-state-machine-transitions-on-event
     svt:groundedIn svtid:citation-state-initial-via-entry-succession ;
     svt:hasInputFile "surface.sysml" ;
     svt:method "state-execution" .
+
+svtid:validation-4402332ac9d82d9e
+    a svt:Validation ;
+    prov:startedAtTime "2026-09-13T02:00:39+00:00"^^xsd:dateTime ;
+    prov:wasAssociatedWith svtid:person-zargham ;
+    svt:validates svtid:testcase-membership-visibility-private-rejected .

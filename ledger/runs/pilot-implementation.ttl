@@ -95,6 +95,21 @@ ERROR: Redefining feature must be an end feature (line 22)
 ERROR: Subsetting/redefining feature must be constant if subsetted/redefined feature is constant (line 22)
 """ .
 
+svtid:invocation-b15d27028dbaff49
+    a svt:Invocation ;
+    prov:startedAtTime "2026-09-13T02:01:05+00:00"^^xsd:dateTime ;
+    svt:command "java -cp .cache/pilot/692170b71867353b8f90341e61556f49a5beb0e5/interactive-all.jar:.cache/pilot/692170b71867353b8f90341e61556f49a5beb0e5/classes svt.Main /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/membership-visibility-private-rejected/private-visibility.sysml" ;
+    svt:exitCode "1"^^xsd:integer ;
+    svt:inputDigest "de9f631acd37024ea472b26f505839b98e889c27830b7dd738cb60aa56c5e4b2" ;
+    svt:stderr """log4j:WARN No appenders could be found for logger (org.eclipse.xtext.parser.antlr.AbstractInternalAntlrParser).
+log4j:WARN Please initialize the log4j system properly.
+log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
+""" ;
+    svt:stdout """ERRORS:
+ERROR: Couldn't resolve reference to Type 'Lib::Widget'. (line 6)
+ERROR: An occurrence, item or part must be typed by occurrence definitions. (line 6)
+""" .
+
 svtid:invocation-f9e3f1d42231e1fb
     a svt:Invocation ;
     prov:startedAtTime "2026-09-12T21:18:52+00:00"^^xsd:dateTime ;
@@ -141,6 +156,12 @@ svtid:result-72e6f09687a691b6
     earl:outcome earl:inapplicable .
 
 svtid:result-9dfe6a6dd68ddf79
+    a earl:TestResult ;
+    earl:info "expected='violated' actual='violated'" ;
+    earl:outcome earl:passed ;
+    svt:actual "violated" .
+
+svtid:result-b15d27028dbaff49
     a earl:TestResult ;
     earl:info "expected='violated' actual='violated'" ;
     earl:outcome earl:passed ;
@@ -211,6 +232,16 @@ svtid:run-9dfe6a6dd68ddf79
     earl:test svtid:testcase-end-feature-redefinition-bare ;
     prov:startedAtTime "2026-09-12T21:18:54+00:00"^^xsd:dateTime ;
     svt:hasInvocation svtid:invocation-9dfe6a6dd68ddf79 .
+
+svtid:run-b15d27028dbaff49
+    a svt:TestRun ;
+    earl:assertedBy svtid:agent-svt-cli ;
+    earl:mode earl:automatic ;
+    earl:result svtid:result-b15d27028dbaff49 ;
+    earl:subject svtid:version-26283fd33076c9d6 ;
+    earl:test svtid:testcase-membership-visibility-private-rejected ;
+    prov:startedAtTime "2026-09-13T02:01:05+00:00"^^xsd:dateTime ;
+    svt:hasInvocation svtid:invocation-b15d27028dbaff49 .
 
 svtid:run-f9e3f1d42231e1fb
     a svt:TestRun ;
