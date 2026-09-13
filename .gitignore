@@ -10,11 +10,11 @@ __pycache__/
 .pytest_cache/
 
 # Pinned toolchain caches (binaries/jars fetched or built by toolchain/*.sh —
-# reproducible from a Version's commitHash/artifactDigest, never committed)
+# reproducible from a Version's commitHash/artifactDigest, never committed).
+# Everything actually lands under .cache/<implementation>/<commit>/ --
+# toolchain/get-pilot-jar.sh and get-sysml-toolkit.sh confirmed directly,
+# neither writes anywhere under toolchain/ or adapters/pilot_glue/ itself.
 .cache/
-toolchain/bin/
-adapters/pilot_glue/*.class
-adapters/pilot_glue/*.jar
 
 /tmp-gate-out*
 

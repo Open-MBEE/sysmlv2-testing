@@ -1,10 +1,12 @@
 """svt run must refuse an unvalidated TestCase outright -- being SHACL-valid
 RDF is not the same thing as a human having confirmed the claim against the
 spec (see AGENTS.md's "Construction vs. validation"). This is the literal
-enforcement of that gate: every seeded TestCase in this repo is, by design,
-unvalidated (nobody has ever run `svt testcase validate` against them --
-see docs/design-notes.md), so a real run against any of them must be
-refused, not just documented as a rule.
+enforcement of that gate: as long as at least one seeded TestCase in this
+ledger remains unvalidated (an agent must never validate one itself, so
+there will always be some -- see docs/design-notes.md/docs/walkthrough.md
+for which ones have been validated by Z so far, a count that only grows
+over time), a real run against it must be refused, not just documented as
+a rule.
 """
 
 from typer.testing import CliRunner
@@ -17,9 +19,10 @@ runner = CliRunner()
 
 
 def _an_unvalidated_testcase_id() -> str:
-    """Every seeded TestCase in this ledger is unvalidated by construction
-    (see AGENTS.md) -- this just picks one and confirms that premise still
-    holds, rather than hard-coding an id that could silently go stale."""
+    """This test only needs *one* real unvalidated TestCase to exist, not
+    all of them -- picks one live rather than hard-coding an id, since
+    which specific TestCases are still unvalidated changes over time as
+    Z validates more (see docs/walkthrough.md)."""
     ledger = load_full_ledger()
     from rdflib import RDF  # noqa: PLC0415
 

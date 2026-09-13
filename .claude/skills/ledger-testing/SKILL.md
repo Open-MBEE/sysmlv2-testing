@@ -20,10 +20,10 @@ specifically should behave at each step.
 
 ## Choosing `--method` when you construct a TestCase
 
-Each `Implementation` is a candidate realization of a transition function
-`f`; a TestCase states `x+ = f(x, u)` for prior state `x`
-(`--prior-state`, almost always omitted) and command `u`. `--method`
-picks which fact about `x+` is checked:
+`--method` picks which fact about the state transition `x+ = f(x, u)`
+this TestCase checks (see AGENTS.md for the full framing -- each
+`Implementation` is a candidate realization of `f`; `x` is
+`--prior-state`, almost always omitted; `u` is the command):
 
 | method | checks | needs |
 |---|---|---|

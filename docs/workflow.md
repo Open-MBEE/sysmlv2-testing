@@ -7,7 +7,8 @@ TestCase) — for a real, worked example following these exact steps, see
 `AGENTS.md`; this document is the *how*.
 
 Two of the seven steps are governance-gated to a human, never an agent
-(step 3 and step 7) — see AGENTS.md's "Construction vs. validation." An
+(step 3 and step 7) — see AGENTS.md's "Construction vs. validation: the
+LLM's role is bounded." An
 agent may perform every other step.
 
 ## 1. Construct
@@ -104,7 +105,11 @@ uv run svt view --testcase <slug>
 
 (Omitting `--testcase` too compiles every TestCase in the ledger into
 one report — rarely what you want day to day, but useful as a full
-snapshot.)
+snapshot. `--implementation <slug>` alone, without `--testcase`, is a
+third combination `svt view` accepts: every TestCase's runs, filtered
+to just that one implementation — useful for "what has this
+implementation actually been tried against so far," across the whole
+ledger rather than one TestCase at a time.)
 
 A third, coarser command, `svt report [--implementation <slug>]
 [--stable-only]`, is neither of these two kinds — it's a quick tally

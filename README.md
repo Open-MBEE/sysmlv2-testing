@@ -4,11 +4,8 @@ A knowledge-graph testing ledger for SysML v2 implementations, built on
 [W3C EARL](https://www.w3.org/TR/EARL10-Schema/) and
 [PROV-O](https://www.w3.org/TR/prov-o/).
 
-This is a **pipeline, not a platform**. Each `Implementation` is a
-candidate realization of a transition function `f`; a `TestCase` states
-the correct `x+ = f(x, u)` for a prior state `x` and command `u`
-(`TestCase.method` says which fact about that transition is being
-checked — see `AGENTS.md`):
+This is a **pipeline, not a platform** (see `AGENTS.md` for the full
+`x+ = f(x, u)` state-transition framing this ledger is built around):
 
 ```
 TestCase input files (u)  ->  pinned tool for (Implementation, Version)  ->  raw stdout/stderr/exit code
@@ -37,7 +34,7 @@ redistributable). Currently three; more may be added as this repo grows
 |---|---|---|
 | `formal-2026-03-02` | SysML v2.0 Part 1: Language Specification | https://www.omg.org/spec/SysML/2.0/ |
 | `formal-2026-03-04` | Systems Modeling API and Services v1.0 | https://www.omg.org/spec/SystemsModelingAPI/1.0/ |
-| `kerml-1.1-beta2` | Kernel Modeling Language (KerML) | https://www.omg.org/spec/KerML/ — this repo's copy is v1.1 Beta 2 (2026-07), *not* the v1.0 the March-2026 SysML spec cross-references; noted honestly in that citation's `svt:rationale` rather than assumed identical |
+| `kerml-1-1-beta2` | Kernel Modeling Language (KerML) | https://www.omg.org/spec/KerML/ — this repo's copy is v1.1 Beta 2 (2026-07), *not* the v1.0 the March-2026 SysML spec cross-references; noted honestly in that citation's `svt:rationale` rather than assumed identical |
 
 Download your own copy of each, save it at the `svt:localPath` recorded
 for it in `sources/sources.ttl`, and confirm it's the same edition:
@@ -50,7 +47,7 @@ a new document with `svt document add` — never hand-edit
 | implementation | how to get it locally | env vars `svt run` needs |
 |---|---|---|
 | OpenSysML | nothing to clone — `opensysml==<version>` is a real PyPI package (a project dependency; `uv sync` installs it), and the matching `sysml-grpc` server binary is auto-fetched by `opensysml.binary.ensure_binary(...)` on first use | `OPENSYSML_VERSION` (optional — see `adapters/opensysml.py` for the default) |
-| sysml-toolkit | `toolchain/get-sysml-toolkit.sh` downloads a pinned release binary (**no PyPI wheel exists** — `pip install sysmlv2` gets an unrelated placeholder, never use it) | `SYSMLV2_BIN` (the binary), `SYSMLV2_LIB_DIR` (an OMG SysML v2 standard library directory — the v0.6.0 release asset does **not** vendor one, verified directly; use a `SysML-v2-Release` checkout, or the Pilot Implementation's own `sysml.library/` if you already have that cloned) |
+| sysml-toolkit | `toolchain/get-sysml-toolkit.sh` downloads a pinned release binary (**no PyPI wheel exists** — `pip install sysmlv2` gets an unrelated placeholder, never use it) | `SYSMLV2_BIN` (optional — defaults to `sysmlv2` on PATH, see `adapters/sysml_toolkit.py`), `SYSMLV2_LIB_DIR` (an OMG SysML v2 standard library directory, required — the v0.6.0 release asset does **not** vendor one, verified directly; use a `SysML-v2-Release` checkout, or the Pilot Implementation's own `sysml.library/` if you already have that cloned) |
 | Pilot Implementation | clone [`Systems-Modeling/SysML-v2-Pilot-Implementation`](https://github.com/Systems-Modeling/SysML-v2-Pilot-Implementation) yourself, then `toolchain/get-pilot-jar.sh` (**needs JDK 21 specifically** — see the script's header for why) | `PILOT_GLUE_CLASSPATH` (the script prints the value to export), `SYSML_LIBRARY_DIR` (the Pilot repo's own `sysml.library/`, trailing slash) |
 
 Once an implementation's tool is available locally, register the exact
@@ -90,12 +87,16 @@ through a small Java shim, `adapters/pilot_glue/Main.java`):
 
 ```
 $ uv run svt report
-passed        14
+passed        <N>
 failed        5
 cantTell      0
 inapplicable  5
 untested      0
 ```
+
+(`passed` grows every time a new TestRun is added — run the command
+yourself for the current count; the point isn't the exact number, it's
+that nothing here is `untested`.)
 
 Every one of those is a real adapter run against a real pinned build —
 nothing here is a fixture standing in for a result, and nothing is an

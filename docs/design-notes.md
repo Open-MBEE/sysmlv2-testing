@@ -169,15 +169,19 @@ Claude, and Claude will not run `svt testcase validate` against its own
 claims, since that would defeat the entire point of the gate. `svt run`
 against any of them refuses with the exact command to fix it; Z
 validates each one himself, on his own schedule, once he's read the
-cited spec text and confirms it. (Two have since been validated and run
-for real — see `docs/walkthrough.md`.)
+cited spec text and confirms it. (Three have since been validated and
+run for real — see `docs/walkthrough.md`. This count will keep moving as
+Z validates more; treat it as a point-in-time note, not a running
+tally.)
 
 The grounding requirement (`svt:expected`/`svt:checksResolution` implies
 at least one `svt:groundedIn` citation) was already a convention; it is
 now a SHACL-enforced shape (`shapes/validation.shapes.ttl`'s
 `TestCaseGroundingRequiredShape`, a `sh:sparql` constraint in the same
-style as `cds`'s `TermVerbatimGuardShape`) — structurally required, not
-just a habit an author is supposed to remember.
+style as `cds`'s `TermVerbatimGuardShape` -- `cds` is Concept Definition
+Stage, an earlier, unrelated project of mine with the same
+hallucination-guard discipline) — structurally required, not just a
+habit an author is supposed to remember.
 
 **Flag for Z's own review, not silently rewritten:** the four
 `SpecCitation.rationale` fields that exist as of this commit

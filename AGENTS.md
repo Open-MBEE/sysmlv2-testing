@@ -17,7 +17,8 @@ two is a real bug this rig found in its own seeded data — see
 `docs/design-notes.md`. It is a **pipeline, not a platform** — see the
 diagram in `README.md`. Keep it that way. Do not add a dashboard, a web
 UI, or a query service; a ledger explorer is explicitly deferred (`svt
-view` compiles a read-only Markdown report instead — see `docs/`).
+view` compiles a read-only Markdown report instead — see
+`docs/workflow.md`).
 
 ## The one rule that matters: no LLM in the run/compare/log path
 

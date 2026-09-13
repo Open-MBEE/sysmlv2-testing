@@ -89,9 +89,10 @@ uv run svt testcase add --id membership-visibility-private-rejected \
   --grounds membership-visibility-private
 ```
 
-Before committing this to the ledger, the claim was checked ad hoc
-(outside the ledger, per AGENTS.md's "exploration is unaffected by the
-run gate") against the Pilot Implementation directly:
+Before committing this to the ledger, the claim was checked ad hoc --
+outside the ledger, a plain subprocess call, not `svt run` (see
+`docs/workflow.md`'s step 1) -- against the Pilot Implementation
+directly:
 
 ```
 $ java -cp "$PILOT_GLUE_CLASSPATH" svt.Main private-visibility.sysml
@@ -196,7 +197,13 @@ own real command/exit code/stdout/stderr.
 
 Both regenerate live (gitignored, ephemeral) under `reports/`; the two
 committed files above are point-in-time snapshots kept specifically as
-this walkthrough's worked examples of the two report kinds.
+this walkthrough's worked examples of the two report kinds. Their
+filenames (`<testcase>--<implementation>.md`, `<testcase>--all-
+implementations.md`) are a deliberate, human-readable naming scheme for
+this doc's own linking, chosen when committing them -- not what `svt
+view` itself names its live output under `reports/`
+(`testcase-<id>[-<implementation>].md`); don't expect the two to match
+byte-for-byte if you regenerate and compare filenames.
 
 ### Step 6 — Human review + operator annotation *(next -- your call)*
 
@@ -376,8 +383,15 @@ refusal behavior can never quietly diverge across commands) -- see
 
 ## Cruft / drift / inconsistency found along the way
 
-Recorded here, not fixed ad hoc -- this list is the seed for a separate,
-explicit cleanup pass, not something to silently patch mid-walkthrough:
+This section is retrospective rationale about *this walkthrough's own*
+development, not a worked example -- more `docs/design-notes.md`'s kind
+of content than this doc's, kept here anyway because it's tied to the
+concrete findings above, not general repo history. It became the seed
+for exactly the "separate, explicit cleanup pass" item 5 below asks for:
+a full audit (Python codebase, RDF/shapes/ledger data, documentation)
+resolved most of what's listed here, and found a good deal more besides
+-- see the commit history following this walkthrough's own commits for
+the complete list; not re-duplicated here.
 
 1. **Citation defects in the existing ledger** (fixed this pass, but
    worth noting *why* they went undetected for as long as they did): one
