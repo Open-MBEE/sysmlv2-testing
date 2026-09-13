@@ -5,6 +5,31 @@
 @prefix svtid: <https://w3id.org/sysmlv2-testing/id/> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
+svtid:resolutioncheck-174697fa0b754215
+    a svt:ResolutionCheck ;
+    svt:expectedTarget "Lib::Container::items" ;
+    svt:subjectFeature "UsageTwo::c::@0" .
+
+svtid:resolutioncheck-ab3ac9a1e4c6960b
+    a svt:ResolutionCheck ;
+    svt:expectedTarget "Lib::Container::items" ;
+    svt:subjectFeature "UsageTwo::c::@1" .
+
+svtid:resolutioncheck-cf995da9324ed91b
+    a svt:ResolutionCheck ;
+    svt:expectedTarget "Lib::Container::items" ;
+    svt:subjectFeature "UsageThree::d::@2" .
+
+svtid:resolutioncheck-d528d62c08b02686
+    a svt:ResolutionCheck ;
+    svt:expectedTarget "Lib::Container::items" ;
+    svt:subjectFeature "UsageThree::d::@1" .
+
+svtid:resolutioncheck-eceab5ff09836ca9
+    a svt:ResolutionCheck ;
+    svt:expectedTarget "Lib::Container::items" ;
+    svt:subjectFeature "UsageThree::d::@0" .
+
 svtid:testcase-constraint-eval-declaration-site
     a svt:TestCase ;
     svt:description "connection l : Link binds source=a (controlled=true) and target=b (controlled=false); Link's assert constraint 'source.controlled and target.controlled' evaluated against l's actual bound values must be false, not Link's own declaration-site defaults." ;
@@ -45,6 +70,16 @@ svtid:testcase-redefinition-ambiguity-2
         "usage-two-ok.sysml" ;
     svt:method "structural-check" .
 
+svtid:testcase-redefinition-ambiguity-2-resolution
+    a svt:TestCase ;
+    svt:checksResolution svtid:resolutioncheck-174697fa0b754215,
+        svtid:resolutioncheck-ab3ac9a1e4c6960b ;
+    svt:description "Both anonymous ':>> items' redefinitions under part c must resolve (real object identity, not diagnostics) to the inherited base feature Container::items -- not to each other." ;
+    svt:groundedIn svtid:citation-remove-redefined-features ;
+    svt:hasInputFile "lib.sysml",
+        "usage-two-ok.sysml" ;
+    svt:method "reference-resolution" .
+
 svtid:testcase-redefinition-ambiguity-3plus
     a svt:TestCase ;
     svt:description "Three anonymous ':>> items' redefinitions of a multi-valued reference feature should all resolve to the inherited base feature Container::items, same as with two -- sibling count should not matter." ;
@@ -53,3 +88,33 @@ svtid:testcase-redefinition-ambiguity-3plus
     svt:hasInputFile "lib.sysml",
         "usage-three-ambiguous.sysml" ;
     svt:method "structural-check" .
+
+svtid:testcase-redefinition-ambiguity-3plus-resolution
+    a svt:TestCase ;
+    svt:checksResolution svtid:resolutioncheck-cf995da9324ed91b,
+        svtid:resolutioncheck-d528d62c08b02686,
+        svtid:resolutioncheck-eceab5ff09836ca9 ;
+    svt:description "All three anonymous ':>> items' redefinitions under part d must resolve (real object identity, not diagnostics) to the inherited base feature Container::items -- not to each other, regardless of sibling count." ;
+    svt:groundedIn svtid:citation-remove-redefined-features ;
+    svt:hasInputFile "lib.sysml",
+        "usage-three-ambiguous.sysml" ;
+    svt:method "reference-resolution" .
+
+svtid:testcase-state-machine-settles-without-events
+    a svt:TestCase ;
+    svt:description "A Surface's exhibited state machine, given no events (the command u is empty), must settle at its declared initial state dormant (entry; then dormant;)." ;
+    svt:evalSubject "StateDemo::Surface::condition" ;
+    svt:expected "dormant" ;
+    svt:groundedIn svtid:citation-state-initial-via-entry-succession ;
+    svt:hasInputFile "surface.sysml" ;
+    svt:method "state-execution" .
+
+svtid:testcase-state-machine-transitions-on-event
+    a svt:TestCase ;
+    svt:description "A Surface's exhibited state machine, given one EngagementEvent, must transition from dormant to active (transition first dormant accept EngagementEvent then active;)." ;
+    svt:evalSubject "StateDemo::Surface::condition" ;
+    svt:events "EngagementEvent" ;
+    svt:expected "dormant,active" ;
+    svt:groundedIn svtid:citation-state-initial-via-entry-succession ;
+    svt:hasInputFile "surface.sysml" ;
+    svt:method "state-execution" .

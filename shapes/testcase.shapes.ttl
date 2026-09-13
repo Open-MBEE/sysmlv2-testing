@@ -7,7 +7,8 @@ svt:TestCaseShape a sh:NodeShape ;
     sh:property svt:TestCaseDescriptionShape, svt:TestCaseHasInputFileShape,
         svt:TestCaseMethodShape, svt:TestCaseExpectedShape,
         svt:TestCaseEvalExpressionShape, svt:TestCaseEvalSubjectShape,
-        svt:TestCaseGroundedInShape .
+        svt:TestCaseGroundedInShape, svt:TestCasePriorStateShape,
+        svt:TestCaseEventsShape, svt:TestCaseChecksResolutionShape .
 
 svt:TestCaseDescriptionShape a sh:PropertyShape ;
     sh:path svt:description ;
@@ -26,8 +27,8 @@ svt:TestCaseMethodShape a sh:PropertyShape ;
     sh:path svt:method ;
     sh:minCount 1 ;
     sh:maxCount 1 ;
-    sh:in ( "structural-check" "constraint-eval" "state-execution" ) ;
-    sh:message "svt:method must be exactly one of: structural-check, constraint-eval, state-execution" .
+    sh:in ( "structural-check" "constraint-eval" "state-execution" "reference-resolution" ) ;
+    sh:message "svt:method must be exactly one of: structural-check, constraint-eval, state-execution, reference-resolution" .
 
 svt:TestCaseExpectedShape a sh:PropertyShape ;
     sh:path svt:expected ;
@@ -50,3 +51,37 @@ svt:TestCaseGroundedInShape a sh:PropertyShape ;
     sh:nodeKind sh:IRI ;
     sh:class svt:SpecCitation ;
     sh:message "svt:groundedIn, when present, must point at a svt:SpecCitation (multivalued -- a claim can need more than one excerpt)" .
+
+svt:TestCasePriorStateShape a sh:PropertyShape ;
+    sh:path svt:priorState ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string .
+
+svt:TestCaseEventsShape a sh:PropertyShape ;
+    sh:path svt:events ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string .
+
+svt:TestCaseChecksResolutionShape a sh:PropertyShape ;
+    sh:path svt:checksResolution ;
+    sh:nodeKind sh:IRI ;
+    sh:class svt:ResolutionCheck ;
+    sh:message "svt:checksResolution, when present, must point at svt:ResolutionCheck instances (multivalued)" .
+
+svt:ResolutionCheckShape a sh:NodeShape ;
+    sh:targetClass svt:ResolutionCheck ;
+    sh:property svt:ResolutionCheckSubjectFeatureShape, svt:ResolutionCheckExpectedTargetShape .
+
+svt:ResolutionCheckSubjectFeatureShape a sh:PropertyShape ;
+    sh:path svt:subjectFeature ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+    sh:message "a ResolutionCheck must have exactly one svt:subjectFeature" .
+
+svt:ResolutionCheckExpectedTargetShape a sh:PropertyShape ;
+    sh:path svt:expectedTarget ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+    sh:message "a ResolutionCheck must have exactly one svt:expectedTarget" .

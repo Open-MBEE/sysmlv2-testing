@@ -41,3 +41,27 @@ def test_report_shows_the_grounding_not_just_a_bare_expected_value():
     assert "### Grounding" in report
     # the verbatim quote, not just a citation ID or page number
     assert "removeRedefinedFeatures" in report
+
+
+def test_reference_resolution_testcase_shows_facts_not_a_bare_expected_line():
+    """The posterior state x+ this method checks is a *set* of facts, not
+    one scalar -- the report must show what those facts are, not fall
+    back to "expected: not yet settled" just because svt:expected is
+    unset for this method."""
+    report = render_report("redefinition-ambiguity-2-resolution")
+    assert "resolution facts" in report
+    assert "Lib::Container::items" in report
+    assert "not yet settled" not in report
+
+
+def test_reference_resolution_testcase_shows_the_real_cross_wiring_bug():
+    report = render_report("redefinition-ambiguity-2-resolution")
+    assert "failed" in report
+    # sysml-toolkit's actual (wrong) resolved target, not just a verdict code
+    assert "UsageTwo::c::@2" in report or "UsageTwo::c::@1" in report
+
+
+def test_state_execution_testcase_shows_the_command_events():
+    report = render_report("state-machine-transitions-on-event")
+    assert "**command (u): events**" in report
+    assert "EngagementEvent" in report

@@ -5,46 +5,85 @@ The full raw stdout/stderr live on the Invocation (see cli.py's run_cmd) --
 this module's ``info`` is a short, precise summary of the comparison
 itself (what was expected, what was actually computed), not a place to
 re-dump the whole captured output.
+
+Each method checks a different fact about the state transition x+ =
+f(x, u) an Implementation computes (see AGENTS.md / vocabulary comments):
+structural-check checks whether u is even admissible (u in U_x);
+constraint-eval/state-execution/reference-resolution each check a
+specific fact about the actual x+, given an admissible u.
 """
 
 from __future__ import annotations
 
-from .base import RawResult
+from .base import RawResult, TestCaseSpec
 
 _OUTCOMES = ("passed", "failed", "cantTell", "inapplicable", "untested")
 
 
-def compare(method: str, expected: str | None, result: RawResult) -> tuple[str, str | None, str]:
+def compare(spec: TestCaseSpec, result: RawResult) -> tuple[str, str | None, str]:
     """Return (outcome, actual, info).
 
     ``outcome`` is one of the five EARL literals. ``actual`` is the bare
-    literal value this method's comparator derived from ``result`` (e.g.
-    "clean"/"violated", "true"/"false", a joined state list) -- recorded
-    verbatim as svt:actual so a reader can see exactly what was compared
-    without re-deriving it from raw stdout. ``info`` is a short
+    literal value this method's comparator derived from ``result`` --
+    recorded verbatim as svt:actual so a reader can see exactly what was
+    compared without re-deriving it from raw stdout. ``info`` is a short
     human-readable note.
-
-    If ``expected`` is unset, the outcome is mechanically ``cantTell`` —
-    the correct behavior hasn't been settled (e.g. pending a spec-text
-    read), so this records what happened without declaring a winner;
-    ``actual`` is still computed and recorded, just not compared to
-    anything.
     """
-    if method == "structural-check":
+    if spec.method == "reference-resolution":
+        return _compare_resolution(spec, result)
+
+    if spec.method == "structural-check":
         actual = "clean" if result.exit_code == 0 else "violated"
         matches = lambda exp: actual == exp  # noqa: E731
-    elif method == "constraint-eval":
+    elif spec.method == "constraint-eval":
         actual = result.stdout.strip().lower()
         matches = lambda exp: actual == exp.strip().lower()  # noqa: E731
-    elif method == "state-execution":
+    elif spec.method == "state-execution":
         actual = result.stdout.strip()
         matches = lambda exp: actual == exp.strip()  # noqa: E731
     else:
-        raise ValueError(f"unknown method: {method!r}")
+        raise ValueError(f"unknown method: {spec.method!r}")
 
-    if expected is None:
+    # If expected is unset, the outcome is mechanically cantTell -- the
+    # correct behavior hasn't been settled (e.g. pending a spec-text
+    # read), so this records what happened without declaring a winner;
+    # actual is still computed and recorded, just not compared to anything.
+    if spec.expected is None:
         return "cantTell", actual, f"actual={actual!r}; expected not yet settled"
 
-    outcome = "passed" if matches(expected) else "failed"
-    info = f"expected={expected!r} actual={actual!r}"
+    outcome = "passed" if matches(spec.expected) else "failed"
+    info = f"expected={spec.expected!r} actual={actual!r}"
+    return outcome, actual, info
+
+
+def _compare_resolution(spec: TestCaseSpec, result: RawResult) -> tuple[str, str | None, str]:
+    """reference-resolution checks a *set* of facts about x+, not one
+    scalar: for each ResolutionCheck, does subject_feature actually
+    resolve to expected_target? Adapters report this as one line per
+    check, ``<subjectFeature>\\t<actualTarget>`` (``UNRESOLVED`` when the
+    implementation couldn't resolve it), in the same order as
+    spec.resolution_checks -- see each adapter's own docstring for its
+    exact resolution mechanism (compact-json @id walk, EMF object
+    identity, etc; never diagnostics alone)."""
+    if not spec.resolution_checks:
+        return "cantTell", None, "no svt:checksResolution facts defined for this TestCase"
+
+    actual_by_subject: dict[str, str] = {}
+    for line in result.stdout.splitlines():
+        if not line.strip():
+            continue
+        subject, _, target = line.partition("\t")
+        actual_by_subject[subject] = target.strip()
+
+    facts: list[str] = []
+    all_match = True
+    for check in spec.resolution_checks:
+        actual_target = actual_by_subject.get(check.subject_feature, "UNRESOLVED")
+        ok = actual_target == check.expected_target
+        all_match = all_match and ok
+        facts.append(f"{check.subject_feature}->{actual_target}")
+
+    actual = "; ".join(facts)
+    outcome = "passed" if all_match else "failed"
+    info = f"{len(spec.resolution_checks)} resolution check(s), all_match={all_match}"
     return outcome, actual, info

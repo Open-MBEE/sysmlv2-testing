@@ -112,30 +112,36 @@ svt:forImplementation a owl:ObjectProperty ;
 svt:TestCase a owl:Class ;
     rdfs:subClassOf earl:TestCriterion ;
     rdfs:label "Test case" ;
-    rdfs:comment "A concrete input -> expected-behavior claim: \"when you run this input through an implementation, it should produce this.\"" .
+    rdfs:comment "A state-transition claim: each Implementation under test is a candidate realization of a transition function f; given prior state x (svt:priorState, default: nothing but the standard library loaded) and command u (svt:hasInputFile, and for some methods svt:events/svt:evalExpression/svt:evalSubject), the correct posterior state is x+ = f_spec(x, u). svt:method selects which fact about that transition this TestCase checks: structural-check asks whether u is even admissible (u in U_x -- see AGENTS.md); constraint-eval, state-execution, and reference-resolution each assert a specific fact about the actual x+ once u is admitted. Grounded in real spec citations (svt:groundedIn), not bare assertions." .
 
 svt:description a owl:DatatypeProperty ;
     rdfs:domain svt:TestCase ;
     rdfs:range xsd:string ;
     rdfs:label "description" .
 
+svt:priorState a owl:DatatypeProperty ;
+    rdfs:domain svt:TestCase ;
+    rdfs:range xsd:string ;
+    rdfs:label "prior state" ;
+    rdfs:comment "x: the state this TestCase's command is applied against. Absent means the default prior state -- nothing but the standard library loaded, no prior command applied. Exists so a future multi-step scenario (one command's x+ feeding the next command's x) has an explicit place to record it, rather than an implicit, untracked assumption." .
+
 svt:hasInputFile a owl:DatatypeProperty ;
     rdfs:domain svt:TestCase ;
     rdfs:range xsd:string ;
     rdfs:label "has input file" ;
-    rdfs:comment "A path (relative to ledger/fixtures/<testcase-id>/) of one file in this test case's input set. Multivalued — a test case's input may be several files." .
+    rdfs:comment "A path (relative to ledger/fixtures/<testcase-id>/) of one file in this test case's input set -- part of the command u. Multivalued — a test case's input may be several files." .
 
 svt:method a owl:DatatypeProperty ;
     rdfs:domain svt:TestCase ;
     rdfs:range xsd:string ;
     rdfs:label "method" ;
-    rdfs:comment "Which scripted comparator applies: structural-check | constraint-eval | state-execution. See shapes/testcase.shapes.ttl for the closed set." .
+    rdfs:comment "Which scripted comparator applies, i.e. which fact about (x, u) -> x+ this TestCase checks: structural-check (is u in U_x -- admissibility only) | constraint-eval | state-execution | reference-resolution (facts about the actual x+, given an admissible u). See shapes/testcase.shapes.ttl for the closed set." .
 
 svt:expected a owl:DatatypeProperty ;
     rdfs:domain svt:TestCase ;
     rdfs:range xsd:string ;
     rdfs:label "expected" ;
-    rdfs:comment "The literal value the method's comparator checks captured output against. Absent when the correct behavior is not yet settled (e.g. pending a spec-text read) — a TestRun against such a TestCase mechanically records earl:cantTell, never a guess." .
+    rdfs:comment "The literal value the method's comparator checks captured output against (for structural-check/constraint-eval/state-execution; reference-resolution uses svt:checksResolution instead, since it asserts a set of facts, not one scalar). Absent when the correct behavior is not yet settled (e.g. pending a spec-text read) — a TestRun against such a TestCase mechanically records earl:cantTell, never a guess." .
 
 svt:evalExpression a owl:DatatypeProperty ;
     rdfs:domain svt:TestCase ;
@@ -149,11 +155,39 @@ svt:evalSubject a owl:DatatypeProperty ;
     rdfs:label "eval subject" ;
     rdfs:comment "For method=constraint-eval or state-execution: the fully-qualified usage/connection name the evaluation is performed against (subject_symbol_id)." .
 
+svt:events a owl:DatatypeProperty ;
+    rdfs:domain svt:TestCase ;
+    rdfs:range xsd:string ;
+    rdfs:label "events" ;
+    rdfs:comment "For method=state-execution: the command u -- a comma-joined, ordered sequence of event names to feed the state machine (e.g. \"EngagementEvent\"). Absent means the zero-event default (does the machine settle correctly with nothing to react to)." .
+
+svt:checksResolution a owl:ObjectProperty ;
+    rdfs:domain svt:TestCase ;
+    rdfs:range svt:ResolutionCheck ;
+    rdfs:label "checks resolution" ;
+    rdfs:comment "For method=reference-resolution: the set of resolution facts x+ must satisfy (multivalued -- a test case may need to check several redefinitions at once)." .
+
+svt:ResolutionCheck a owl:Class ;
+    rdfs:label "Resolution check" ;
+    rdfs:comment "One fact about x+: the feature named svt:subjectFeature must resolve (via redefinition/specialization) to the feature named svt:expectedTarget. Checked by real per-implementation object identity, never by diagnostics alone -- see AGENTS.md." .
+
+svt:subjectFeature a owl:DatatypeProperty ;
+    rdfs:domain svt:ResolutionCheck ;
+    rdfs:range xsd:string ;
+    rdfs:label "subject feature" ;
+    rdfs:comment "A locator for the feature whose resolution is being checked -- a qualified name where the implementation can resolve one, otherwise an implementation-specific positional locator (e.g. \"UsageTwo::c::@0\")." .
+
+svt:expectedTarget a owl:DatatypeProperty ;
+    rdfs:domain svt:ResolutionCheck ;
+    rdfs:range xsd:string ;
+    rdfs:label "expected target" ;
+    rdfs:comment "The qualified name subjectFeature's redefinition/specialization must resolve to." .
+
 svt:groundedIn a owl:ObjectProperty ;
     rdfs:domain svt:TestCase ;
     rdfs:range svt:SpecCitation ;
     rdfs:label "grounded in" ;
-    rdfs:comment "Multivalued: the SpecCitation(s) backing this TestCase's svt:expected value. A TestCase with no groundedIn is an unsupported assertion -- ground it or leave expected unset (which mechanically records cantTell, never a guess dressed up as a claim)." .
+    rdfs:comment "Multivalued: the SpecCitation(s) backing this TestCase's expected posterior state (svt:expected, or the svt:ResolutionCheck set). A TestCase with no groundedIn is an unsupported assertion -- ground it or leave expected unset (which mechanically records cantTell, never a guess dressed up as a claim)." .
 
 #################################################################
 # svt:SpecDocument, svt:SpecCitation — the sources register

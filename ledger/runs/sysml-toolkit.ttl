@@ -10,6 +10,18 @@ svtid:agent-svt-cli
         prov:SoftwareAgent ;
     rdfs:label "sysmlv2-testing CLI (svt)" .
 
+svtid:invocation-3575bc8475cfdcb3
+    a svt:Invocation ;
+    prov:startedAtTime "2026-09-13T00:19:09+00:00"^^xsd:dateTime ;
+    svt:command "/Users/z/Documents/GitHub/sysml-toolkit/target/release/sysmlv2 convert --lib /Users/z/Documents/GitHub/sysml-toolkit/spec-refs/SysML-v2-Release/sysml.library --to compact-json /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/redefinition-ambiguity-3plus-resolution/lib.sysml /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/redefinition-ambiguity-3plus-resolution/usage-three-ambiguous.sysml -o /var/folders/_z/k9fkf53x4q7dm02s4lr__qq00000gn/T/tmpojvxpw7_/model.json" ;
+    svt:exitCode "0"^^xsd:integer ;
+    svt:inputDigest "918e05e1bc6e884e0ccd7463547e4d4fe50086c280ee5e28f5b37c0b614711ca" ;
+    svt:stderr "" ;
+    svt:stdout """UsageThree::d::@2	UNRESOLVED:items
+UsageThree::d::@1	UNRESOLVED:items
+UsageThree::d::@0	UNRESOLVED:items
+""" .
+
 svtid:invocation-4f6aa0fb2bc3df1f
     a svt:Invocation ;
     prov:startedAtTime "2026-09-12T21:18:34+00:00"^^xsd:dateTime ;
@@ -27,6 +39,26 @@ svtid:invocation-968932ee86faa164
     svt:inputDigest "dd8e5e69f050f6548c2e6e2e7cb21b17e84b79019c80fd3ffacb29d95c05e35a" ;
     svt:stderr "" ;
     svt:stdout "" .
+
+svtid:invocation-9a23a41cc8de8d13
+    a svt:Invocation ;
+    prov:startedAtTime "2026-09-13T00:21:11+00:00"^^xsd:dateTime ;
+    svt:command "(unsupported)" ;
+    svt:exitCode "-1"^^xsd:integer ;
+    svt:inputDigest "a42791bd6ee2f43cb1ef27ea1dd8197ff401212039cde225961d6167bd0e4d0a" ;
+    svt:stderr "sysml-toolkit has no working state-execution mechanism (see ISSUES-PROPOSED.md #1: verify/query evaluate a constraint's declaration-site defaults, not a usage's actual bindings)" ;
+    svt:stdout "" .
+
+svtid:invocation-a12af5ad367fb4b0
+    a svt:Invocation ;
+    prov:startedAtTime "2026-09-13T00:19:09+00:00"^^xsd:dateTime ;
+    svt:command "/Users/z/Documents/GitHub/sysml-toolkit/target/release/sysmlv2 convert --lib /Users/z/Documents/GitHub/sysml-toolkit/spec-refs/SysML-v2-Release/sysml.library --to compact-json /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/redefinition-ambiguity-2-resolution/lib.sysml /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/redefinition-ambiguity-2-resolution/usage-two-ok.sysml -o /var/folders/_z/k9fkf53x4q7dm02s4lr__qq00000gn/T/tmpgae1xsfd/model.json" ;
+    svt:exitCode "0"^^xsd:integer ;
+    svt:inputDigest "dd8e5e69f050f6548c2e6e2e7cb21b17e84b79019c80fd3ffacb29d95c05e35a" ;
+    svt:stderr "" ;
+    svt:stdout """UsageTwo::c::@0	UsageTwo::c::@2
+UsageTwo::c::@1	UsageTwo::c::@1
+""" .
 
 svtid:invocation-a8a1ca16a95a2126
     a svt:Invocation ;
@@ -71,6 +103,12 @@ svtid:invocation-f19dbd0d109d687e
     svt:stderr "" ;
     svt:stdout "" .
 
+svtid:result-3575bc8475cfdcb3
+    a earl:TestResult ;
+    earl:info "3 resolution check(s), all_match=False" ;
+    earl:outcome earl:failed ;
+    svt:actual "UsageThree::d::@2->UNRESOLVED:items; UsageThree::d::@1->UNRESOLVED:items; UsageThree::d::@0->UNRESOLVED:items" .
+
 svtid:result-4f6aa0fb2bc3df1f
     a earl:TestResult ;
     earl:info "sysml-toolkit has no working constraint-eval mechanism (see ISSUES-PROPOSED.md #1: verify/query evaluate a constraint's declaration-site defaults, not a usage's actual bindings)" ;
@@ -81,6 +119,17 @@ svtid:result-968932ee86faa164
     earl:info "expected='clean' actual='clean'" ;
     earl:outcome earl:passed ;
     svt:actual "clean" .
+
+svtid:result-9a23a41cc8de8d13
+    a earl:TestResult ;
+    earl:info "sysml-toolkit has no working state-execution mechanism (see ISSUES-PROPOSED.md #1: verify/query evaluate a constraint's declaration-site defaults, not a usage's actual bindings)" ;
+    earl:outcome earl:inapplicable .
+
+svtid:result-a12af5ad367fb4b0
+    a earl:TestResult ;
+    earl:info "2 resolution check(s), all_match=False" ;
+    earl:outcome earl:failed ;
+    svt:actual "UsageTwo::c::@0->UsageTwo::c::@2; UsageTwo::c::@1->UsageTwo::c::@1" .
 
 svtid:result-a8a1ca16a95a2126
     a earl:TestResult ;
@@ -99,6 +148,16 @@ svtid:result-f19dbd0d109d687e
     earl:info "expected='violated' actual='clean'" ;
     earl:outcome earl:failed ;
     svt:actual "clean" .
+
+svtid:run-3575bc8475cfdcb3
+    a svt:TestRun ;
+    earl:assertedBy svtid:agent-svt-cli ;
+    earl:mode earl:automatic ;
+    earl:result svtid:result-3575bc8475cfdcb3 ;
+    earl:subject svtid:version-cdc8cdb3385265b0 ;
+    earl:test svtid:testcase-redefinition-ambiguity-3plus-resolution ;
+    prov:startedAtTime "2026-09-13T00:19:09+00:00"^^xsd:dateTime ;
+    svt:hasInvocation svtid:invocation-3575bc8475cfdcb3 .
 
 svtid:run-4f6aa0fb2bc3df1f
     a svt:TestRun ;
@@ -119,6 +178,26 @@ svtid:run-968932ee86faa164
     earl:test svtid:testcase-redefinition-ambiguity-2 ;
     prov:startedAtTime "2026-09-12T21:18:32+00:00"^^xsd:dateTime ;
     svt:hasInvocation svtid:invocation-968932ee86faa164 .
+
+svtid:run-9a23a41cc8de8d13
+    a svt:TestRun ;
+    earl:assertedBy svtid:agent-svt-cli ;
+    earl:mode earl:automatic ;
+    earl:result svtid:result-9a23a41cc8de8d13 ;
+    earl:subject svtid:version-cdc8cdb3385265b0 ;
+    earl:test svtid:testcase-state-machine-settles-without-events ;
+    prov:startedAtTime "2026-09-13T00:21:11+00:00"^^xsd:dateTime ;
+    svt:hasInvocation svtid:invocation-9a23a41cc8de8d13 .
+
+svtid:run-a12af5ad367fb4b0
+    a svt:TestRun ;
+    earl:assertedBy svtid:agent-svt-cli ;
+    earl:mode earl:automatic ;
+    earl:result svtid:result-a12af5ad367fb4b0 ;
+    earl:subject svtid:version-cdc8cdb3385265b0 ;
+    earl:test svtid:testcase-redefinition-ambiguity-2-resolution ;
+    prov:startedAtTime "2026-09-13T00:19:09+00:00"^^xsd:dateTime ;
+    svt:hasInvocation svtid:invocation-a12af5ad367fb4b0 .
 
 svtid:run-a8a1ca16a95a2126
     a svt:TestRun ;

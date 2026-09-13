@@ -92,6 +92,20 @@ def _grounding_lines(tc_iri: URIRef, ledger) -> list[str]:
     return lines
 
 
+def _resolution_check_lines(tc_iri: URIRef, ledger) -> list[str]:
+    """svt:checksResolution facts -- reference-resolution's expected
+    posterior state is a *set* of facts, not the single svt:expected
+    scalar, so this renders instead of (never alongside) an "expected"
+    line for that method."""
+    checks = sorted(ledger.objects(tc_iri, SVT.checksResolution), key=str)
+    lines = ["- **expected posterior state** (resolution facts):"]
+    for check in checks:
+        subject = ledger.value(check, SVT.subjectFeature)
+        target = ledger.value(check, SVT.expectedTarget)
+        lines.append(f"  - `{subject}` must resolve to `{target}`")
+    return lines
+
+
 def _testcase_section(tc_iri: URIRef, rows: list, ledger) -> str:
     slug = _local_slug(tc_iri)
     first = rows[0]
@@ -99,7 +113,16 @@ def _testcase_section(tc_iri: URIRef, rows: list, ledger) -> str:
     fixtures_dir = fixtures_dir_for(slug)
 
     lines = [f"## {slug}", "", str(first.description), "", f"- **method**: `{first.method}`"]
-    if first.expected is not None:
+    prior_state = ledger.value(tc_iri, SVT.priorState)
+    if prior_state is not None:
+        lines.append(f"- **prior state (x)**: {prior_state}")
+    events = ledger.value(tc_iri, SVT.events)
+    if events is not None:
+        lines.append(f"- **command (u): events**: `{events}`")
+
+    if str(first.method) == "reference-resolution":
+        lines += _resolution_check_lines(tc_iri, ledger)
+    elif first.expected is not None:
         lines.append(f"- **expected**: `{first.expected}`")
     else:
         lines.append("- **expected**: _not yet settled_")

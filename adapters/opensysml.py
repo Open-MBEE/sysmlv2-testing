@@ -36,6 +36,29 @@ class OpenSysMLAdapter(Adapter):
                 return self._constraint_eval(conn, content, spec)
             if spec.method == "state-execution":
                 return self._state_execution(conn, content, spec)
+            if spec.method == "reference-resolution":
+                # Confirmed two ways, not one, not a client-wrapping gap:
+                # (1) the wire protocol's only identity field (SymbolInfo.id
+                # / Specialization.target_id, per sysml_pb2.pyi) *is* the
+                # collision-prone qualified-name string -- both anonymous
+                # `ref :>> items = a/b;` redefinitions under the same
+                # container get the identical synthesized id, and
+                # GetSymbol on it 404s; (2) model.convert('turtle') *does*
+                # assign distinguishable per-element URIs to the two
+                # siblings (positional @0/@1 naming), but its
+                # `sysml:redefines` predicate is a bare declared-name
+                # string literal ("items"), not a link to the resolved
+                # target element -- so even the richer export can't
+                # answer "resolves to which one." A real upstream gap,
+                # not engineered around client-side.
+                raise UnsupportedMethod(
+                    "opensysml has no way to check reference-resolution facts for "
+                    "anonymous features: its Symbol/Query wire protocol's only "
+                    "identity field is the same colliding qualified-name string "
+                    "(confirmed via sysml_pb2.pyi), and its to_turtle() export's "
+                    "sysml:redefines predicate is a bare name string, not a link "
+                    "to the resolved target -- worth filing upstream"
+                )
             raise UnsupportedMethod(
                 f"opensysml adapter has no handler for method {spec.method!r}"
             )
@@ -74,9 +97,13 @@ class OpenSysMLAdapter(Adapter):
                 "state-execution requires --eval-subject (the state machine's FQN) "
                 "on the TestCase"
             )
+        # spec.events is the command u: an ordered, comma-joined event
+        # sequence to feed the state machine (absent = the zero-event
+        # default -- does it settle correctly with nothing to react to).
+        events = [e.strip() for e in spec.events.split(",") if e.strip()] if spec.events else None
         model = conn.load_from_content(content, strict=False)
-        command = f"Model.execute_state({spec.eval_subject!r})"
-        result = model.execute_state(spec.eval_subject)
+        command = f"Model.execute_state({spec.eval_subject!r}, events={events!r})"
+        result = model.execute_state(spec.eval_subject, events=events)
         return RawResult(
             command=command,
             exit_code=0,

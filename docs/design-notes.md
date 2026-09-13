@@ -82,6 +82,61 @@ since the same citations apply and the explicit form is the spec's own
 normative example), so the Pilot's run there is an honest `failed`, not
 adjudicated away.
 
+## The rig's own rigor check caught a second real bug: `structural-check` alone is not enough
+
+Z's challenge, verified rather than argued about: does this rig actually
+catch "runs clean but produces the wrong answer" bugs, or only "did the
+tool report an error"? Checked directly against `redefinition-ambiguity-2`
+(the 2-occurrence case, seeded as `structural-check`, `expected: clean`):
+sysml-toolkit exits 0 (admissible — `u` is legal at `U_x`), and the ledger
+recorded `passed`. But converting that same fixture to compact-json and
+walking the real `Redefinition` edges by object id showed the two
+anonymous `:>> items` redefinitions resolving to **each other**, not to
+`Container::items` — a real, silent, wrong-answer bug the exit-code check
+structurally cannot see. This reframes the whole model: each
+`Implementation` is a candidate realization of a transition function `f`;
+`structural-check` only asks whether a command `u` is admissible (`u` in
+`U_x`); it says nothing about whether the resulting `x+ = f(x, u)` is
+actually correct.
+
+Fixed by adding a fourth method, `reference-resolution`, which asserts a
+*set* of resolved-reference facts (`svt:checksResolution` →
+`svt:ResolutionCheck{subjectFeature, expectedTarget}`) checked by real
+per-implementation object identity, never diagnostics:
+
+- **sysml-toolkit**: `sysmlv2 convert --to compact-json` + walk
+  `Redefinition.redefiningFeature`/`redefinedFeature` `@id` links —
+  confirmed the project's own idiomatic test technique (its `IDS.md`
+  documents the `@id` stability contract this relies on; its
+  `tests/json.rs` does the identical walk). `redefinition-ambiguity-2`/
+  `-3plus-resolution` now record real, grounded `failed`s here: the
+  2-occurrence case cross-wires silently, the 3+ case leaves
+  `redefinedFeature` permanently unresolved (`@ref`, never `@id`) —
+  both now visible in the ledger, not hidden behind a clean exit code.
+- **Pilot Implementation**: `SysMLInteractive.resolve()` +
+  `Feature.getOwnedRedefinition()` + `Redefinition.getRedefinedFeature()`,
+  compared by real Java object identity (`==`) — a small
+  `adapters/pilot_glue/Main.java` addition (`--redef <container>` mode).
+  Resolves correctly in both cases (`passed`).
+- **OpenSysML**: confirmed, two ways, genuinely not possible today. Its
+  `Symbol`/`Specialization`/`Query` wire protocol's only identity field
+  (`SymbolInfo.id`/`Specialization.target_id`, per the actual protobuf
+  schema) *is* the same colliding qualified-name string two anonymous
+  siblings both get; its `to_turtle()` export assigns them distinguishable
+  URIs but represents `sysml:redefines` as a bare declared-name string,
+  not a link to the resolved target. Recorded as `earl:inapplicable`,
+  with both findings in the `Invocation`'s stderr — a real upstream gap
+  worth filing, not something to fake around.
+
+Also added: `svt:events` (state-execution's previously-unmodeled command
+`u` — an ordered event sequence) and `svt:priorState` (mostly unused today,
+but now a place to record `x` explicitly for a future multi-step
+scenario). Seeded the first real state-execution test cases from
+`BrandFootprintML`'s own worked `Surface` state-machine example — grounded
+in §7.18.2's entry-transition-succession text, which also explains
+`BrandFootprintML`'s own `ISSUES-PROPOSED.md` #6 finding (a state machine
+with no explicit entry transition has no well-defined initial state).
+
 ## Why `expected` can still be unset
 
 `svt:expected` is only ever set once it's actually grounded. A test case

@@ -4,16 +4,20 @@ A knowledge-graph testing ledger for SysML v2 implementations, built on
 [W3C EARL](https://www.w3.org/TR/EARL10-Schema/) and
 [PROV-O](https://www.w3.org/TR/prov-o/).
 
-This is a **pipeline, not a platform**:
+This is a **pipeline, not a platform**. Each `Implementation` is a
+candidate realization of a transition function `f`; a `TestCase` states
+the correct `x+ = f(x, u)` for a prior state `x` and command `u`
+(`TestCase.method` says which fact about that transition is being
+checked — see `AGENTS.md`):
 
 ```
-TestCase input files  ->  pinned tool for (Implementation, Version)  ->  raw stdout/stderr/exit code
-        ->  scripted comparator (keyed by TestCase.method) vs TestCase.expected  ->  earl:outcome
+TestCase input files (u)  ->  pinned tool for (Implementation, Version)  ->  raw stdout/stderr/exit code
+        ->  scripted comparator (keyed by TestCase.method) vs the expected x+  ->  earl:outcome
         ->  canonical Turtle, SHACL-validated, appended to the ledger
 ```
 
-No LLM anywhere in the run/compare/log path. `expected` values are
-grounded in verbatim-quoted spec citations, not bare assertions — see
+No LLM anywhere in the run/compare/log path. Expected values are grounded
+in verbatim-quoted spec citations, not bare assertions — see
 `docs/design-notes.md`. See `AGENTS.md` for the full contract.
 
 ## Setup
@@ -84,35 +88,46 @@ uv run svt view --testcase <slug>
 
 ## What's in the ledger already
 
-Five seeded test cases (ported from real ad hoc testing — see
-`docs/design-notes.md`), every one grounded in a verbatim-quoted spec
-citation, run against real, pinned builds of all three implementations:
-[OpenSysML](https://github.com/Open-MBEE/OpenSysML) (Go),
-[sysml-toolkit](https://github.com/Open-MBEE/sysml-toolkit) (Rust), and the
-OMG's own
+Ten seeded test cases across four methods (`structural-check`,
+`constraint-eval`, `state-execution`, `reference-resolution`), every one
+grounded in a verbatim-quoted spec citation, run against real, pinned
+builds of all three implementations: [OpenSysML](https://github.com/Open-MBEE/OpenSysML)
+(Go), [sysml-toolkit](https://github.com/Open-MBEE/sysml-toolkit) (Rust),
+and the OMG's own
 [Pilot Implementation](https://github.com/Systems-Modeling/SysML-v2-Pilot-Implementation)
 (Java, driven headlessly via `org.omg.sysml.interactive.SysMLInteractive`
 through a small Java shim, `adapters/pilot_glue/Main.java`):
 
 ```
 $ uv run svt report
-passed        10
-failed        3
+passed        14
+failed        5
 cantTell      0
-inapplicable  1
+inapplicable  5
 untested      0
 ```
 
 Every one of those is a real adapter run against a real pinned build —
 nothing here is a fixture standing in for a result, and nothing is an
-ungrounded coin flip:
+ungrounded coin flip. Two of the `failed`s are the same real bug seen two
+different ways — worth calling out, since it's the reason
+`reference-resolution` exists at all:
 
-- sysml-toolkit `failed` on `redefinition-ambiguity-3plus`: anonymous
-  `:>>` redefinition of a multi-valued reference feature becomes falsely
-  "ambiguous" at 3+ occurrences. Grounded in KerML's
-  `Type::removeRedefinedFeatures` operation, a general set operation over
-  however many redefining memberships exist (not a pairwise fold) — both
-  other implementations resolve it cleanly, matching the spec.
+- `redefinition-ambiguity-2` (`structural-check`, exit-code only) records
+  sysml-toolkit as `passed` — it exits clean. But
+  `redefinition-ambiguity-2-resolution` (`reference-resolution`, checking
+  what the two anonymous `:>> items` redefinitions actually resolve to by
+  real object identity) shows sysml-toolkit `failed`: they resolve to
+  **each other**, not to `Container::items` — a silent wrong-answer bug
+  `structural-check` structurally cannot see. `redefinition-ambiguity-3plus`
+  shows the same split (`passed` on exit code, `failed` on resolution —
+  the 3+ case leaves the reference permanently unresolved). Both grounded
+  in KerML's `Type::removeRedefinedFeatures` operation, a general set
+  operation over however many redefining memberships exist (not a
+  pairwise fold) — OpenSysML records `inapplicable` here (a confirmed
+  upstream gap: its only per-element identity is the same colliding
+  qualified-name string two anonymous siblings share), the Pilot resolves
+  correctly (`passed`).
 - sysml-toolkit `failed` on `end-feature-redefinition-bare`: silently
   accepts a bare `:>> source = a;` connection-end redefinition (no `end`
   keyword). Grounded in SysML v2.0 Part 1 §8.4.9.2's
@@ -125,9 +140,11 @@ ungrounded coin flip:
   with `"Must have at least two related elements"` — a genuine
   Pilot-specific bug, not a harness artifact (confirmed against two
   different input-feeding strategies).
-- The `inapplicable` is sysml-toolkit's `verify` mechanism honestly
-  reporting it can't perform a per-usage constraint evaluation (it
-  evaluates a constraint's declaration-site defaults instead).
+- The `inapplicable`s: sysml-toolkit's `verify`/`query` can't do a
+  per-usage constraint evaluation (evaluates declaration-site defaults
+  instead); neither sysml-toolkit nor the Pilot expose a state-execution
+  API; OpenSysML has no reference-resolution path for anonymous features
+  (above). All recorded honestly, never faked.
 
 Per-implementation: `uv run svt report --implementation <slug>`. Read any
 test case's full detail — grounding, real input, every implementation's

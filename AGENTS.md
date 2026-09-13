@@ -4,10 +4,20 @@
 
 A testing ledger for SysML v2 implementations: a knowledge graph (W3C EARL
 and PROV-O) recording which `Implementation` × `Version` was run against
-which `TestCase`, and what actually happened. It is a **pipeline, not a
-platform** — see the diagram in `README.md`. Keep it that way. Do not add
-a dashboard, a web UI, or a query service; a ledger explorer is explicitly
-deferred (see `docs/`).
+which `TestCase`, and what actually happened. Each `Implementation` is a
+candidate realization of a state-transition function `f`; a `TestCase`
+states the correct `x+ = f(x, u)` for a prior state `x` (`svt:priorState`)
+and command `u` (input files, plus a method-specific piece), and
+`svt:method` says which fact about that transition is being checked —
+`structural-check` only asks whether `u` is admissible at all (`u` in
+`U_x`), which is a genuinely different, weaker question than whether the
+resulting `x+` is actually correct (`constraint-eval`/`state-execution`/
+`reference-resolution` each check a real fact about `x+`). Conflating the
+two is a real bug this rig found in its own seeded data — see
+`docs/design-notes.md`. It is a **pipeline, not a platform** — see the
+diagram in `README.md`. Keep it that way. Do not add a dashboard, a web
+UI, or a query service; a ledger explorer is explicitly deferred (`svt
+view` compiles a read-only Markdown report instead — see `docs/`).
 
 ## The one rule that matters: no LLM in the run/compare/log path
 
@@ -67,7 +77,8 @@ against each `Implementation`/`Version` you care about, then `svt report`.
 ## Design source
 
 Several seeded test cases and the adapter shapes (`structural-check`,
-`constraint-eval`, `state-execution`) come from real ad hoc dual-tool
-testing the repo's author did before this repo existed — see the credit
-in `docs/design-notes.md`. When adding a new test case, prefer a real,
-reproducible divergence you actually observed over an invented one.
+`constraint-eval`, `state-execution`, `reference-resolution`) come from
+real ad hoc dual-tool testing the repo's author did before this repo
+existed — see the credit in `docs/design-notes.md`. When adding a new
+test case, prefer a real, reproducible divergence you actually observed
+over an invented one.

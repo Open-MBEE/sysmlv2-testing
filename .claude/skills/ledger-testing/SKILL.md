@@ -33,30 +33,51 @@ uv run svt version set-stable --implementation <slug> --version <commit>
 This *appends* a new stability record; it never overwrites history — old
 `TestRun`s stay interpretable against what was stable when they ran.
 
-## 2. Write the test case as a concrete input → expected-output claim
+## 2. Write the test case as a state-transition claim: x+ = f(x, u)
 
-A test case is: some input files, a `method` telling `svt run` which
-scripted comparator to use, and (usually) an `expected` value that
-comparator checks against.
+Each `Implementation` is a candidate realization of a transition function
+`f`. A test case states: given prior state `x` (`--prior-state`, almost
+always omitted — absence means fresh, nothing but the standard library)
+and command `u` (the input files, plus a method-specific piece —
+`--events`, `--eval-expression`/`--eval-subject`, or `--resolves`), the
+correct posterior state `x+` is what `--method` checks:
 
-| method | what it checks | needs |
+| method | checks | needs |
 |---|---|---|
-| `structural-check` | exit code / diagnostics, `clean` or `violated` | just the input files |
-| `constraint-eval` | a boolean, vs. `expected` (`true`/`false`) | `--eval-expression` and `--eval-subject` (the usage FQN) |
-| `state-execution` | the comma-joined states a state machine visits | `--eval-subject` (the state machine FQN) |
+| `structural-check` | is `u` even admissible (`u` in `U_x`) — exit code / diagnostics, `clean` or `violated` | just the input files |
+| `constraint-eval` | a fact about the actual `x+`: a boolean | `--eval-expression` and `--eval-subject` (the usage FQN) |
+| `state-execution` | a fact about the actual `x+`: the comma-joined states visited | `--eval-subject` (the state machine FQN); `--events` is the command `u` (an ordered, comma-joined event sequence — omit for the zero-event default) |
+| `reference-resolution` | facts about the actual `x+`: does each named feature really resolve to the target it should — by real object identity, never diagnostics | `--resolves "<subjectFeature>=<expectedTarget>"`, repeatable |
+
+`structural-check` only tells you the input was *legal* — it cannot catch
+"ran clean but resolved to the wrong thing" (a real bug this rig found in
+its own seeded data: two anonymous redefinitions silently cross-wired to
+each other while the tool exited 0 — see `docs/design-notes.md`). If your
+test case is really about what a reference resolves to, use
+`reference-resolution`, not `structural-check`.
 
 ```bash
 uv run svt testcase add --id <slug> \
   --description "when you do X, it should produce Y" \
   --input-file path/to/one.sysml [--input-file path/to/two.sysml ...] \
-  --method structural-check --expected clean
+  --method structural-check --expected clean \
+  --grounds <citation-id>
 ```
+
+**Ground it.** `--expected` (or `--resolves`) with no `--grounds` is an
+unsupported assertion — cite the actual spec text that settles it
+(`svt document add` / `svt citation add` first, if the citation doesn't
+exist yet; `svt testcase ground` to add citations after the fact).
 
 **If you don't yet know the correct answer** (e.g. two implementations
 disagree and it isn't settled which matches the spec), omit `--expected`.
 Do not guess to fill the field. A `TestRun` against an unsettled test case
 mechanically records `earl:cantTell` — the honest outcome — with the real
-captured output kept in `earl:info` for whoever adjudicates it later.
+captured output kept on the `Invocation` for whoever adjudicates it later.
+If you find grounding for a test case that was left unset (or realize
+`--expected` was wrong), `svt testcase set-expected` corrects it in
+place — regenerate every existing `TestRun` against that test case
+afterward, since they were computed under the old value.
 
 ## 3. Run it
 
@@ -95,5 +116,8 @@ patch the symptom.
 - Edit a fixture file after a `TestRun` already cites it — add a new test
   case instead.
 
-A ledger explorer/browser is out of scope for now; read the `.ttl` files
-directly, or `svt report`, until one exists.
+A ledger explorer/browser is out of scope for now, but `svt view
+[--testcase <slug>]` compiles a deterministic Markdown report (one SPARQL
+query + the fixture files — grounding, real input, every implementation's
+real command/exit code/full stdout/stderr) to `reports/` (gitignored,
+ephemeral). Prefer it over reading the `.ttl` files directly.

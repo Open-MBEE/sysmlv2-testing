@@ -21,6 +21,7 @@ EXPECTED_VIOLATIONS = {
     "testresult_bad_outcome": "TestResultOutcomeShape",
     "invocation_bad_digest": "InvocationInputDigestShape",
     "citation_missing_quote": "SpecCitationQuoteShape",
+    "resolutioncheck_missing_target": "ResolutionCheckExpectedTargetShape",
 }
 
 

@@ -22,12 +22,20 @@ class UnsupportedMethod(Exception):
 
 
 @dataclass(frozen=True)
+class ResolutionCheck:
+    subject_feature: str
+    expected_target: str
+
+
+@dataclass(frozen=True)
 class TestCaseSpec:
     input_files: list[Path]
     method: str
     expected: str | None
     eval_expression: str | None = None
     eval_subject: str | None = None
+    events: str | None = None  # method=state-execution: comma-joined event names (the command u)
+    resolution_checks: tuple[ResolutionCheck, ...] = ()  # method=reference-resolution
 
 
 @dataclass(frozen=True)

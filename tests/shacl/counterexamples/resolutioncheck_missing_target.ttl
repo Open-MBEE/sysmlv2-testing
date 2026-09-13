@@ -1,0 +1,6 @@
+@prefix svt: <https://w3id.org/sysmlv2-testing#> .
+@prefix svtid: <https://w3id.org/sysmlv2-testing/id/> .
+
+svtid:resolutioncheck-broken a svt:ResolutionCheck ;
+    svt:subjectFeature "UsageTwo::c::@0" .
+# missing svt:expectedTarget -- violates svt:ResolutionCheckShape

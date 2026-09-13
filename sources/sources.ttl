@@ -37,6 +37,14 @@ svtid:citation-remove-redefined-features
     svt:rationale "This is a general set operation over the whole memberships collection (existential quantification, not a pairwise fold) -- it is defined the same way regardless of how many redefining memberships exist. Nothing in this algorithm conditions correctness on sibling count, so 2 vs 3+ anonymous redefinitions of the same base feature should resolve identically. This directly supports expected=clean for both redefinition-ambiguity-2 and redefinition-ambiguity-3plus, and independently corroborates BrandFootprintML's own root-cause hypothesis that sysml-toolkit's drop_redefined_hits (a suspected pairwise fold) diverges from this normative set-based algorithm. Version caveat: this is KerML v1.1 Beta 2 (Release 2026-07), not the v1.0 release the SysML v2.0 Language Specification (formal/2026-03-02, March 2026) cross-references as '[KerML, ...]' -- used as the best locally-held proxy; this is a foundational, long-stable KerML mechanism unlikely to have changed in a way that would flip this conclusion, but the version mismatch is real and noted rather than glossed over." ;
     svt:section "8.3.3.1.10 Type (removeRedefinedFeatures operation)" .
 
+svtid:citation-state-initial-via-entry-succession
+    a svt:SpecCitation ;
+    svt:citesDocument svtid:spec-formal-2026-03-02 ;
+    svt:page "117" ;
+    svt:quote "A state definition or usage may hierarchically contain state usages in its body. By default, these substate usages are considered to be exclusive, that is, their performances do not overlap in time. The initial state usage to be performed is indicated by a succession (see 7.13.5) from the entry action to that state usage, representing that this is the state that is entered on completion of the entry action. If the containing state has no substantive entry action, then an empty entry action may be used as the source of the succession. A shorthand may also be used for a succession whose source is the entry action, consisting of the keyword then followed by a qualified name or feature chain for the target state usage, placed immediately after the entry action declaration." ;
+    svt:rationale "Our fixture's 'entry; then dormant;' is exactly this shorthand (an empty entry action, then a succession to dormant) -- grounding dormant as the correct settled state when no events are given (the command u is empty). Given an EngagementEvent, the fixture's explicit 'transition first dormant accept EngagementEvent then active;' grounds transitioning to active." ;
+    svt:section "7.18.2 State Definitions and Usages" .
+
 svtid:spec-formal-2026-03-02
     a svt:SpecDocument ;
     rdfs:label "OMG Systems Modeling Language (SysML), Version 2.0, Part 1: Language Specification" ;

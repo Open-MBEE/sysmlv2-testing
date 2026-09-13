@@ -22,6 +22,24 @@ error <content>:22:9-22:16: Redefining feature must be an end feature
 warning <content>:22:9-22:15: Duplicate of inherited member name 'target' from BinaryConnection""" ;
     svt:stdout "" .
 
+svtid:invocation-0b1e2a6e11a706ea
+    a svt:Invocation ;
+    prov:startedAtTime "2026-09-13T00:20:59+00:00"^^xsd:dateTime ;
+    svt:command "Model.execute_state('StateDemo::Surface::condition', events=['EngagementEvent'])" ;
+    svt:exitCode "0"^^xsd:integer ;
+    svt:inputDigest "a42791bd6ee2f43cb1ef27ea1dd8197ff401212039cde225961d6167bd0e4d0a" ;
+    svt:stderr "" ;
+    svt:stdout "dormant,active" .
+
+svtid:invocation-124b82f1c1237e0b
+    a svt:Invocation ;
+    prov:startedAtTime "2026-09-13T00:20:59+00:00"^^xsd:dateTime ;
+    svt:command "Model.execute_state('StateDemo::Surface::condition', events=None)" ;
+    svt:exitCode "0"^^xsd:integer ;
+    svt:inputDigest "a42791bd6ee2f43cb1ef27ea1dd8197ff401212039cde225961d6167bd0e4d0a" ;
+    svt:stderr "" ;
+    svt:stdout "dormant" .
+
 svtid:invocation-59a9dc1ec284415e
     a svt:Invocation ;
     prov:startedAtTime "2026-09-12T21:18:42+00:00"^^xsd:dateTime ;
@@ -30,6 +48,24 @@ svtid:invocation-59a9dc1ec284415e
     svt:inputDigest "bba86b0291f9536718ccec38a52c692089862f2cfb5a24dd31ec4dc5adce9903" ;
     svt:stderr "" ;
     svt:stdout "false" .
+
+svtid:invocation-5f0a86cb80f7637e
+    a svt:Invocation ;
+    prov:startedAtTime "2026-09-13T00:19:10+00:00"^^xsd:dateTime ;
+    svt:command "(unsupported)" ;
+    svt:exitCode "-1"^^xsd:integer ;
+    svt:inputDigest "918e05e1bc6e884e0ccd7463547e4d4fe50086c280ee5e28f5b37c0b614711ca" ;
+    svt:stderr "opensysml has no way to check reference-resolution facts for anonymous features: its Symbol/Query wire protocol's only identity field is the same colliding qualified-name string (confirmed via sysml_pb2.pyi), and its to_turtle() export's sysml:redefines predicate is a bare name string, not a link to the resolved target -- worth filing upstream" ;
+    svt:stdout "" .
+
+svtid:invocation-648f3889d4a57b27
+    a svt:Invocation ;
+    prov:startedAtTime "2026-09-13T00:19:10+00:00"^^xsd:dateTime ;
+    svt:command "(unsupported)" ;
+    svt:exitCode "-1"^^xsd:integer ;
+    svt:inputDigest "dd8e5e69f050f6548c2e6e2e7cb21b17e84b79019c80fd3ffacb29d95c05e35a" ;
+    svt:stderr "opensysml has no way to check reference-resolution facts for anonymous features: its Symbol/Query wire protocol's only identity field is the same colliding qualified-name string (confirmed via sysml_pb2.pyi), and its to_turtle() export's sysml:redefines predicate is a bare name string, not a link to the resolved target -- worth filing upstream" ;
+    svt:stdout "" .
 
 svtid:invocation-75c5822601fb66db
     a svt:Invocation ;
@@ -64,11 +100,33 @@ svtid:result-028809c427cb28e0
     earl:outcome earl:passed ;
     svt:actual "violated" .
 
+svtid:result-0b1e2a6e11a706ea
+    a earl:TestResult ;
+    earl:info "expected='dormant,active' actual='dormant,active'" ;
+    earl:outcome earl:passed ;
+    svt:actual "dormant,active" .
+
+svtid:result-124b82f1c1237e0b
+    a earl:TestResult ;
+    earl:info "expected='dormant' actual='dormant'" ;
+    earl:outcome earl:passed ;
+    svt:actual "dormant" .
+
 svtid:result-59a9dc1ec284415e
     a earl:TestResult ;
     earl:info "expected='false' actual='false'" ;
     earl:outcome earl:passed ;
     svt:actual "false" .
+
+svtid:result-5f0a86cb80f7637e
+    a earl:TestResult ;
+    earl:info "opensysml has no way to check reference-resolution facts for anonymous features: its Symbol/Query wire protocol's only identity field is the same colliding qualified-name string (confirmed via sysml_pb2.pyi), and its to_turtle() export's sysml:redefines predicate is a bare name string, not a link to the resolved target -- worth filing upstream" ;
+    earl:outcome earl:inapplicable .
+
+svtid:result-648f3889d4a57b27
+    a earl:TestResult ;
+    earl:info "opensysml has no way to check reference-resolution facts for anonymous features: its Symbol/Query wire protocol's only identity field is the same colliding qualified-name string (confirmed via sysml_pb2.pyi), and its to_turtle() export's sysml:redefines predicate is a bare name string, not a link to the resolved target -- worth filing upstream" ;
+    earl:outcome earl:inapplicable .
 
 svtid:result-75c5822601fb66db
     a earl:TestResult ;
@@ -98,6 +156,26 @@ svtid:run-028809c427cb28e0
     prov:startedAtTime "2026-09-12T21:18:41+00:00"^^xsd:dateTime ;
     svt:hasInvocation svtid:invocation-028809c427cb28e0 .
 
+svtid:run-0b1e2a6e11a706ea
+    a svt:TestRun ;
+    earl:assertedBy svtid:agent-svt-cli ;
+    earl:mode earl:automatic ;
+    earl:result svtid:result-0b1e2a6e11a706ea ;
+    earl:subject svtid:version-f69111dc2adf2203 ;
+    earl:test svtid:testcase-state-machine-transitions-on-event ;
+    prov:startedAtTime "2026-09-13T00:20:59+00:00"^^xsd:dateTime ;
+    svt:hasInvocation svtid:invocation-0b1e2a6e11a706ea .
+
+svtid:run-124b82f1c1237e0b
+    a svt:TestRun ;
+    earl:assertedBy svtid:agent-svt-cli ;
+    earl:mode earl:automatic ;
+    earl:result svtid:result-124b82f1c1237e0b ;
+    earl:subject svtid:version-f69111dc2adf2203 ;
+    earl:test svtid:testcase-state-machine-settles-without-events ;
+    prov:startedAtTime "2026-09-13T00:20:59+00:00"^^xsd:dateTime ;
+    svt:hasInvocation svtid:invocation-124b82f1c1237e0b .
+
 svtid:run-59a9dc1ec284415e
     a svt:TestRun ;
     earl:assertedBy svtid:agent-svt-cli ;
@@ -107,6 +185,26 @@ svtid:run-59a9dc1ec284415e
     earl:test svtid:testcase-constraint-eval-declaration-site ;
     prov:startedAtTime "2026-09-12T21:18:42+00:00"^^xsd:dateTime ;
     svt:hasInvocation svtid:invocation-59a9dc1ec284415e .
+
+svtid:run-5f0a86cb80f7637e
+    a svt:TestRun ;
+    earl:assertedBy svtid:agent-svt-cli ;
+    earl:mode earl:automatic ;
+    earl:result svtid:result-5f0a86cb80f7637e ;
+    earl:subject svtid:version-f69111dc2adf2203 ;
+    earl:test svtid:testcase-redefinition-ambiguity-3plus-resolution ;
+    prov:startedAtTime "2026-09-13T00:19:10+00:00"^^xsd:dateTime ;
+    svt:hasInvocation svtid:invocation-5f0a86cb80f7637e .
+
+svtid:run-648f3889d4a57b27
+    a svt:TestRun ;
+    earl:assertedBy svtid:agent-svt-cli ;
+    earl:mode earl:automatic ;
+    earl:result svtid:result-648f3889d4a57b27 ;
+    earl:subject svtid:version-f69111dc2adf2203 ;
+    earl:test svtid:testcase-redefinition-ambiguity-2-resolution ;
+    prov:startedAtTime "2026-09-13T00:19:10+00:00"^^xsd:dateTime ;
+    svt:hasInvocation svtid:invocation-648f3889d4a57b27 .
 
 svtid:run-75c5822601fb66db
     a svt:TestRun ;

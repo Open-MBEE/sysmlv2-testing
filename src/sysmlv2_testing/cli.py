@@ -52,7 +52,7 @@ app.add_typer(document_app, name="document")
 app.add_typer(citation_app, name="citation")
 
 AGENT_IRI = URIRef(f"{SVTID}agent-svt-cli")
-METHODS = ("structural-check", "constraint-eval", "state-execution")
+METHODS = ("structural-check", "constraint-eval", "state-execution", "reference-resolution")
 ADAPTER_MODULES = {
     "opensysml": "adapters.opensysml",
     "sysml-toolkit": "adapters.sysml_toolkit",
@@ -244,8 +244,19 @@ def testcase_add(
     input_file: List[Path] = typer.Option(..., "--input-file"),
     method: str = typer.Option(..., "--method"),
     expected: Optional[str] = typer.Option(None, "--expected"),
+    prior_state: Optional[str] = typer.Option(
+        None, "--prior-state", help="x: absent means the default (fresh, nothing but stdlib)"
+    ),
     eval_expression: Optional[str] = typer.Option(None, "--eval-expression"),
     eval_subject: Optional[str] = typer.Option(None, "--eval-subject"),
+    events: Optional[str] = typer.Option(
+        None, "--events", help="method=state-execution: comma-joined event names (the command u)"
+    ),
+    resolves: List[str] = typer.Option(
+        [],
+        "--resolves",
+        help='method=reference-resolution: "<subjectFeature>=<expectedTarget>"; repeatable',
+    ),
     grounds: List[str] = typer.Option(
         [], "--grounds", help="a svt:SpecCitation --id backing --expected; repeatable"
     ),
@@ -259,12 +270,26 @@ def testcase_add(
     g.add((iri, RDF.type, SVT.TestCase))
     g.add((iri, SVT.description, Literal(description)))
     g.add((iri, SVT.method, Literal(method)))
+    if prior_state is not None:
+        g.add((iri, SVT.priorState, Literal(prior_state)))
     if expected is not None:
         g.add((iri, SVT.expected, Literal(expected)))
     if eval_expression is not None:
         g.add((iri, SVT.evalExpression, Literal(eval_expression)))
     if eval_subject is not None:
         g.add((iri, SVT.evalSubject, Literal(eval_subject)))
+    if events is not None:
+        g.add((iri, SVT.events, Literal(events)))
+    for pair in resolves:
+        subject, sep, target = pair.partition("=")
+        if not sep:
+            typer.echo(f"error: --resolves must be '<subject>=<target>', got {pair!r}", err=True)
+            raise typer.Exit(2)
+        check_iri = ids.mint("resolutioncheck", f"{id_}|{subject}|{target}")
+        g.add((check_iri, RDF.type, SVT.ResolutionCheck))
+        g.add((check_iri, SVT.subjectFeature, Literal(subject)))
+        g.add((check_iri, SVT.expectedTarget, Literal(target)))
+        g.add((iri, SVT.checksResolution, check_iri))
     for citation_iri in citation_iris:
         g.add((iri, SVT.groundedIn, citation_iri))
 
@@ -345,7 +370,7 @@ def run_cmd(
     implementation: str = typer.Option(..., "--implementation"),
     version: str = typer.Option(..., "--version", help="the commit hash"),
 ) -> None:
-    from adapters.base import TestCaseSpec, UnsupportedMethod  # noqa: PLC0415
+    from adapters.base import ResolutionCheck, TestCaseSpec, UnsupportedMethod  # noqa: PLC0415
     from adapters.compare import compare  # noqa: PLC0415
 
     ledger = load_full_ledger()
@@ -364,6 +389,16 @@ def run_cmd(
     expected = str(expected_node) if expected_node is not None else None
     eval_expr = ledger.value(tc_iri, SVT.evalExpression)
     eval_subject = ledger.value(tc_iri, SVT.evalSubject)
+    events_node = ledger.value(tc_iri, SVT.events)
+    resolution_checks = tuple(
+        ResolutionCheck(
+            subject_feature=str(ledger.value(check_iri, SVT.subjectFeature)),
+            expected_target=str(ledger.value(check_iri, SVT.expectedTarget)),
+        )
+        # sorted for determinism -- the ledger's set-valued objects() has no
+        # guaranteed order, and adapters must see checks in a stable order
+        for check_iri in sorted(ledger.objects(tc_iri, SVT.checksResolution))
+    )
     input_names = sorted(str(o) for o in ledger.objects(tc_iri, SVT.hasInputFile))
     fixtures_dir = fixtures_dir_for(testcase)
     input_files = [fixtures_dir / name for name in input_names]
@@ -378,6 +413,8 @@ def run_cmd(
         expected=expected,
         eval_expression=str(eval_expr) if eval_expr is not None else None,
         eval_subject=str(eval_subject) if eval_subject is not None else None,
+        events=str(events_node) if events_node is not None else None,
+        resolution_checks=resolution_checks,
     )
 
     module_name = ADAPTER_MODULES.get(implementation)
@@ -399,7 +436,7 @@ def run_cmd(
         outcome, actual, info = "inapplicable", None, str(exc)
         command, exit_code, stdout, stderr = "(unsupported)", -1, "", str(exc)
     else:
-        outcome, actual, info = compare(method, expected, raw)
+        outcome, actual, info = compare(spec, raw)
         command, exit_code, stdout, stderr = raw.command, raw.exit_code, raw.stdout, raw.stderr
 
     run_iri = ids.mint("run", invocation_key)

@@ -29,11 +29,18 @@ svtid:citation-ok a svt:SpecCitation ;
     svt:page "1" ;
     svt:quote "ok is ok" .
 
+svtid:resolutioncheck-ok a svt:ResolutionCheck ;
+    svt:subjectFeature "UsageTwo::c::@0" ;
+    svt:expectedTarget "Lib::Container::items" .
+
 svtid:testcase-ok a svt:TestCase ;
     svt:description "ok" ;
     svt:hasInputFile "input.sysml" ;
     svt:method "structural-check" ;
     svt:expected "clean" ;
+    svt:priorState "fresh" ;
+    svt:events "SomeEvent" ;
+    svt:checksResolution svtid:resolutioncheck-ok ;
     svt:groundedIn svtid:citation-ok .
 
 svtid:agent-ok a earl:Software .
