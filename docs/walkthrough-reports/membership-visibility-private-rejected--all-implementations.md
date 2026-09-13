@@ -112,10 +112,10 @@ log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more in
 - **outcome**: `passed`
 - **actual**: `violated`
 - **info**: expected='violated' actual='violated'
-- **command**: `/Users/z/Documents/GitHub/sysmlv2-testing/.cache/sysml-toolkit/v0.6.0/sysmlv2-0.6.0-aarch64-apple-darwin/sysmlv2 check --lib /Users/z/Documents/GitHub/SysML-v2-Pilot-Implementation/sysml.library --strict /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/membership-visibility-private-rejected/private-visibility.sysml`
+- **command**: `/Users/z/Documents/GitHub/sysml-toolkit/target/release/sysmlv2 check --lib /Users/z/Documents/GitHub/sysml-toolkit/spec-refs/SysML-v2-Release/sysml.library --strict /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/membership-visibility-private-rejected/private-visibility.sysml`
 - **exit code**: `1`
 - **input digest**: `sha256:de9f631acd37024ea472b26f505839b98e889c27830b7dd738cb60aa56c5e4b2`
-- **started at**: 2026-09-13T02:37:12+00:00
+- **started at**: 2026-09-13T04:36:12+00:00
 
 stdout:
 
