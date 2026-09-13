@@ -13,9 +13,10 @@ TestCase input files (u)  ->  pinned tool for (Implementation, Version)  ->  raw
         ->  canonical Turtle, SHACL-validated, appended to the ledger
 ```
 
-No LLM anywhere in the run/compare/log path. Expected values are grounded
-in verbatim-quoted spec citations, not bare assertions — see
-`docs/design-notes.md`. See `AGENTS.md` for the full contract.
+No LLM anywhere in the run/compare/log path. Every claim is grounded in
+a verbatim-quoted spec citation and confirmed by a named human (never an
+agent) before `svt run` will execute it — see `AGENTS.md` for the full
+contract.
 
 ## Setup
 
@@ -66,81 +67,25 @@ uv run svt report           # pass/fail/cantTell/inapplicable/untested census
 uv run svt view             # compile a readable Markdown report (reports/, gitignored)
 ```
 
-To ledger a new test end to end, see **`docs/workflow.md`** — the
-canonical, step-by-step procedure (construct → verify → human-validate →
-run → report → review → issue-decide) — or `docs/walkthrough.md` for a
-full worked example following those exact steps. The
-`ledger-testing` skill (`.claude/skills/ledger-testing/SKILL.md`) covers
-the same steps framed for an agent to follow.
+## Where to go next
 
-## What's in the ledger already
-
-Ten seeded test cases across four methods (`structural-check`,
-`constraint-eval`, `state-execution`, `reference-resolution`), every one
-grounded in a verbatim-quoted spec citation, run against real, pinned
-builds of all three implementations: [OpenSysML](https://github.com/Open-MBEE/OpenSysML)
-(Go), [sysml-toolkit](https://github.com/Open-MBEE/sysml-toolkit) (Rust),
-and the OMG's own
-[Pilot Implementation](https://github.com/Systems-Modeling/SysML-v2-Pilot-Implementation)
-(Java, driven headlessly via `org.omg.sysml.interactive.SysMLInteractive`
-through a small Java shim, `adapters/pilot_glue/Main.java`):
-
-```
-$ uv run svt report
-passed        <N>
-failed        5
-cantTell      0
-inapplicable  5
-untested      0
-```
-
-(`passed` grows every time a new TestRun is added — run the command
-yourself for the current count; the point isn't the exact number, it's
-that nothing here is `untested`.)
-
-Every one of those is a real adapter run against a real pinned build —
-nothing here is a fixture standing in for a result, and nothing is an
-ungrounded coin flip. Two of the `failed`s are the same real bug seen two
-different ways — worth calling out, since it's the reason
-`reference-resolution` exists at all:
-
-- `redefinition-ambiguity-2` (`structural-check`, exit-code only) records
-  sysml-toolkit as `passed` — it exits clean. But
-  `redefinition-ambiguity-2-resolution` (`reference-resolution`, checking
-  what the two anonymous `:>> items` redefinitions actually resolve to by
-  real object identity) shows sysml-toolkit `failed`: they resolve to
-  **each other**, not to `Container::items` — a silent wrong-answer bug
-  `structural-check` structurally cannot see. `redefinition-ambiguity-3plus`
-  shows the same split (`passed` on exit code, `failed` on resolution —
-  the 3+ case leaves the reference permanently unresolved). Both grounded
-  in KerML's `Type::removeRedefinedFeatures` operation, a general set
-  operation over however many redefining memberships exist (not a
-  pairwise fold) — OpenSysML records `inapplicable` here (a confirmed
-  upstream gap: its only per-element identity is the same colliding
-  qualified-name string two anonymous siblings share), the Pilot resolves
-  correctly (`passed`).
-- sysml-toolkit `failed` on `end-feature-redefinition-bare`: silently
-  accepts a bare `:>> source = a;` connection-end redefinition (no `end`
-  keyword). Grounded in SysML v2.0 Part 1 §8.4.9.2's
-  `checkFeatureEndRedefinition` constraint + §8.2.2.6.2's `isEnd` grammar
-  rule — a feature only counts as an end feature when the literal `end`
-  is present, so this should be rejected. OpenSysML and the Pilot both
-  reject it correctly.
-- Pilot Implementation `failed` on `end-feature-redefinition-explicit`:
-  rejects the spec's own normative example form (`end :>> source = a;`)
-  with `"Must have at least two related elements"` — a genuine
-  Pilot-specific bug, not a harness artifact (confirmed against two
-  different input-feeding strategies).
-- The `inapplicable`s: sysml-toolkit's `verify`/`query` can't do a
-  per-usage constraint evaluation (evaluates declaration-site defaults
-  instead); neither sysml-toolkit nor the Pilot expose a state-execution
-  API; OpenSysML has no reference-resolution path for anonymous features
-  (above). All recorded honestly, never faked.
-
-Per-implementation: `uv run svt report --implementation <slug>`. Read any
-test case's full detail — grounding, real input, every implementation's
-real command/exit code/complete stdout and stderr — with
-`uv run svt view --testcase <slug>`.
+- **[`docs/workflow.md`](docs/workflow.md)** — the canonical, TestCase-
+  agnostic step-by-step procedure: construct → verify construction →
+  human-validate → run → report → review → issue-decide. Start here to
+  ledger a new test.
+- **[`docs/walkthrough.md`](docs/walkthrough.md)** — the same procedure
+  worked end to end against real TestCases, with real commands and real
+  captured output at every step (including committed report snapshots
+  under `docs/walkthrough-reports/`). Read this before adding your own
+  first real TestCase.
+- **`AGENTS.md`** — the contributor contract: the state-transition
+  framing, the no-LLM-in-run/compare/log rule, and why a human (never an
+  agent) must validate a claim before it can run.
+- **[`docs/design-notes.md`](docs/design-notes.md)** — retrospective
+  rationale for past design decisions, including a real bug this rig's
+  own seeded data caught (why `structural-check` alone isn't enough).
+- **`.claude/skills/ledger-testing/SKILL.md`** — the same workflow,
+  framed for an agent to follow.
 
 ## Repo layout
 
@@ -154,4 +99,7 @@ adapters/     one module per implementation + the scripted comparators
 toolchain/    pinned-binary/build scripts for implementations under test
 src/          the svt CLI
 tests/        unit, SHACL counterexamples, determinism, PROV consistency
+docs/         workflow.md (the SOP), walkthrough.md (a full worked example,
+              + its committed report snapshots under walkthrough-reports/),
+              design-notes.md (retrospective rationale for past decisions)
 ```
