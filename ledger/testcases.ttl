@@ -136,3 +136,9 @@ svtid:validation-4402332ac9d82d9e
     prov:startedAtTime "2026-09-13T02:00:39+00:00"^^xsd:dateTime ;
     prov:wasAssociatedWith svtid:person-zargham ;
     svt:validates svtid:testcase-membership-visibility-private-rejected .
+
+svtid:validation-5df9d17405b10dce
+    a svt:Validation ;
+    prov:startedAtTime "2026-09-13T02:10:24+00:00"^^xsd:dateTime ;
+    prov:wasAssociatedWith svtid:person-zargham ;
+    svt:validates svtid:testcase-state-machine-transitions-on-event .

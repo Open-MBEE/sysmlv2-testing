@@ -37,7 +37,14 @@ in it (a human's comment on a completed run, and linking a run to an
 external issue) had no vocabulary, shape, or CLI command at all. This
 walkthrough is that first real pass, and the document recording it.
 
-## The example: `membership-visibility-private-rejected`
+Two examples are worked below: one whose actual output is a rejection
+(structural-check, `actual: violated`) and one whose actual output is a
+genuinely computed value (state-execution, `actual: dormant,active`) --
+worth keeping both, since "the tool produced an error" and "the tool
+produced a specific result that happens to match" are different kinds of
+evidence, and a reader should see both kinds in this ledger.
+
+## Example 1: `membership-visibility-private-rejected`
 
 **Claim**: a part usage typed by a `private part def`, referenced by
 qualified name from outside the definition's owning package, must be
@@ -186,6 +193,73 @@ than settled, correct behavior everywhere: `svt testrun link-issue
 --testcase ... --implementation ... --version ... --by <your name> --url
 <issue-url> [--label "..."]`. If not: nothing to do, the `TestRun` stands
 on its own.
+
+## Example 2: `state-machine-transitions-on-event`
+
+Example 1's `actual` is always either `clean` or `violated` --
+structural-check only ever answers "was this admissible." This example
+shows the other half of the ledger: a method whose `actual` is a real,
+specific computed value.
+
+**Claim**: a `Surface`'s exhibited state machine, given one
+`EngagementEvent`, must transition from `dormant` to `active`.
+
+**Grounded in**: SysML v2.0 Part 1, §7.18.2 "State Definitions and
+Usages", p.118 -- the entry-succession shorthand text (this citation was
+one of the four with an off-by-one page fixed earlier this pass; the
+page sent to Z for this validation was the corrected one).
+
+**Fixture** (`ledger/fixtures/state-machine-transitions-on-event/surface.sysml`,
+already seeded before this walkthrough -- reused here rather than
+constructing a new TestCase from scratch, since the point of this second
+example is the *kind* of output, not a new claim):
+
+```sysml
+package StateDemo {
+    occurrence def EngagementEvent;
+
+    part def Surface {
+        exhibit state condition {
+            entry; then dormant;
+            state dormant;
+            state active;
+            transition first dormant accept EngagementEvent then active;
+        }
+    }
+
+    part surface1 : Surface;
+}
+```
+
+Confirmed by an ad hoc probe (outside the ledger) before asking Z to
+spend time on it:
+
+```
+>>> model.execute_state('StateDemo::Surface::condition', events=['EngagementEvent'])
+{'states_visited': ['dormant', 'active']}
+```
+
+Z read the corrected p.118 and validated it himself:
+
+```
+$ uv run svt testcase validate --id state-machine-transitions-on-event --by Zargham
+https://w3id.org/sysmlv2-testing/id/validation-5df9d17405b10dce
+```
+
+Run against OpenSysML (this method has no path through sysml-toolkit or
+the Pilot Implementation -- both adapters raise `UnsupportedMethod` for
+`state-execution`; OpenSysML is the only one with a reachable execution
+API):
+
+```
+$ uv run svt run --testcase state-machine-transitions-on-event \
+    --implementation opensysml --version 2b6c1cf6c31266396899a90d3290cfbdf44019b9
+passed	https://w3id.org/sysmlv2-testing/id/run-29d5c83c1e3dbdf2
+```
+
+`actual`: `dormant,active` -- the real comma-joined state sequence the
+tool computed, not `clean`/`violated`, matching `expected` exactly. See
+`reports/testcase-state-machine-transitions-on-event.md`.
 
 ## What this pass built (not just this one TestCase)
 
