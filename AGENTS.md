@@ -74,6 +74,31 @@ work.** Doing so would make the ledger indistinguishable from one where a
 human genuinely checked every claim against the spec, which is the exact
 failure mode this gate exists to prevent.
 
+## Post-run human review: annotation and issue-linking
+
+Once a `TestRun` exists, two more human-only actions are available --
+distinct from `Validation`, which is about the TestCase's claim *before*
+any run happens:
+
+- **`svt testrun annotate --testcase <id> --implementation <slug>
+  --version <commit> --by <name> --comment "..."`** records a human's
+  free-text observation about one specific, already-completed `TestRun`
+  (`svt:Annotation`).
+- **`svt testrun link-issue --testcase <id> --implementation <slug>
+  --version <commit> --by <name> --url <issue-url> [--label "..."]`**
+  records that a `TestRun` relates to an external issue-tracker entry
+  (`svt:IssueLink`) -- a real, queryable fact instead of prose buried in
+  `svt:stderr`/`earl:info` or a `docs/design-notes.md` credit line.
+
+Both are `prov:Activity`-typed and append-only (a correction is a *new*
+record, never an edit), gated by the same `NOT_A_HUMAN` denylist as
+`svt testcase validate` -- **an agent must never run either of these on
+its own behalf**, same reasoning as validation. Both live under a new
+`svt testrun ...` sub-app, a deliberate asymmetry with the top-level `svt
+run` command (renaming `run` would be a breaking change for no benefit).
+See `docs/walkthrough.md` for a full worked example of the entire
+pipeline, construction through issue-linking, in one real pass.
+
 **`svt:description` is a requirement statement, not commentary.** Write
 it the way the spec states the requirement — it should read identically
 whether written before or after anything has ever been run against it.
@@ -100,7 +125,8 @@ tool's behavior the citation settles — that is rationale's actual job.
 Use the `ledger-testing` skill (`.claude/skills/ledger-testing/SKILL.md`),
 or directly: `svt testcase add` with your fixture files, ground it,
 **have a human run `svt testcase validate`**, then `svt run` it against
-each `Implementation`/`Version` you care about, then `svt report`.
+each `Implementation`/`Version` you care about, then `svt report`. Once a
+run exists, a human may also `svt testrun annotate`/`link-issue` it.
 
 ## Reproducibility
 

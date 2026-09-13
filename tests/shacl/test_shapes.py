@@ -24,6 +24,8 @@ EXPECTED_VIOLATIONS = {
     "resolutioncheck_missing_target": "ResolutionCheckExpectedTargetShape",
     "validation_missing_person": "ValidationAssociatedWithShape",
     "testcase_expected_without_grounding": "TestCaseGroundingRequiredShape",
+    "annotation_missing_person": "AnnotationAssociatedWithShape",
+    "issuelink_missing_url": "IssueLinkIssueURLShape",
 }
 
 

@@ -8,31 +8,39 @@
 svtid:citation-assert-constraint-per-usage-evaluation
     a svt:SpecCitation ;
     svt:citesDocument svtid:spec-formal-2026-03-02 ;
-    svt:page "125; 446" ;
-    svt:quote "(7.20.1, p.125) A constraint usage that is a feature of another definition or usage may also directly reference features of its containing context, in which case it may be used to effectively constrain the values of those features. (8.4.16.3, p.446) In general, a ConstraintCheck of a ConstraintUsage at a certain point in time produces a Boolean result indicating whether the modeled constraint holds or not at that point in time. [...] Therefore, a ConstraintCheck of a non-negated AssertConstraintUsage must have a true result -- that is, the constraint modeled by the AssertConstraintUsage is asserted to always hold." ;
+    svt:page "126; 447" ;
+    svt:quote "(7.20.1, p.126) A constraint usage that is a feature of another definition or usage may also directly reference features of its containing context, in which case it may be used to effectively constrain the values of those features. (8.4.16.3, p.447) In general, a ConstraintCheck of a ConstraintUsage at a certain point in time produces a Boolean result indicating whether the modeled constraint holds or not at that point in time. [...] Therefore, a ConstraintCheck of a non-negated AssertConstraintUsage must have a true result -- that is, the constraint modeled by the AssertConstraintUsage is asserted to always hold." ;
     svt:rationale "An assert constraint declared on a connection definition (Link) and evaluated for a specific usage (l) must be checked against l's own containing-context feature values (l's actual bound source/target), not the definition's own declaration-site defaults -- the ConstraintCheck is a check of the constraint in the context it is used. This grounds expected=false for connection l : Link { end :>> source = a; end :>> target = b; } where a.controlled=true, b.controlled=false: evaluated against l's real bindings, 'source.controlled and target.controlled' is false. sysml-toolkit's verify/query mechanism instead evaluates the constraint using Link's own default-bound values regardless of which usage is asked about (BrandFootprintML ISSUES-PROPOSED.md #1) -- a real conformance gap, which is exactly why the sysml-toolkit adapter for this method raises UnsupportedMethod rather than faking a result." ;
     svt:section "7.20.1 Constraints Overview; 8.4.16.3 Assert Constraint Usages" .
 
 svtid:citation-check-feature-end-redefinition
     a svt:SpecCitation ;
     svt:citesDocument svtid:spec-formal-2026-03-02 ;
-    svt:page "412-413" ;
-    svt:quote "A ConnectionUsage is a PartUsage and a ConnectorAsUsage, which is a kind of KerML Connector. [...] Further, the checkFeatureEndRedefinition constraint requires that the end Features of a ConnectionUsage redefine of corresponding end Features of its connectionDefinitions (see [KerML, 8.4.4.5]). Example: connection b : B subsets Connections::binaryConnections { end ref source references f1 redefines B::source; end ref target references f2 redefines B::target; }" ;
+    svt:page "413" ;
+    svt:quote "A ConnectionUsage is a PartUsage and a ConnectorAsUsage, which is a kind of KerML Connector. [...] Further, the checkFeatureEndRedefinition constraint requires that the end Features of a ConnectionUsage redefine of corresponding end Features of its connectionDefinitions (see [KerML, 8.4.4.5])." ;
     svt:rationale "Combined with the isEnd grammar rule (citation-end-usage-prefix-grammar): a feature written as bare ':>> source = a;' (no 'end' keyword) has isEnd = false, so it cannot satisfy checkFeatureEndRedefinition when redefining an end Feature such as BinaryLinkObject::source. This grounds rejecting the bare form and accepting only the explicit 'end :>> source = a;' form -- i.e. OpenSysML's rejection of end-feature-redefinition-bare is spec-conformant, and sysml-toolkit's silent acceptance of it is a real conformance gap, not an unresolved disagreement." ;
     svt:section "8.4.9.2 Connection Usages" .
 
 svtid:citation-end-usage-prefix-grammar
     a svt:SpecCitation ;
     svt:citesDocument svtid:spec-formal-2026-03-02 ;
-    svt:page "168-169" ;
+    svt:page "169" ;
     svt:quote "EndUsagePrefix : Usage = isEnd ?= 'end' ( ownedRelationship += OwnedCrossFeatureMember )?" ;
     svt:rationale "isEnd is set true only when the literal 'end' keyword is parsed. A feature written without 'end' therefore has isEnd = false." ;
     svt:section "8.2.2.6.2 Usages (Textual Notation)" .
 
+svtid:citation-membership-visibility-private
+    a svt:SpecCitation ;
+    svt:citesDocument svtid:spec-kerml-1-1-beta2 ;
+    svt:page "22" ;
+    svt:quote "The visibility of the membership can be specified by placing one of the keywords public, protected or private before the public element declaration. If the membership is public (the default), then it is visible outside of the namespace. If it is private, then it is not visible." ;
+    svt:rationale "A private member's membership is not visible outside its owning namespace -- a qualified-name reference to it from outside that namespace should therefore fail name resolution. This grounds expected=violated for a part usage typed by a private part def referenced from a sibling package." ;
+    svt:section "7.2.5.2 Namespace Declaration" .
+
 svtid:citation-remove-redefined-features
     a svt:SpecCitation ;
     svt:citesDocument svtid:spec-kerml-1-1-beta2 ;
-    svt:page "146" ;
+    svt:page "147" ;
     svt:quote "removeRedefinedFeatures(memberships : Membership [0..*]) : Membership [0..*] -- Return a subset of memberships, removing those Memberships whose memberElements are Features and for which either of the following two conditions holds: 1. The memberElement of the Membership is included in redefined Features of another Membership in memberships. 2. One of the redefined Features of the Membership is a directly redefinedFeature of an ownedFeature of this Type. [...] body: let reducedMemberships : Sequence(Membership) = memberships->reject(mem1 | memberships->excluding(mem1)-> exists(mem2 | allRedefinedFeaturesOf(mem2)-> includes(mem1.memberElement))) in let redefinedFeatures : Set(Feature) = ownedFeature.redefinition.redefinedFeature->asSet() in reducedMemberships->reject(mem | allRedefinedFeaturesOf(mem)-> exists(feature | redefinedFeatures->includes(feature)))" ;
     svt:rationale "This is a general set operation over the whole memberships collection (existential quantification, not a pairwise fold) -- it is defined the same way regardless of how many redefining memberships exist. Nothing in this algorithm conditions correctness on sibling count, so 2 vs 3+ anonymous redefinitions of the same base feature should resolve identically. This directly supports expected=clean for both redefinition-ambiguity-2 and redefinition-ambiguity-3plus, and independently corroborates BrandFootprintML's own root-cause hypothesis that sysml-toolkit's drop_redefined_hits (a suspected pairwise fold) diverges from this normative set-based algorithm. Version caveat: this is KerML v1.1 Beta 2 (Release 2026-07), not the v1.0 release the SysML v2.0 Language Specification (formal/2026-03-02, March 2026) cross-references as '[KerML, ...]' -- used as the best locally-held proxy; this is a foundational, long-stable KerML mechanism unlikely to have changed in a way that would flip this conclusion, but the version mismatch is real and noted rather than glossed over." ;
     svt:section "8.3.3.1.10 Type (removeRedefinedFeatures operation)" .
@@ -40,7 +48,7 @@ svtid:citation-remove-redefined-features
 svtid:citation-state-initial-via-entry-succession
     a svt:SpecCitation ;
     svt:citesDocument svtid:spec-formal-2026-03-02 ;
-    svt:page "117" ;
+    svt:page "118" ;
     svt:quote "A state definition or usage may hierarchically contain state usages in its body. By default, these substate usages are considered to be exclusive, that is, their performances do not overlap in time. The initial state usage to be performed is indicated by a succession (see 7.13.5) from the entry action to that state usage, representing that this is the state that is entered on completion of the entry action. If the containing state has no substantive entry action, then an empty entry action may be used as the source of the succession. A shorthand may also be used for a succession whose source is the entry action, consisting of the keyword then followed by a qualified name or feature chain for the target state usage, placed immediately after the entry action declaration." ;
     svt:rationale "Our fixture's 'entry; then dormant;' is exactly this shorthand (an empty entry action, then a succession to dormant) -- grounding dormant as the correct settled state when no events are given (the command u is empty). Given an EngagementEvent, the fixture's explicit 'transition first dormant accept EngagementEvent then active;' grounds transitioning to active." ;
     svt:section "7.18.2 State Definitions and Usages" .

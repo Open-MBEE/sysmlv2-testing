@@ -134,6 +134,30 @@ same gate before being saved. If it doesn't, something touched
 `ledger/*.ttl` outside `svt`; find it and fix it at the source, don't
 patch the symptom.
 
+## 6. Human review, annotation, and (maybe) an issue
+
+```bash
+svt testrun annotate --testcase <slug> --implementation <slug> --version <commit> \
+  --by <your name> --comment "..."
+```
+
+Records a human's observation about one already-completed `TestRun` —
+distinct from step 3's `Validation`, which is about the claim *before*
+any run happens. **This is a human step, not an agent step**, same
+denylist as `svt testcase validate`. If the run's outcome looks like a
+real conformance gap worth filing upstream, link it:
+
+```bash
+svt testrun link-issue --testcase <slug> --implementation <slug> --version <commit> \
+  --by <your name> --url <issue-url> [--label "..."]
+```
+
+Both take the identical `--testcase --implementation --version` triple
+`svt run` does (plus an `--at <timestamp>` escape hatch if more than one
+`TestRun` matches — the command tells you the exact candidates when that
+happens). See `docs/walkthrough.md` for a full worked example of every
+step in this skill done for real, once, start to finish.
+
 ## What you will never need to do
 
 - Compute a `TestRun`'s IRI, timestamp, or outcome by hand.
@@ -147,6 +171,9 @@ patch the symptom.
   `--by` name other than the actual human it's working for.
 - Treat "SHACL passed" as "this claim is correct" — those are different
   claims; only a human `Validation` record makes the latter one.
+- Run `svt testrun annotate`/`link-issue` on its own behalf, or with any
+  `--by` name other than the actual human it's working for — same
+  reasoning, same denylist, as `svt testcase validate`.
 
 A ledger explorer/browser is out of scope for now, but `svt view
 [--testcase <slug>]` compiles a deterministic Markdown report (one SPARQL

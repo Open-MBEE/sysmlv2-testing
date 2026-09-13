@@ -1,0 +1,86 @@
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix svt: <https://w3id.org/sysmlv2-testing#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# The post-run pair to shapes/validation.shapes.ttl's pre-run gate: a
+# human's comment on a completed TestRun, and a human's record that a
+# TestRun relates to an external issue-tracker entry. Both classes are
+# unbounded-multivalued per TestRun by design (an operator conversation
+# over time, a second later-found issue) -- no sh:maxCount caps how many
+# Annotation/IssueLink nodes may point at one TestRun.
+
+svt:AnnotationShape a sh:NodeShape ;
+    sh:targetClass svt:Annotation ;
+    sh:property svt:AnnotationConcernsRunShape, svt:AnnotationAssociatedWithShape,
+        svt:AnnotationStartedAtTimeShape, svt:AnnotationCommentShape .
+
+svt:AnnotationConcernsRunShape a sh:PropertyShape ;
+    sh:path svt:concernsRun ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:nodeKind sh:IRI ;
+    sh:class svt:TestRun ;
+    sh:message "an Annotation must concern exactly one svt:TestRun" .
+
+svt:AnnotationAssociatedWithShape a sh:PropertyShape ;
+    sh:path prov:wasAssociatedWith ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:nodeKind sh:IRI ;
+    sh:class prov:Person ;
+    sh:message "an Annotation must record exactly one prov:wasAssociatedWith, a prov:Person (never this repo's own svt-cli agent)" .
+
+svt:AnnotationStartedAtTimeShape a sh:PropertyShape ;
+    sh:path prov:startedAtTime ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:dateTime ;
+    sh:message "an Annotation must record exactly one prov:startedAtTime" .
+
+svt:AnnotationCommentShape a sh:PropertyShape ;
+    sh:path svt:comment ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+    sh:message "an Annotation must have exactly one svt:comment -- an annotation with no text is meaningless" .
+
+svt:IssueLinkShape a sh:NodeShape ;
+    sh:targetClass svt:IssueLink ;
+    sh:property svt:IssueLinkConcernsRunShape, svt:IssueLinkAssociatedWithShape,
+        svt:IssueLinkStartedAtTimeShape, svt:IssueLinkIssueURLShape, svt:IssueLinkIssueLabelShape .
+
+svt:IssueLinkConcernsRunShape a sh:PropertyShape ;
+    sh:path svt:concernsRun ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:nodeKind sh:IRI ;
+    sh:class svt:TestRun ;
+    sh:message "an IssueLink must concern exactly one svt:TestRun" .
+
+svt:IssueLinkAssociatedWithShape a sh:PropertyShape ;
+    sh:path prov:wasAssociatedWith ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:nodeKind sh:IRI ;
+    sh:class prov:Person ;
+    sh:message "an IssueLink must record exactly one prov:wasAssociatedWith, a prov:Person (never this repo's own svt-cli agent)" .
+
+svt:IssueLinkStartedAtTimeShape a sh:PropertyShape ;
+    sh:path prov:startedAtTime ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:dateTime ;
+    sh:message "an IssueLink must record exactly one prov:startedAtTime" .
+
+svt:IssueLinkIssueURLShape a sh:PropertyShape ;
+    sh:path svt:issueURL ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:anyURI ;
+    sh:message "an IssueLink must have exactly one svt:issueURL" .
+
+svt:IssueLinkIssueLabelShape a sh:PropertyShape ;
+    sh:path svt:issueLabel ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string .

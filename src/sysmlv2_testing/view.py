@@ -38,7 +38,35 @@ def _outcome_local(outcome) -> str:
     return str(outcome).rsplit("#", 1)[-1] if outcome is not None else ""
 
 
-def _run_section(row) -> str:
+def _annotation_and_issue_lines(run_iri, ledger) -> list[str]:
+    """svt:concernsRun is multivalued (many humans may annotate, or find a
+    second related issue, over time) and shared by both svt:Annotation and
+    svt:IssueLink -- deliberately not joined into queries/testcase_view.rq
+    for the same reason svt:groundedIn isn't: it would multiply rows per
+    run. Read directly, sorted by IRI for determinism (same discipline as
+    _grounding_lines)."""
+    concerning = sorted(ledger.subjects(SVT.concernsRun, run_iri), key=str)
+    annotations = [c for c in concerning if (c, RDF.type, SVT.Annotation) in ledger]
+    issues = [c for c in concerning if (c, RDF.type, SVT.IssueLink) in ledger]
+    lines = []
+    for a in annotations:
+        person = ledger.value(a, PROV.wasAssociatedWith)
+        name = ledger.value(person, RDFS.label) if person is not None else None
+        when = ledger.value(a, PROV.startedAtTime)
+        comment = ledger.value(a, SVT.comment)
+        lines.append(f"- **annotation** by {name or person} ({when}): {comment}")
+    for i in issues:
+        person = ledger.value(i, PROV.wasAssociatedWith)
+        name = ledger.value(person, RDFS.label) if person is not None else None
+        when = ledger.value(i, PROV.startedAtTime)
+        url = ledger.value(i, SVT.issueURL)
+        label = ledger.value(i, SVT.issueLabel)
+        label_part = f" ({label})" if label is not None else ""
+        lines.append(f"- **issue**{label_part}: {url} -- linked by {name or person} ({when})")
+    return lines
+
+
+def _run_section(row, ledger) -> str:
     label = f" ({row.versionLabel})" if row.versionLabel is not None else ""
     lines = [
         f"#### {row.implName} @ `{row.commitHash}`{label}",
@@ -49,6 +77,7 @@ def _run_section(row) -> str:
         lines.append(f"- **actual**: `{row.actual}`")
     if row.info is not None:
         lines.append(f"- **info**: {row.info}")
+    lines += _annotation_and_issue_lines(row.run, ledger)
     lines += [
         f"- **command**: `{row.command}`",
         f"- **exit code**: `{row.exitCode}`",
@@ -173,7 +202,7 @@ def _testcase_section(tc_iri: URIRef, rows: list, ledger) -> str:
             )
         lines.append("")
         for r in runs:
-            lines.append(_run_section(r))
+            lines.append(_run_section(r, ledger))
 
     return "\n".join(lines)
 

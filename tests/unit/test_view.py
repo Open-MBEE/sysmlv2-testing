@@ -5,7 +5,12 @@ byte-for-byte deterministic. (Same discipline as
 tests/determinism/test_roundtrip.py, for a different artifact.)
 """
 
+from typer.testing import CliRunner
+
+from sysmlv2_testing import cli as cli_module
 from sysmlv2_testing.view import render_report
+
+runner = CliRunner()
 
 
 def test_render_report_is_deterministic_across_runs():
@@ -65,3 +70,68 @@ def test_state_execution_testcase_shows_the_command_events():
     report = render_report("state-machine-transitions-on-event")
     assert "**command (u): events**" in report
     assert "EngagementEvent" in report
+
+
+def test_report_renders_multiple_annotations_and_issue_links_deterministically(isolated_ledger):
+    """_run_section reads svt:concernsRun directly off the ledger (not
+    through queries/testcase_view.rq, same reasoning as svt:groundedIn) --
+    this must stay sorted and stable with more than one Annotation/
+    IssueLink on the same TestRun, or render_report's determinism
+    (asserted elsewhere in this file) would go flaky the moment a run
+    has more than one of either."""
+    testcase = isolated_ledger["testcase"]
+    implementation = isolated_ledger["implementation"]
+    version = isolated_ledger["version"]
+
+    def _annotate(by, comment):
+        result = runner.invoke(
+            cli_module.app,
+            [
+                "testrun",
+                "annotate",
+                "--testcase",
+                testcase,
+                "--implementation",
+                implementation,
+                "--version",
+                version,
+                "--by",
+                by,
+                "--comment",
+                comment,
+            ],
+        )
+        assert result.exit_code == 0, result.output
+
+    def _link_issue(by, url):
+        result = runner.invoke(
+            cli_module.app,
+            [
+                "testrun",
+                "link-issue",
+                "--testcase",
+                testcase,
+                "--implementation",
+                implementation,
+                "--version",
+                version,
+                "--by",
+                by,
+                "--url",
+                url,
+            ],
+        )
+        assert result.exit_code == 0, result.output
+
+    _annotate("Zargham", "first observation")
+    _annotate("A Colleague", "second observation")
+    _link_issue("Zargham", "https://example.org/issues/1")
+    _link_issue("Zargham", "https://example.org/issues/2")
+
+    once = render_report(testcase)
+    twice = render_report(testcase)
+    assert once == twice
+    assert "first observation" in once
+    assert "second observation" in once
+    assert "https://example.org/issues/1" in once
+    assert "https://example.org/issues/2" in once

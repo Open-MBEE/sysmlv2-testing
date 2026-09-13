@@ -214,6 +214,52 @@ svt:note a owl:DatatypeProperty ;
     rdfs:comment "Optional free-text note from the validating human, e.g. what in the spec they checked." .
 
 #################################################################
+# svt:Annotation, svt:IssueLink -- append-only, like StabilityDesignation
+# and Validation. Both are modeled as prov:Activity, not prov:Entity,
+# deliberately: each records the *act* of a human reviewing a completed
+# TestRun and recording a fact about it, not the fact's own referent (an
+# IssueLink is "the event of a human declaring this run relates to that
+# URL," not the tracker issue itself as a first-class resource -- if a
+# future need arises to model the tracker issue itself, with its own
+# title/assignee/status, that is a different, later class, not this one).
+# A correction is a *new* Annotation/IssueLink, never an edit to an
+# existing one -- same append-only rule as StabilityDesignation.
+#################################################################
+
+svt:Annotation a owl:Class ;
+    rdfs:subClassOf prov:Activity ;
+    rdfs:label "Annotation" ;
+    rdfs:comment "A human's free-text comment on one specific, already-completed TestRun -- distinct from svt:Validation, which is about a TestCase's claim before any run happens. Recorded after svt run, once a human has reviewed the actual captured evidence (see svt view)." .
+
+svt:IssueLink a owl:Class ;
+    rdfs:subClassOf prov:Activity ;
+    rdfs:label "Issue link" ;
+    rdfs:comment "A human's record that a TestRun's outcome became (or relates to) an external issue-tracker entry -- makes \"this failure became issue #N\" a real, queryable fact instead of prose buried in svt:stderr/earl:info or a design-notes.md credit line." .
+
+svt:concernsRun a owl:ObjectProperty ;
+    rdfs:range svt:TestRun ;
+    rdfs:label "concerns run" ;
+    rdfs:comment "Which TestRun this Annotation or IssueLink is about. Shared by both classes -- one property doing the identical job, rather than two near-duplicate names." .
+
+svt:comment a owl:DatatypeProperty ;
+    rdfs:domain svt:Annotation ;
+    rdfs:range xsd:string ;
+    rdfs:label "comment" ;
+    rdfs:comment "The annotating human's observation about this TestRun. Required -- unlike Validation's optional svt:note, an Annotation with no text is meaningless." .
+
+svt:issueURL a owl:DatatypeProperty ;
+    rdfs:domain svt:IssueLink ;
+    rdfs:range xsd:anyURI ;
+    rdfs:label "issue URL" ;
+    rdfs:comment "The external issue-tracker entry's URL. Same xsd:anyURI typing convention as svt:repositoryURL/svt:sourceURL." .
+
+svt:issueLabel a owl:DatatypeProperty ;
+    rdfs:domain svt:IssueLink ;
+    rdfs:range xsd:string ;
+    rdfs:label "issue label" ;
+    rdfs:comment "Optional short human-readable label for the issue, e.g. a title or \"Open-MBEE/sysml-toolkit#2\"." .
+
+#################################################################
 # svt:SpecDocument, svt:SpecCitation — the sources register
 # (sources/sources.ttl). The PDFs themselves are held locally
 # (sources/local/, gitignored); these records are what's committed.

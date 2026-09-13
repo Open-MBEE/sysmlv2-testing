@@ -75,3 +75,16 @@ svtid:run-ok a svt:TestRun ;
     earl:result svtid:result-ok ;
     svt:hasInvocation svtid:invocation-ok ;
     prov:startedAtTime "2026-01-01T00:00:00"^^xsd:dateTime .
+
+svtid:annotation-ok a svt:Annotation ;
+    svt:concernsRun svtid:run-ok ;
+    prov:wasAssociatedWith svtid:person-ok ;
+    prov:startedAtTime "2026-01-01T00:00:00"^^xsd:dateTime ;
+    svt:comment "looked odd, worth a second look" .
+
+svtid:issuelink-ok a svt:IssueLink ;
+    svt:concernsRun svtid:run-ok ;
+    prov:wasAssociatedWith svtid:person-ok ;
+    prov:startedAtTime "2026-01-01T00:00:00"^^xsd:dateTime ;
+    svt:issueURL "https://example.org/issues/1"^^xsd:anyURI ;
+    svt:issueLabel "example issue" .

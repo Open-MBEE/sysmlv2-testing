@@ -45,11 +45,17 @@ version_app = typer.Typer(help="Register versions and stability designations.")
 testcase_app = typer.Typer(help="Register test cases.")
 document_app = typer.Typer(help="Register spec documents (sources/sources.ttl).")
 citation_app = typer.Typer(help="Register spec citations grounding a TestCase's expected value.")
+testrun_app = typer.Typer(
+    help="Post-run human review: annotate a TestRun, link it to an issue. "
+    "(svt run itself stays a top-level command -- this sub-app covers only "
+    "the actions a human takes after a run already exists.)"
+)
 app.add_typer(implementation_app, name="implementation")
 app.add_typer(version_app, name="version")
 app.add_typer(testcase_app, name="testcase")
 app.add_typer(document_app, name="document")
 app.add_typer(citation_app, name="citation")
+app.add_typer(testrun_app, name="testrun")
 
 AGENT_IRI = URIRef(f"{SVTID}agent-svt-cli")
 METHODS = ("structural-check", "constraint-eval", "state-execution", "reference-resolution")
@@ -217,6 +223,47 @@ def citation_add(
     typer.echo(str(iri))
 
 
+def _existing_citation_iri(id_: str) -> URIRef:
+    g = load_graph(SOURCES_TTL)
+    iri = ids.slug_id("citation", id_)
+    if (iri, RDF.type, SVT.SpecCitation) not in g:
+        typer.echo(f"error: unknown citation {id_!r}", err=True)
+        raise typer.Exit(2)
+    return iri
+
+
+@citation_app.command("set-quote")
+def citation_set_quote(
+    id_: str = typer.Option(..., "--id"),
+    quote: str = typer.Option(..., "--quote", help="verbatim -- never paraphrased"),
+) -> None:
+    """Correct a SpecCitation's svt:quote in place -- e.g. once a closer
+    read of the actual PDF shows the recorded text isn't truly verbatim
+    (invented, paraphrased, or conflated with a different passage)."""
+    iri = _existing_citation_iri(id_)
+    g = load_graph(SOURCES_TTL)
+    g.remove((iri, SVT.quote, None))
+    g.add((iri, SVT.quote, Literal(quote)))
+    _gate_and_save(g, SOURCES_TTL)
+    typer.echo(str(iri))
+
+
+@citation_app.command("set-page")
+def citation_set_page(
+    id_: str = typer.Option(..., "--id"),
+    page: str = typer.Option(..., "--page"),
+) -> None:
+    """Correct a SpecCitation's svt:page in place -- e.g. once checked
+    against the actual PDF and the quoted text turns out to live on a
+    different page than first recorded."""
+    iri = _existing_citation_iri(id_)
+    g = load_graph(SOURCES_TTL)
+    g.remove((iri, SVT.page, None))
+    g.add((iri, SVT.page, Literal(page)))
+    _gate_and_save(g, SOURCES_TTL)
+    typer.echo(str(iri))
+
+
 def _resolved_citation_iris(grounds: List[str]) -> List[URIRef]:
     """Every --grounds id must already exist as a svt:SpecCitation -- a
     dangling citation reference is worse than no citation at all."""
@@ -371,6 +418,138 @@ def testcase_set_expected(
 NOT_A_HUMAN = {"svt", "svt-cli", "cli", "claude", "llm", "ai", "agent", "bot", "assistant"}
 
 
+def _mint_person(g: Graph, name: str) -> URIRef:
+    """Mint (or reuse) a prov:Person record for ``name`` inside graph
+    ``g``. Shared by every command that attributes a record to a human
+    (testcase validate, testrun annotate, testrun link-issue) so the
+    denylist refusal can never quietly diverge at one call site -- that
+    denylist is the actual point of AGENTS.md's "an agent must never
+    validate/annotate its own claims" rule.
+
+    A real cross-file identity gap this guards against: ``person_iri`` is
+    minted from ``name`` alone (via ``ids.slug_id``), so the same human
+    named slightly differently across two commands/files ("Z" once,
+    "Zargham" another time) would otherwise silently pick up two
+    different rdfs:label values scattered across separate ledger files --
+    no shape constrains rdfs:label cardinality on prov:Person, and every
+    existing test (SHACL, PROV-consistency, roundtrip) only checks one
+    file's own internal consistency, never compares across files. So this
+    checks the *whole* ledger for a conflicting prior label and refuses
+    rather than silently accepting the divergence, the same
+    correct-by-construction idiom used for citation/version existence
+    checks below. (The heavier real fix -- one canonical ledger/people.ttl
+    home for every prov:Person -- is a deferred cleanup item; see
+    docs/walkthrough.md.)
+    """
+    if name.strip().lower() in NOT_A_HUMAN:
+        typer.echo(
+            f"error: {name!r} looks like an LLM/agent name, not a human -- "
+            "this must be attributed to the actual person who did this",
+            err=True,
+        )
+        raise typer.Exit(2)
+    person_iri = ids.slug_id("person", name)
+    existing_label = load_full_ledger().value(person_iri, RDFS.label)
+    if existing_label is not None and str(existing_label) != name:
+        typer.echo(
+            f"error: --by {name!r} resolves to the same person as "
+            f"previously-recorded {str(existing_label)!r} -- use the same "
+            "name every time",
+            err=True,
+        )
+        raise typer.Exit(2)
+    g.add((person_iri, RDF.type, PROV.Person))
+    g.add((person_iri, RDFS.label, Literal(name)))
+    return person_iri
+
+
+def _resolve_testcase_iri(ledger: Graph, testcase: str) -> URIRef:
+    tc_iri = ids.slug_id("testcase", testcase)
+    if (tc_iri, RDF.type, SVT.TestCase) not in ledger:
+        typer.echo(f"error: unknown testcase {testcase!r}", err=True)
+        raise typer.Exit(2)
+    return tc_iri
+
+
+def _resolve_version_iri(ledger: Graph, implementation: str, version: str) -> URIRef:
+    version_iri = ids.mint("version", f"{implementation}|{version}")
+    if (version_iri, RDF.type, SVT.Version) not in ledger:
+        typer.echo(f"error: unknown version {version!r} of {implementation!r}", err=True)
+        raise typer.Exit(2)
+    return version_iri
+
+
+def _parse_dt(value: object) -> datetime:
+    """Parse an xsd:dateTime literal (or a user-supplied --at string) into
+    a real datetime for instant comparison. Never compare timestamps as
+    raw strings -- a user-typed --at may spell the same instant a
+    different way ('Z' vs '+00:00', fractional seconds) than what's
+    actually stored."""
+    s = str(value).strip()
+    if s.endswith("Z"):
+        s = s[:-1] + "+00:00"
+    return datetime.fromisoformat(s)
+
+
+def _resolve_run_iri(
+    ledger: Graph,
+    testcase: str,
+    implementation: str,
+    version: str,
+    at: Optional[str] = None,
+) -> URIRef:
+    """Find the TestRun for (testcase, implementation, version). A
+    TestRun's IRI is minted from a real wall-clock timestamp with no
+    slug, so there's nothing to type directly -- this resolves the same
+    triple `svt run` takes. Unlike `_is_current_stable`'s "latest wins"
+    precedent for StabilityDesignation, this never silently picks among
+    multiple matches: misattributing a human's comment to the wrong run
+    is a real correctness bug, not a cosmetic one. If more than one
+    TestRun matches, refuse and print every candidate's exact stored
+    timestamp so the human can paste one back in via --at."""
+    tc_iri = _resolve_testcase_iri(ledger, testcase)
+    version_iri = _resolve_version_iri(ledger, implementation, version)
+    candidates = []
+    for run_iri in ledger.subjects(RDF.type, SVT.TestRun):
+        if ledger.value(run_iri, EARL.test) != tc_iri:
+            continue
+        if ledger.value(run_iri, EARL.subject) != version_iri:
+            continue
+        started = ledger.value(run_iri, PROV.startedAtTime)
+        if started is not None:
+            candidates.append((run_iri, started))
+    if not candidates:
+        typer.echo(
+            f"error: no TestRun found for testcase={testcase!r} "
+            f"implementation={implementation!r} version={version!r} -- "
+            "run `svt run` first",
+            err=True,
+        )
+        raise typer.Exit(2)
+    if at is not None:
+        target = _parse_dt(at)
+        matches = [run_iri for run_iri, started in candidates if _parse_dt(started) == target]
+        if len(matches) != 1:
+            typer.echo(
+                f"error: no TestRun with prov:startedAtTime matching --at {at!r} -- "
+                "candidates:\n"
+                + "\n".join(f"  {started}" for _, started in sorted(candidates, key=lambda c: str(c[1]))),
+                err=True,
+            )
+            raise typer.Exit(2)
+        return matches[0]
+    if len(candidates) > 1:
+        typer.echo(
+            f"error: {len(candidates)} TestRuns match testcase={testcase!r} "
+            f"implementation={implementation!r} version={version!r} -- "
+            "disambiguate with --at, one of:\n"
+            + "\n".join(f"  {started}" for _, started in sorted(candidates, key=lambda c: str(c[1]))),
+            err=True,
+        )
+        raise typer.Exit(2)
+    return candidates[0][0]
+
+
 @testcase_app.command("validate")
 def testcase_validate(
     id_: str = typer.Option(..., "--id"),
@@ -384,22 +563,9 @@ def testcase_validate(
     Validation record. This command is for a human to run on their own
     judgment; an agent should never invoke it on a TestCase it authored
     itself, and never with a non-human --by name."""
-    if by.strip().lower() in NOT_A_HUMAN:
-        typer.echo(
-            f"error: {by!r} looks like an LLM/agent name, not a human -- "
-            "a Validation must be attributed to the actual person who checked "
-            "this claim against the spec",
-            err=True,
-        )
-        raise typer.Exit(2)
     g = load_graph(TESTCASES_TTL)
-    iri = ids.slug_id("testcase", id_)
-    if (iri, RDF.type, SVT.TestCase) not in g:
-        typer.echo(f"error: unknown testcase {id_!r}", err=True)
-        raise typer.Exit(2)
-    person_iri = ids.slug_id("person", by)
-    g.add((person_iri, RDF.type, PROV.Person))
-    g.add((person_iri, RDFS.label, Literal(by)))
+    person_iri = _mint_person(g, by)
+    iri = _resolve_testcase_iri(g, id_)
     ts = _now()
     validation_iri = ids.mint("validation", f"{id_}|{by}|{ts}")
     g.add((validation_iri, RDF.type, SVT.Validation))
@@ -412,6 +578,79 @@ def testcase_validate(
     typer.echo(str(validation_iri))
 
 
+@testrun_app.command("annotate")
+def testrun_annotate(
+    testcase: str = typer.Option(..., "--testcase"),
+    implementation: str = typer.Option(..., "--implementation"),
+    version: str = typer.Option(..., "--version", help="the commit hash"),
+    by: str = typer.Option(..., "--by", help="the annotating human's name"),
+    comment: str = typer.Option(..., "--comment"),
+    at: Optional[str] = typer.Option(
+        None, "--at", help="disambiguate which TestRun, if more than one matches"
+    ),
+) -> None:
+    """Record a human's free-text observation about one already-completed
+    TestRun. Distinct from `svt testcase validate`, which is about the
+    TestCase's claim before any run happens -- this is about the actual
+    captured outcome, reviewed via `svt view`."""
+    ledger = load_full_ledger()
+    run_iri = _resolve_run_iri(ledger, testcase, implementation, version, at=at)
+    g = load_graph(runs_ttl(implementation))
+    person_iri = _mint_person(g, by)
+    ts = _now()
+    # comment folded into the key (not just testcase|impl|version|by|ts):
+    # two different observations minted within the same wall-clock second
+    # would otherwise collide on the identical IRI -- see the same
+    # same-second landmine documented for `svt run`'s run_iri. Folding in
+    # the payload narrows, but does not eliminate, that collision (two
+    # byte-identical comments within the same second still collide,
+    # which is the accepted, documented limitation).
+    annotation_iri = ids.mint(
+        "annotation", f"{testcase}|{implementation}|{version}|{by}|{comment}|{ts}"
+    )
+    g.add((annotation_iri, RDF.type, SVT.Annotation))
+    g.add((annotation_iri, SVT.concernsRun, run_iri))
+    g.add((annotation_iri, PROV.wasAssociatedWith, person_iri))
+    g.add((annotation_iri, PROV.startedAtTime, ts))
+    g.add((annotation_iri, SVT.comment, Literal(comment)))
+    _gate_and_save(g, runs_ttl(implementation))
+    typer.echo(str(annotation_iri))
+
+
+@testrun_app.command("link-issue")
+def testrun_link_issue(
+    testcase: str = typer.Option(..., "--testcase"),
+    implementation: str = typer.Option(..., "--implementation"),
+    version: str = typer.Option(..., "--version", help="the commit hash"),
+    by: str = typer.Option(..., "--by", help="the human who decided to file/link this"),
+    url: str = typer.Option(..., "--url"),
+    label: Optional[str] = typer.Option(None, "--label"),
+    at: Optional[str] = typer.Option(
+        None, "--at", help="disambiguate which TestRun, if more than one matches"
+    ),
+) -> None:
+    """Record that one already-completed TestRun relates to an external
+    issue-tracker entry -- makes "this failure became issue #N" a real,
+    queryable fact instead of prose in svt:stderr or a design-notes.md
+    credit line."""
+    ledger = load_full_ledger()
+    run_iri = _resolve_run_iri(ledger, testcase, implementation, version, at=at)
+    g = load_graph(runs_ttl(implementation))
+    person_iri = _mint_person(g, by)
+    ts = _now()
+    # url folded into the key -- same reasoning as annotate's comment above.
+    issue_iri = ids.mint("issuelink", f"{testcase}|{implementation}|{version}|{by}|{url}|{ts}")
+    g.add((issue_iri, RDF.type, SVT.IssueLink))
+    g.add((issue_iri, SVT.concernsRun, run_iri))
+    g.add((issue_iri, PROV.wasAssociatedWith, person_iri))
+    g.add((issue_iri, PROV.startedAtTime, ts))
+    g.add((issue_iri, SVT.issueURL, Literal(url, datatype=XSD.anyURI)))
+    if label is not None:
+        g.add((issue_iri, SVT.issueLabel, Literal(label)))
+    _gate_and_save(g, runs_ttl(implementation))
+    typer.echo(str(issue_iri))
+
+
 @app.command("run")
 def run_cmd(
     testcase: str = typer.Option(..., "--testcase"),
@@ -422,15 +661,9 @@ def run_cmd(
     from adapters.compare import compare  # noqa: PLC0415
 
     ledger = load_full_ledger()
-    tc_iri = ids.slug_id("testcase", testcase)
-    if (tc_iri, RDF.type, SVT.TestCase) not in ledger:
-        typer.echo(f"error: unknown testcase {testcase!r}", err=True)
-        raise typer.Exit(2)
+    tc_iri = _resolve_testcase_iri(ledger, testcase)
     impl_iri = ids.slug_id("implementation", implementation)
-    version_iri = ids.mint("version", f"{implementation}|{version}")
-    if (version_iri, RDF.type, SVT.Version) not in ledger:
-        typer.echo(f"error: unknown version {version!r} of {implementation!r}", err=True)
-        raise typer.Exit(2)
+    version_iri = _resolve_version_iri(ledger, implementation, version)
 
     # Being SHACL-valid RDF is not the same thing as a human having
     # confirmed this claim against the spec -- construction and structural

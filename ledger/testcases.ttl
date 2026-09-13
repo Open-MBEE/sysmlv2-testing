@@ -61,6 +61,14 @@ svtid:testcase-end-feature-redefinition-explicit
         "usage-end-portable.sysml" ;
     svt:method "structural-check" .
 
+svtid:testcase-membership-visibility-private-rejected
+    a svt:TestCase ;
+    svt:description "A part usage typed by a private part definition, referenced by qualified name from outside the definition's owning package, must be rejected -- the private member is not visible outside its owning namespace." ;
+    svt:expected "violated" ;
+    svt:groundedIn svtid:citation-membership-visibility-private ;
+    svt:hasInputFile "private-visibility.sysml" ;
+    svt:method "structural-check" .
+
 svtid:testcase-redefinition-ambiguity-2
     a svt:TestCase ;
     svt:description "Two anonymous ':>> items' redefinitions of a multi-valued reference feature should both resolve to the inherited base feature Container::items." ;

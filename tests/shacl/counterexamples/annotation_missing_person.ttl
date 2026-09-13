@@ -1,0 +1,12 @@
+@prefix svt: <https://w3id.org/sysmlv2-testing#> .
+@prefix svtid: <https://w3id.org/sysmlv2-testing/id/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+svtid:run-ok a svt:TestRun .
+
+svtid:annotation-broken a svt:Annotation ;
+    svt:concernsRun svtid:run-ok ;
+    svt:comment "looked odd" ;
+    prov:startedAtTime "2026-01-01T00:00:00"^^xsd:dateTime .
+# missing prov:wasAssociatedWith -- violates svt:AnnotationAssociatedWithShape

@@ -82,8 +82,11 @@ uv run svt citation add --id <slug> --document <doc-id> \
 uv run svt testcase add --id <slug> --description "..." \
   --input-file <path>... --method structural-check --expected clean \
   --grounds <citation-id>
+svt testcase validate --id <slug> --by <your name>   # a human step, not an agent step
 uv run svt run --testcase <slug> --implementation <slug> --version <commit>
 uv run svt view --testcase <slug>
+svt testrun annotate --testcase <slug> --implementation <slug> --version <commit> \
+  --by <your name> --comment "..."                    # optional, after review
 ```
 
 ## What's in the ledger already

@@ -1,0 +1,14 @@
+@prefix svt: <https://w3id.org/sysmlv2-testing#> .
+@prefix svtid: <https://w3id.org/sysmlv2-testing/id/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+svtid:run-ok a svt:TestRun .
+
+svtid:person-ok a prov:Person .
+
+svtid:issuelink-broken a svt:IssueLink ;
+    svt:concernsRun svtid:run-ok ;
+    prov:wasAssociatedWith svtid:person-ok ;
+    prov:startedAtTime "2026-01-01T00:00:00"^^xsd:dateTime .
+# missing svt:issueURL -- violates svt:IssueLinkIssueURLShape
