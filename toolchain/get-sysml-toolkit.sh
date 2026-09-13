@@ -25,7 +25,11 @@ URL="https://github.com/Open-MBEE/sysml-toolkit/releases/download/${TAG}/${ASSET
 echo "== downloading $URL ==" >&2
 curl -fL -o "$OUT/$ASSET" "$URL"
 tar xzf "$OUT/$ASSET" -C "$OUT"
-BIN="$OUT/sysmlv2"
+# The release tarball extracts into its own top-level directory (named
+# after the asset itself), not flat into $OUT -- verified against the
+# real v0.6.0 asset, which contains sysmlv2-0.6.0-aarch64-apple-darwin/
+# {sysmlv2,LICENSE,README.md}, not a bare sysmlv2 binary.
+BIN="$OUT/${ASSET%.tar.gz}/sysmlv2"
 chmod +x "$BIN"
 
 ACTUAL=$(shasum -a 256 "$BIN" | awk '{print $1}')

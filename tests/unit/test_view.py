@@ -135,3 +135,28 @@ def test_report_renders_multiple_annotations_and_issue_links_deterministically(i
     assert "second observation" in once
     assert "https://example.org/issues/1" in once
     assert "https://example.org/issues/2" in once
+
+
+def test_report_kind_1_filters_to_one_implementation_only():
+    """Report kind 1 (docs/workflow.md): one TestCase against one
+    Implementation. redefinition-ambiguity-3plus has real runs from more
+    than one implementation -- filtering by --implementation must drop
+    the others' commands/output entirely, not just de-emphasize them."""
+    unfiltered = render_report("redefinition-ambiguity-3plus")
+    filtered = render_report("redefinition-ambiguity-3plus", "sysml-toolkit")
+    assert "_Scope: testcase `redefinition-ambiguity-3plus` only._" in unfiltered
+    assert (
+        "_Scope: testcase `redefinition-ambiguity-3plus`, "
+        "implementation `sysml-toolkit` only._" in filtered
+    )
+    assert "sysml-toolkit" in filtered
+    # every *other* registered implementation's own name must be absent
+    # from the filtered report's Runs table/sections
+    assert "opensysml" not in filtered
+    assert "pilot-implementation" not in filtered
+
+
+def test_report_kind_1_is_deterministic():
+    once = render_report("redefinition-ambiguity-3plus", "sysml-toolkit")
+    twice = render_report("redefinition-ambiguity-3plus", "sysml-toolkit")
+    assert once == twice

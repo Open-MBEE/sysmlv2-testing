@@ -207,15 +207,28 @@ def _testcase_section(tc_iri: URIRef, rows: list, ledger) -> str:
     return "\n".join(lines)
 
 
-def render_report(testcase_id: str | None = None) -> str:
+def render_report(testcase_id: str | None = None, implementation_slug: str | None = None) -> str:
     """The whole compiled Markdown report, as a string. Deterministic:
     same ledger state + same fixtures -> byte-identical output, every time.
+
+    Two independent, orthogonal filters give the two report kinds
+    docs/workflow.md documents: ``testcase_id`` alone (or neither filter)
+    is kind 2, a cross-implementation comparison of one TestCase (or the
+    whole ledger); both filters together is kind 1, one TestCase against
+    exactly one Implementation.
     """
     ledger = load_full_ledger()
     query_text = QUERY_PATH.read_text(encoding="utf-8")
     init_bindings = {}
     if testcase_id is not None:
-        init_bindings = {"testcase": ids.slug_id("testcase", testcase_id)}
+        init_bindings["testcase"] = ids.slug_id("testcase", testcase_id)
+    if implementation_slug is not None:
+        # ?implementation is already a SELECTed variable, matched inside
+        # the run OPTIONAL block via `?version svt:ofImplementation
+        # ?implementation` -- pre-binding it the same way ?testcase is
+        # pre-bound constrains that OPTIONAL match to just this
+        # implementation's runs, with no query rewrite needed.
+        init_bindings["implementation"] = ids.slug_id("implementation", implementation_slug)
     results = ledger.query(query_text, initBindings=init_bindings)
 
     by_testcase: dict[URIRef, list] = {}
@@ -232,6 +245,13 @@ def render_report(testcase_id: str | None = None) -> str:
         "Compiled by `svt view` from the ledger + fixtures. Ephemeral --\n"
         "regenerate any time with the same command; never committed.\n\n"
     )
+    if testcase_id is not None or implementation_slug is not None:
+        scope_parts = []
+        if testcase_id is not None:
+            scope_parts.append(f"testcase `{testcase_id}`")
+        if implementation_slug is not None:
+            scope_parts.append(f"implementation `{implementation_slug}`")
+        header += f"_Scope: {', '.join(scope_parts)} only._\n\n"
     sections = [_testcase_section(tc, by_testcase[tc], ledger) for tc in order]
     if not sections:
         return header + "_no matching test case found_\n"

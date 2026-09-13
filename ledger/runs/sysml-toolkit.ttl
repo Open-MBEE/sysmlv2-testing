@@ -22,6 +22,22 @@ UsageThree::d::@1	UNRESOLVED:items
 UsageThree::d::@0	UNRESOLVED:items
 """ .
 
+svtid:invocation-3f29a125c5d21881
+    a svt:Invocation ;
+    prov:startedAtTime "2026-09-13T02:37:12+00:00"^^xsd:dateTime ;
+    svt:command "/Users/z/Documents/GitHub/sysmlv2-testing/.cache/sysml-toolkit/v0.6.0/sysmlv2-0.6.0-aarch64-apple-darwin/sysmlv2 check --lib /Users/z/Documents/GitHub/SysML-v2-Pilot-Implementation/sysml.library --strict /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/membership-visibility-private-rejected/private-visibility.sysml" ;
+    svt:exitCode "1"^^xsd:integer ;
+    svt:inputDigest "de9f631acd37024ea472b26f505839b98e889c27830b7dd738cb60aa56c5e4b2" ;
+    svt:stderr """warning: unresolved reference `Lib::Widget`
+  --> /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/membership-visibility-private-rejected/private-visibility.sysml:6:14
+   |
+   |     part w : Lib::Widget;
+
+1 warning(s)
+--strict: warnings are failures
+""" ;
+    svt:stdout "" .
+
 svtid:invocation-4f6aa0fb2bc3df1f
     a svt:Invocation ;
     prov:startedAtTime "2026-09-12T21:18:34+00:00"^^xsd:dateTime ;
@@ -109,6 +125,12 @@ svtid:result-3575bc8475cfdcb3
     earl:outcome earl:failed ;
     svt:actual "UsageThree::d::@2->UNRESOLVED:items; UsageThree::d::@1->UNRESOLVED:items; UsageThree::d::@0->UNRESOLVED:items" .
 
+svtid:result-3f29a125c5d21881
+    a earl:TestResult ;
+    earl:info "expected='violated' actual='violated'" ;
+    earl:outcome earl:passed ;
+    svt:actual "violated" .
+
 svtid:result-4f6aa0fb2bc3df1f
     a earl:TestResult ;
     earl:info "sysml-toolkit has no working constraint-eval mechanism (see ISSUES-PROPOSED.md #1: verify/query evaluate a constraint's declaration-site defaults, not a usage's actual bindings)" ;
@@ -158,6 +180,16 @@ svtid:run-3575bc8475cfdcb3
     earl:test svtid:testcase-redefinition-ambiguity-3plus-resolution ;
     prov:startedAtTime "2026-09-13T00:19:09+00:00"^^xsd:dateTime ;
     svt:hasInvocation svtid:invocation-3575bc8475cfdcb3 .
+
+svtid:run-3f29a125c5d21881
+    a svt:TestRun ;
+    earl:assertedBy svtid:agent-svt-cli ;
+    earl:mode earl:automatic ;
+    earl:result svtid:result-3f29a125c5d21881 ;
+    earl:subject svtid:version-cdc8cdb3385265b0 ;
+    earl:test svtid:testcase-membership-visibility-private-rejected ;
+    prov:startedAtTime "2026-09-13T02:37:12+00:00"^^xsd:dateTime ;
+    svt:hasInvocation svtid:invocation-3f29a125c5d21881 .
 
 svtid:run-4f6aa0fb2bc3df1f
     a svt:TestRun ;

@@ -829,6 +829,14 @@ def view_cmd(
     testcase: Optional[str] = typer.Option(
         None, "--testcase", help="Report just this test case; omit for every test case."
     ),
+    implementation: Optional[str] = typer.Option(
+        None,
+        "--implementation",
+        help="Report just this implementation's runs -- combined with --testcase, "
+        "this is the single-test/single-implementation report (docs/workflow.md's "
+        "report kind 1); --testcase alone (or neither filter) is the "
+        "cross-implementation comparison (report kind 2).",
+    ),
 ) -> None:
     """Compile a deterministic Markdown report (one SPARQL query + the
     fixture files) so a human can actually read the ledger's precise
@@ -836,10 +844,15 @@ def view_cmd(
     fully reproducible from the ledger + fixtures at any time."""
     from .view import render_report  # noqa: PLC0415
 
-    content = render_report(testcase)
+    content = render_report(testcase, implementation)
     reports_dir = ROOT / "reports"
     reports_dir.mkdir(parents=True, exist_ok=True)
-    name = f"testcase-{testcase}.md" if testcase is not None else "all.md"
+    name_parts = []
+    if testcase is not None:
+        name_parts.append(f"testcase-{testcase}")
+    if implementation is not None:
+        name_parts.append(implementation if testcase is not None else f"implementation-{implementation}")
+    name = "-".join(name_parts) + ".md" if name_parts else "all.md"
     path = reports_dir / name
     path.write_text(content, encoding="utf-8")
     typer.echo(str(path))

@@ -67,6 +67,15 @@ svtid:invocation-5f0a86cb80f7637e
     svt:stderr "opensysml has no way to check reference-resolution facts for anonymous features: its Symbol/Query wire protocol's only identity field is the same colliding qualified-name string (confirmed via sysml_pb2.pyi), and its to_turtle() export's sysml:redefines predicate is a bare name string, not a link to the resolved target -- worth filing upstream" ;
     svt:stdout "" .
 
+svtid:invocation-5f1b01cbf2b5eb0f
+    a svt:Invocation ;
+    prov:startedAtTime "2026-09-13T02:35:13+00:00"^^xsd:dateTime ;
+    svt:command "Connection.load_from_content(<input files>, strict=False)" ;
+    svt:exitCode "1"^^xsd:integer ;
+    svt:inputDigest "de9f631acd37024ea472b26f505839b98e889c27830b7dd738cb60aa56c5e4b2" ;
+    svt:stderr "error <content>:6:14-6:25: unresolved reference: Lib::Widget" ;
+    svt:stdout "" .
+
 svtid:invocation-648f3889d4a57b27
     a svt:Invocation ;
     prov:startedAtTime "2026-09-13T00:19:10+00:00"^^xsd:dateTime ;
@@ -137,6 +146,12 @@ svtid:result-5f0a86cb80f7637e
     a earl:TestResult ;
     earl:info "opensysml has no way to check reference-resolution facts for anonymous features: its Symbol/Query wire protocol's only identity field is the same colliding qualified-name string (confirmed via sysml_pb2.pyi), and its to_turtle() export's sysml:redefines predicate is a bare name string, not a link to the resolved target -- worth filing upstream" ;
     earl:outcome earl:inapplicable .
+
+svtid:result-5f1b01cbf2b5eb0f
+    a earl:TestResult ;
+    earl:info "expected='violated' actual='violated'" ;
+    earl:outcome earl:passed ;
+    svt:actual "violated" .
 
 svtid:result-648f3889d4a57b27
     a earl:TestResult ;
@@ -220,6 +235,16 @@ svtid:run-5f0a86cb80f7637e
     earl:test svtid:testcase-redefinition-ambiguity-3plus-resolution ;
     prov:startedAtTime "2026-09-13T00:19:10+00:00"^^xsd:dateTime ;
     svt:hasInvocation svtid:invocation-5f0a86cb80f7637e .
+
+svtid:run-5f1b01cbf2b5eb0f
+    a svt:TestRun ;
+    earl:assertedBy svtid:agent-svt-cli ;
+    earl:mode earl:automatic ;
+    earl:result svtid:result-5f1b01cbf2b5eb0f ;
+    earl:subject svtid:version-f69111dc2adf2203 ;
+    earl:test svtid:testcase-membership-visibility-private-rejected ;
+    prov:startedAtTime "2026-09-13T02:35:13+00:00"^^xsd:dateTime ;
+    svt:hasInvocation svtid:invocation-5f1b01cbf2b5eb0f .
 
 svtid:run-648f3889d4a57b27
     a svt:TestRun ;
