@@ -22,6 +22,8 @@ EXPECTED_VIOLATIONS = {
     "invocation_bad_digest": "InvocationInputDigestShape",
     "citation_missing_quote": "SpecCitationQuoteShape",
     "resolutioncheck_missing_target": "ResolutionCheckExpectedTargetShape",
+    "validation_missing_person": "ValidationAssociatedWithShape",
+    "testcase_expected_without_grounding": "TestCaseGroundingRequiredShape",
 }
 
 

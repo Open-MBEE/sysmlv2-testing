@@ -1,0 +1,10 @@
+@prefix svt: <https://w3id.org/sysmlv2-testing#> .
+@prefix svtid: <https://w3id.org/sysmlv2-testing/id/> .
+
+svtid:testcase-broken a svt:TestCase ;
+    svt:description "an ungrounded claim" ;
+    svt:hasInputFile "input.sysml" ;
+    svt:method "structural-check" ;
+    svt:expected "clean" .
+# svt:expected with no svt:groundedIn -- an unsupported assertion,
+# violates svt:TestCaseGroundingRequiredShape

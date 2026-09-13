@@ -2,6 +2,7 @@
 @prefix svtid: <https://w3id.org/sysmlv2-testing/id/> .
 @prefix earl: <http://www.w3.org/ns/earl#> .
 @prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 svtid:implementation-ok a svt:Implementation ;
@@ -42,6 +43,14 @@ svtid:testcase-ok a svt:TestCase ;
     svt:events "SomeEvent" ;
     svt:checksResolution svtid:resolutioncheck-ok ;
     svt:groundedIn svtid:citation-ok .
+
+svtid:person-ok a prov:Person ;
+    rdfs:label "Ok Human" .
+
+svtid:validation-ok a svt:Validation ;
+    svt:validates svtid:testcase-ok ;
+    prov:wasAssociatedWith svtid:person-ok ;
+    prov:startedAtTime "2026-01-01T00:00:00"^^xsd:dateTime .
 
 svtid:agent-ok a earl:Software .
 

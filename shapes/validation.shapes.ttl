@@ -1,0 +1,61 @@
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix svt: <https://w3id.org/sysmlv2-testing#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+svt:ValidationShape a sh:NodeShape ;
+    sh:targetClass svt:Validation ;
+    sh:property svt:ValidationValidatesShape, svt:ValidationAssociatedWithShape,
+        svt:ValidationStartedAtTimeShape, svt:ValidationNoteShape .
+
+svt:ValidationValidatesShape a sh:PropertyShape ;
+    sh:path svt:validates ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:nodeKind sh:IRI ;
+    sh:class svt:TestCase ;
+    sh:message "a Validation must validate exactly one svt:TestCase" .
+
+svt:ValidationAssociatedWithShape a sh:PropertyShape ;
+    sh:path prov:wasAssociatedWith ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:nodeKind sh:IRI ;
+    sh:class prov:Person ;
+    sh:message "a Validation must record exactly one prov:wasAssociatedWith, a prov:Person (never this repo's own svt-cli agent)" .
+
+svt:ValidationStartedAtTimeShape a sh:PropertyShape ;
+    sh:path prov:startedAtTime ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:dateTime ;
+    sh:message "a Validation must record exactly one prov:startedAtTime" .
+
+svt:ValidationNoteShape a sh:PropertyShape ;
+    sh:path svt:note ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string .
+
+# The hallucination guard this repo's design docs always claimed to
+# follow (cds's own discipline) but never actually enforced as a shape: a
+# TestCase asserting an expected posterior state must cite what settles
+# it. An ungrounded svt:expected/svt:checksResolution is an unsupported
+# assertion -- ground it, or leave it unset (which mechanically records
+# earl:cantTell, never a guess).
+svt:TestCaseGroundingRequiredShape a sh:NodeShape ;
+    sh:targetClass svt:TestCase ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "a TestCase asserting svt:expected or svt:checksResolution must have at least one svt:groundedIn citation" ;
+        sh:select """
+            PREFIX svt: <https://w3id.org/sysmlv2-testing#>
+            SELECT $this
+            WHERE {
+                $this a svt:TestCase .
+                FILTER (
+                    (EXISTS { $this svt:expected ?e } || EXISTS { $this svt:checksResolution ?r })
+                    && NOT EXISTS { $this svt:groundedIn ?g }
+                )
+            }
+        """ ;
+    ] .

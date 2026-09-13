@@ -64,10 +64,17 @@ uv run svt testcase add --id <slug> \
   --grounds <citation-id>
 ```
 
-**Ground it.** `--expected` (or `--resolves`) with no `--grounds` is an
-unsupported assertion — cite the actual spec text that settles it
-(`svt document add` / `svt citation add` first, if the citation doesn't
-exist yet; `svt testcase ground` to add citations after the fact).
+**Ground it.** `--expected` (or `--resolves`) with no `--grounds` is
+SHACL-rejected outright, not just discouraged — cite the actual spec text
+that settles it (`svt document add` / `svt citation add` first, if the
+citation doesn't exist yet; `svt testcase ground` to add citations after
+the fact).
+
+**Write `--description` as the requirement, not as a report of what
+happened.** It should read identically whether written before or after
+anything has ever run against it. Never phrase it as narration of an
+outcome ("...not to each other", "...confirms the bug") — see AGENTS.md's
+"Construction vs. validation."
 
 **If you don't yet know the correct answer** (e.g. two implementations
 disagree and it isn't settled which matches the spec), omit `--expected`.
@@ -79,7 +86,23 @@ If you find grounding for a test case that was left unset (or realize
 place — regenerate every existing `TestRun` against that test case
 afterward, since they were computed under the old value.
 
-## 3. Run it
+## 3. Have a human validate it
+
+```bash
+svt testcase validate --id <slug> --by <your name> [--note "..."]
+```
+
+Being SHACL-valid RDF (step 2) is not the same thing as being *true* —
+nothing before this step confirms the cited spec text actually says what
+the claim needs it to say. `svt run` refuses outright without this
+record. **This is a human step, not an agent step**: an agent must never
+run this for a TestCase it authored, and the CLI refuses a denylist of
+LLM/agent-flavored `--by` names (`claude`, `llm`, `ai`, `agent`, ...). If
+you are an agent and just constructed a test case, stop here and hand it
+to the human directing your work — don't attempt to satisfy this step
+yourself by any means.
+
+## 4. Run it
 
 ```bash
 uv run svt run --testcase <slug> --implementation <slug> --version <commit>
@@ -90,12 +113,14 @@ tool (see `adapters/`), captures the raw output, and logs a `TestRun`.
 Nothing about this step is negotiable by an agent — the comparator
 decides the outcome, not you. If the implementation's adapter can't
 perform this test case's `method` at all (a real, honest limitation, not a
-guess), the run records `earl:inapplicable` with why.
+guess), the run records `earl:inapplicable` with why. If the TestCase
+hasn't been validated yet (step 3), this refuses with the exact command
+to run.
 
 Repeat for every `(testcase, implementation, version)` combination you
 care about — that's the whole point of a differential ledger.
 
-## 4. Read it back
+## 5. Read it back
 
 ```bash
 uv run svt report                          # everything
@@ -115,6 +140,13 @@ patch the symptom.
 - Decide `passed` vs `failed` yourself — that's `adapters/compare.py`.
 - Edit a fixture file after a `TestRun` already cites it — add a new test
   case instead.
+
+## What an agent must never do
+
+- Run `svt testcase validate` on a TestCase it authored, or with any
+  `--by` name other than the actual human it's working for.
+- Treat "SHACL passed" as "this claim is correct" — those are different
+  claims; only a human `Validation` record makes the latter one.
 
 A ledger explorer/browser is out of scope for now, but `svt view
 [--testcase <slug>]` compiles a deterministic Markdown report (one SPARQL

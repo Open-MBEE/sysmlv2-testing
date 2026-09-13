@@ -1,0 +1,14 @@
+@prefix svt: <https://w3id.org/sysmlv2-testing#> .
+@prefix svtid: <https://w3id.org/sysmlv2-testing/id/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+svtid:testcase-ok a svt:TestCase ;
+    svt:description "ok" ;
+    svt:hasInputFile "input.sysml" ;
+    svt:method "structural-check" .
+
+svtid:validation-broken a svt:Validation ;
+    svt:validates svtid:testcase-ok ;
+    prov:startedAtTime "2026-01-01T00:00:00"^^xsd:dateTime .
+# missing prov:wasAssociatedWith -- violates svt:ValidationAssociatedWithShape

@@ -9,11 +9,12 @@ input/output evidence the ledger holds, instead of grepping .ttl files.
 
 from __future__ import annotations
 
-from rdflib import URIRef
+from rdflib import RDF, URIRef
+from rdflib.namespace import RDFS
 
 from . import ids
 from .graph import fixtures_dir_for, load_full_ledger
-from .namespaces import ROOT, SVT
+from .namespaces import PROV, ROOT, SVT
 
 QUERY_PATH = ROOT / "queries" / "testcase_view.rq"
 
@@ -106,13 +107,37 @@ def _resolution_check_lines(tc_iri: URIRef, ledger) -> list[str]:
     return lines
 
 
+def _validation_line(tc_iri: URIRef, ledger) -> str:
+    """Being SHACL-valid RDF is not the same thing as a human having
+    confirmed this claim against the spec -- this is precisely the fact a
+    reader needs to trust (or not yet trust) everything below it."""
+    validations = list(ledger.subjects(SVT.validates, tc_iri))
+    if not validations:
+        return "**VALIDATION: none recorded -- `svt run` refuses this TestCase until a human validates it.**"
+    by_names = []
+    for v in sorted(validations, key=str):
+        person = ledger.value(v, PROV.wasAssociatedWith)
+        when = ledger.value(v, PROV.startedAtTime)
+        name = ledger.value(person, RDFS.label) if person is not None else None
+        by_names.append(f"{name or person} ({when})")
+    return f"**VALIDATION: confirmed by** {'; '.join(by_names)}"
+
+
 def _testcase_section(tc_iri: URIRef, rows: list, ledger) -> str:
     slug = _local_slug(tc_iri)
     first = rows[0]
     input_names = sorted(str(o) for o in ledger.objects(tc_iri, SVT.hasInputFile))
     fixtures_dir = fixtures_dir_for(slug)
 
-    lines = [f"## {slug}", "", str(first.description), "", f"- **method**: `{first.method}`"]
+    lines = [
+        f"## {slug}",
+        "",
+        _validation_line(tc_iri, ledger),
+        "",
+        str(first.description),
+        "",
+        f"- **method**: `{first.method}`",
+    ]
     prior_state = ledger.value(tc_iri, SVT.priorState)
     if prior_state is not None:
         lines.append(f"- **prior state (x)**: {prior_state}")

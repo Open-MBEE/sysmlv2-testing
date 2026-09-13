@@ -43,6 +43,48 @@ this repo: never write to `ledger/*.ttl` directly, never hand-author a
 `TestRun`, and never decide an `earl:outcome` yourself — call `svt run`
 and let the comparator decide.
 
+## Construction vs. validation: the LLM's role is bounded
+
+The rule above covers *execution* (no LLM in run/compare/log). It says
+nothing about *construction* — and an LLM constructing a TestCase via the
+CLI can still produce SHACL-valid RDF around an invented claim. Being
+structurally well-formed is not the same thing as being true. So:
+
+- **Construct** — an agent may draft a `TestCase` via `svt testcase add`
+  (description, method, expected/`--resolves`, `--grounds`). This is
+  fine — the CLI's own gate keeps it correct-by-construction.
+- **SHACL-gate** — every write already goes through `_gate_and_save`
+  (`src/sysmlv2_testing/cli.py`). This confirms the RDF is well-formed
+  and, since the grounding-required shape landed, that any `expected`/
+  `checksResolution` cites at least one `SpecCitation`. It does **not**
+  confirm the citation actually says what the claim needs it to say —
+  that's still just an LLM's or a human's assertion at this point.
+- **Human-validate** — `svt testcase validate --id <id> --by <name>`
+  records that a **named human** (never an LLM/agent name — the CLI
+  refuses a denylist of those) actually read the cited spec text and
+  confirmed the claim. This is the step that makes a claim trustworthy,
+  and it is the one step an agent must never perform on its own behalf.
+- **Run** — `svt run` refuses outright if no `svt:Validation` record
+  exists for the target TestCase. Constructing and SHACL-gating a claim
+  is necessary but not sufficient to make it runnable.
+
+**If you are an agent: never call `svt testcase validate` for a TestCase
+you authored, or with any name other than the actual human directing your
+work.** Doing so would make the ledger indistinguishable from one where a
+human genuinely checked every claim against the spec, which is the exact
+failure mode this gate exists to prevent.
+
+**`svt:description` is a requirement statement, not commentary.** Write
+it the way the spec states the requirement — it should read identically
+whether written before or after anything has ever been run against it.
+Never phrase it as narration of an outcome ("...not to each other",
+"...confirms the bug", "...as expected") — that reads as an LLM
+describing what it just found, which is precisely the tell that a claim
+was invented to match an observation rather than derived from the spec
+first. `svt:rationale` (on a `SpecCitation`) is different and may
+legitimately connect a quote to a claim, including naming a specific
+tool's behavior the citation settles — that is rationale's actual job.
+
 ## Authority tiers
 
 | Tier | Paths | Rule |
@@ -56,8 +98,9 @@ and let the comparator decide.
 ## Adding a test case, in one sentence
 
 Use the `ledger-testing` skill (`.claude/skills/ledger-testing/SKILL.md`),
-or directly: `svt testcase add` with your fixture files, then `svt run` it
-against each `Implementation`/`Version` you care about, then `svt report`.
+or directly: `svt testcase add` with your fixture files, ground it,
+**have a human run `svt testcase validate`**, then `svt run` it against
+each `Implementation`/`Version` you care about, then `svt report`.
 
 ## Reproducibility
 

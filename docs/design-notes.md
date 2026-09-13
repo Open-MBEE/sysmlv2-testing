@@ -146,3 +146,67 @@ it then mechanically records `earl:cantTell` (see AGENTS.md's "no LLM in
 the run/compare/log path"). None of the five seeded test cases are
 currently in that state, but the mechanism exists for the next one that
 is.
+
+## Construction vs. validation: why the gate exists
+
+Z's catch, verbatim, on `redefinition-ambiguity-2-resolution`'s original
+description ("...must resolve...to the inherited base feature
+Container::items -- not to each other"): that phrasing is LLM narration of
+a bug already found, not a prospective, spec-derived requirement written
+before anything ran. It's a real tell, not a style nitpick — nothing in
+the ledger distinguished "Claude drafted this claim" from "a human
+confirmed this is what the spec actually requires." Every
+`svt:description`, every `svt:expected`/`svt:checksResolution` value, and
+every citation's `svt:rationale` in this repo up to this point was
+authored by Claude in a single session; being SHACL-valid RDF never
+implied any of it was checked against the spec by a person.
+
+The fix (see AGENTS.md's "Construction vs. validation: the LLM's role is
+bounded" for the normative contract): a new `svt:Validation` record — a
+named `prov:Person`, never this repo's own `svt-cli` agent identity,
+confirming they read the cited spec text and it says what the claim needs
+it to say — is now required before `svt run` will execute a TestCase at
+all (`src/sysmlv2_testing/cli.py`'s `run_cmd`, the `_gate_and_save`-style
+check right after the version-existence check). `svt testcase validate
+--id <id> --by <name>` is the only way to record one, and it refuses a
+denylist of LLM/agent-flavored `--by` names. **All ten TestCases seeded so
+far are, as of this commit, unvalidated under this gate** — every one was
+authored by Claude, and Claude will not run `svt testcase validate`
+against its own claims, since that would defeat the entire point of the
+gate. `svt run` against any of them refuses with the exact command to fix
+it; Z validates each one himself, on his own schedule, once he's read the
+cited spec text and confirms it.
+
+The grounding requirement (`svt:expected`/`svt:checksResolution` implies
+at least one `svt:groundedIn` citation) was already a convention; it is
+now a SHACL-enforced shape (`shapes/validation.shapes.ttl`'s
+`TestCaseGroundingRequiredShape`, a `sh:sparql` constraint in the same
+style as `cds`'s `TermVerbatimGuardShape`) — structurally required, not
+just a habit an author is supposed to remember.
+
+**Flag for Z's own review, not silently rewritten:** the four
+`SpecCitation.rationale` fields that exist as of this commit
+(`citation-assert-constraint-per-usage-evaluation`,
+`citation-check-feature-end-redefinition`,
+`citation-remove-redefined-features`,
+`citation-state-initial-via-entry-succession`) were read back against the
+new "is this narrating a verdict as already settled?" standard. Unlike
+`svt:description` (which this same commit rewords for exactly that
+reason — see the ten `svt testcase set-description` calls in this
+commit's diff), `rationale`'s actual job is connecting a quote to a claim,
+and legitimately may name a specific tool's observed behavior — that is
+not the same failure mode. But at least two of the four go further than
+that: `citation-check-feature-end-redefinition` states outright
+"OpenSysML's rejection...is spec-conformant, and sysml-toolkit's silent
+acceptance of it is a real conformance gap, not an unresolved
+disagreement," and `citation-remove-redefined-features` states
+"independently corroborates BrandFootprintML's own root-cause hypothesis
+that sysml-toolkit's `drop_redefined_hits`...diverges from this normative
+set-based algorithm" — both read less like "here is why this citation
+supports this claim" and more like a settled verdict on a specific
+implementation's conformance, asserted with the same confidence as the
+grounding itself. Left as-is deliberately (this plan's scope was the
+construction/validation boundary, not unilaterally re-editing content Z
+should review himself) — worth Z's own judgment on whether either crosses
+the line, and if so, whether the fix is rewording or is itself something
+only a `Validation` pass can settle.

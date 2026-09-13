@@ -190,6 +190,30 @@ svt:groundedIn a owl:ObjectProperty ;
     rdfs:comment "Multivalued: the SpecCitation(s) backing this TestCase's expected posterior state (svt:expected, or the svt:ResolutionCheck set). A TestCase with no groundedIn is an unsupported assertion -- ground it or leave expected unset (which mechanically records cantTell, never a guess dressed up as a claim)." .
 
 #################################################################
+# svt:Validation -- append-only, like StabilityDesignation. Being
+# SHACL-valid RDF (structurally well-formed) is not the same thing as a
+# human having actually confirmed a TestCase's claim against the spec.
+# svt run refuses to run a TestCase with no Validation record -- see
+# AGENTS.md's "construct -> SHACL-gate -> human-validate -> run" sequence.
+#################################################################
+
+svt:Validation a owl:Class ;
+    rdfs:subClassOf prov:Activity ;
+    rdfs:label "Validation" ;
+    rdfs:comment "A record that a named human reviewed a TestCase's claim (its description, expected posterior state, and groundedIn citations) against the actual spec text and confirmed it. Distinct from, and required in addition to, SHACL structural validity -- an LLM can construct SHACL-valid RDF with an invented claim; only a human Validation makes it trustworthy enough to run. prov:wasAssociatedWith must be a prov:Person, never this repo's own svt-cli prov:SoftwareAgent." .
+
+svt:validates a owl:ObjectProperty ;
+    rdfs:domain svt:Validation ;
+    rdfs:range svt:TestCase ;
+    rdfs:label "validates" .
+
+svt:note a owl:DatatypeProperty ;
+    rdfs:domain svt:Validation ;
+    rdfs:range xsd:string ;
+    rdfs:label "note" ;
+    rdfs:comment "Optional free-text note from the validating human, e.g. what in the spec they checked." .
+
+#################################################################
 # svt:SpecDocument, svt:SpecCitation — the sources register
 # (sources/sources.ttl). The PDFs themselves are held locally
 # (sources/local/, gitignored); these records are what's committed.

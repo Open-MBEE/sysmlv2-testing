@@ -364,6 +364,54 @@ def testcase_set_expected(
     typer.echo(str(iri))
 
 
+# A blunt, real guard: this CLI must never record an LLM/agent as the
+# human who validated a TestCase's claim against the spec. Not a security
+# boundary (nothing stops someone from typing a different name) -- the
+# same trust model as git commit authorship. See AGENTS.md.
+NOT_A_HUMAN = {"svt", "svt-cli", "cli", "claude", "llm", "ai", "agent", "bot", "assistant"}
+
+
+@testcase_app.command("validate")
+def testcase_validate(
+    id_: str = typer.Option(..., "--id"),
+    by: str = typer.Option(..., "--by", help="the validating human's name"),
+    note: Optional[str] = typer.Option(None, "--note"),
+) -> None:
+    """Record that a named human reviewed this TestCase's claim (its
+    description, expected posterior state, and groundedIn citations)
+    against the actual spec text and confirmed it. Being SHACL-valid RDF
+    is not the same thing -- `svt run` refuses to run a TestCase with no
+    Validation record. This command is for a human to run on their own
+    judgment; an agent should never invoke it on a TestCase it authored
+    itself, and never with a non-human --by name."""
+    if by.strip().lower() in NOT_A_HUMAN:
+        typer.echo(
+            f"error: {by!r} looks like an LLM/agent name, not a human -- "
+            "a Validation must be attributed to the actual person who checked "
+            "this claim against the spec",
+            err=True,
+        )
+        raise typer.Exit(2)
+    g = load_graph(TESTCASES_TTL)
+    iri = ids.slug_id("testcase", id_)
+    if (iri, RDF.type, SVT.TestCase) not in g:
+        typer.echo(f"error: unknown testcase {id_!r}", err=True)
+        raise typer.Exit(2)
+    person_iri = ids.slug_id("person", by)
+    g.add((person_iri, RDF.type, PROV.Person))
+    g.add((person_iri, RDFS.label, Literal(by)))
+    ts = _now()
+    validation_iri = ids.mint("validation", f"{id_}|{by}|{ts}")
+    g.add((validation_iri, RDF.type, SVT.Validation))
+    g.add((validation_iri, SVT.validates, iri))
+    g.add((validation_iri, PROV.wasAssociatedWith, person_iri))
+    g.add((validation_iri, PROV.startedAtTime, ts))
+    if note is not None:
+        g.add((validation_iri, SVT.note, Literal(note)))
+    _gate_and_save(g, TESTCASES_TTL)
+    typer.echo(str(validation_iri))
+
+
 @app.command("run")
 def run_cmd(
     testcase: str = typer.Option(..., "--testcase"),
@@ -382,6 +430,19 @@ def run_cmd(
     version_iri = ids.mint("version", f"{implementation}|{version}")
     if (version_iri, RDF.type, SVT.Version) not in ledger:
         typer.echo(f"error: unknown version {version!r} of {implementation!r}", err=True)
+        raise typer.Exit(2)
+
+    # Being SHACL-valid RDF is not the same thing as a human having
+    # confirmed this claim against the spec -- construction and structural
+    # gating alone are not sufficient to make a TestCase runnable. See
+    # AGENTS.md's "construct -> SHACL-gate -> human-validate -> run".
+    if not any(ledger.subjects(SVT.validates, tc_iri)):
+        typer.echo(
+            f"error: testcase {testcase!r} has no svt:Validation record -- "
+            f"a human must confirm this claim against the spec first:\n"
+            f"  svt testcase validate --id {testcase} --by <your name>",
+            err=True,
+        )
         raise typer.Exit(2)
 
     method = str(ledger.value(tc_iri, SVT.method))
