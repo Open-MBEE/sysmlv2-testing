@@ -119,6 +119,18 @@ svtid:invocation-f19dbd0d109d687e
     svt:stderr "" ;
     svt:stdout "" .
 
+svtid:issuelink-b36078b05596c5c6
+    a svt:IssueLink ;
+    prov:startedAtTime "2026-09-13T02:50:03+00:00"^^xsd:dateTime ;
+    prov:wasAssociatedWith svtid:person-zargham ;
+    svt:concernsRun svtid:run-a12af5ad367fb4b0 ;
+    svt:issueLabel "sysml-toolkit v0.6.0 (3a13c64a): cross-wires anonymous :>> items redefinitions to each other instead of the base feature" ;
+    svt:issueURL "https://github.com/Open-MBEE/sysml-toolkit/issues/2"^^xsd:anyURI .
+
+svtid:person-zargham
+    a prov:Person ;
+    rdfs:label "Zargham" .
+
 svtid:result-3575bc8475cfdcb3
     a earl:TestResult ;
     earl:info "3 resolution check(s), all_match=False" ;

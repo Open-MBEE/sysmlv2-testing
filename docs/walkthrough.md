@@ -37,12 +37,13 @@ in it (a human's comment on a completed run, and linking a run to an
 external issue) had no vocabulary, shape, or CLI command at all. This
 walkthrough is that first real pass, and the document recording it.
 
-Two examples are worked below: one whose actual output is a rejection
-(structural-check, `actual: violated`) and one whose actual output is a
-genuinely computed value (state-execution, `actual: dormant,active`) --
-worth keeping both, since "the tool produced an error" and "the tool
-produced a specific result that happens to match" are different kinds of
-evidence, and a reader should see both kinds in this ledger.
+Three examples are worked below: one whose actual output is a rejection
+(structural-check, `actual: violated`), one whose actual output is a
+genuinely computed value (state-execution, `actual: dormant,active`),
+and one where the comparator's own verdict is `failed` -- a real,
+known, still-open divergence, not a clean pass. All three kinds of
+evidence matter; a reader should see all three in this ledger, not just
+the two that happen to agree with the spec.
 
 ## Example 1: `membership-visibility-private-rejected`
 
@@ -282,6 +283,81 @@ passed	https://w3id.org/sysmlv2-testing/id/run-29d5c83c1e3dbdf2
 tool computed, not `clean`/`violated`, matching `expected` exactly. See
 `reports/testcase-state-machine-transitions-on-event.md`.
 
+## Example 3: `redefinition-ambiguity-2-resolution` -- a real failure
+
+Examples 1 and 2 both settled clean. This one didn't, and stayed that
+way on purpose -- a genuine, still-open divergence is exactly the kind
+of evidence a differential ledger exists to hold onto, not paper over.
+
+**Claim**: each of two anonymous `:>> items` redefinitions of a
+multi-valued reference feature must resolve, by real object identity,
+to the inherited base feature `Container::items` -- never to each
+other.
+
+**Grounded in**: KerML v1.1 Beta 2, §8.3.3.1.10 (`removeRedefinedFeatures`),
+p.147 -- a general, sibling-count-independent set operation over the
+whole memberships collection (see `reports/testcase-redefinition-ambiguity-2-resolution.md`
+for the full quote).
+
+Unlike examples 1-2, this TestCase (and its runs) predates this
+walkthrough entirely -- it's the original seeded finding that led to the
+whole construction/validation governance model in the first place (see
+"Why this exists," above, and `docs/design-notes.md`). Steps 1-2, 4 were
+already done; this pass added steps 3, 5, and 7 for real.
+
+### Step 3 — Human validates *(done -- by Zargham)*
+
+```
+$ uv run svt testcase validate --id redefinition-ambiguity-2-resolution --by Zargham
+https://w3id.org/sysmlv2-testing/id/validation-ba4d619d960026bd
+```
+
+### Step 4 — The runs *(already existed)*
+
+| Implementation | Version | Outcome | Actual |
+|---|---|---|---|
+| pilot-implementation | `692170b7...` | passed | resolves correctly to `Lib::Container::items` |
+| opensysml | `2b6c1cf6...` | inapplicable | honestly can't check this (confirmed two independent ways, not a client-wrapping gap -- see `docs/design-notes.md`) |
+| sysml-toolkit | `3a13c64a...` (**v0.6.0**) | **failed** | cross-wired: `@0`→`@2`, `@1`→`@1`, instead of the base feature |
+
+### Step 5 — Report, both kinds *(done)*
+
+Committed snapshots:
+[kind 1, sysml-toolkit only](walkthrough-reports/redefinition-ambiguity-2-resolution--sysml-toolkit.md),
+[kind 2, all three](walkthrough-reports/redefinition-ambiguity-2-resolution--all-implementations.md).
+
+### Step 7 — Decide on an issue *(done -- by Zargham)*
+
+This is a real, already-known upstream conformance gap
+([Open-MBEE/sysml-toolkit#2](https://github.com/Open-MBEE/sysml-toolkit/issues/2),
+filed from the same ad hoc testing that seeded this TestCase in the
+first place):
+
+```
+$ uv run svt testrun link-issue \
+    --testcase redefinition-ambiguity-2-resolution \
+    --implementation sysml-toolkit \
+    --version 3a13c64adb93f1d069ce021c598318587126044a \
+    --by Zargham \
+    --url https://github.com/Open-MBEE/sysml-toolkit/issues/2 \
+    --label "sysml-toolkit v0.6.0 (3a13c64a): cross-wires anonymous :>> items redefinitions to each other instead of the base feature"
+https://w3id.org/sysmlv2-testing/id/issuelink-b36078b05596c5c6
+```
+
+**Why the version is in the label, not just the ledger's structure:**
+every `TestRun` is already pinned to an exact `commitHash` -- that part
+was never in question. What this makes explicit is that **this record
+will never need to be edited or retracted** when the fix ships. Nobody
+goes back and marks this `TestRun` "resolved" or deletes the `IssueLink`
+-- both stay exactly as true as they always were: *as of sysml-toolkit
+v0.6.0, this failed.* When a fixed release comes out, the correct move
+is a new `Version` registration and a *new* `TestRun` against it (`svt
+version add --implementation sysml-toolkit --commit <new-sha> --label
+v0.7.0`, then `svt run` again) -- which checks whether the fix actually
+resolves the real semantics correctly, not merely whether the old
+symptom went quiet. That new, independent `TestRun` is the evidence the
+bug is fixed; editing this one would only destroy evidence.
+
 ## What this pass built (not just this one TestCase)
 
 Getting to a runnable step 1 required two new post-run capabilities that
@@ -357,7 +433,12 @@ explicit cleanup pass, not something to silently patch mid-walkthrough:
   deterministic across repeated renders.
 - Report kind 2's cross-comparison: genuine 3-way data for
   `membership-visibility-private-rejected` -- Pilot, OpenSysML, and
-  sysml-toolkit all `passed`, all `actual: violated`.
+  sysml-toolkit all `passed`, all `actual: violated`; and for
+  `redefinition-ambiguity-2-resolution` -- a genuine three-way
+  *divergence* (passed/inapplicable/failed), not a clean sweep.
+- `svt testrun link-issue` exercised for real, not just tested in
+  isolation: a version-labeled link to a real, open upstream issue,
+  correctly rendered in both report kinds.
 - New SHACL shapes (`AnnotationShape`, `IssueLinkShape`): counterexamples
   each fail exactly the shape they target; `_conforms.ttl` passes clean
   with both new classes represented.
