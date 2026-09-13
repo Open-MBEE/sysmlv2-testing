@@ -66,7 +66,9 @@ def isolated_ledger(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     cli.py's and graph.py's path constants monkeypatched to point at it."""
     ledger_dir = tmp_path / "ledger"
     runs_dir = ledger_dir / "runs"
+    fixtures_dir = ledger_dir / "fixtures"
     runs_dir.mkdir(parents=True)
+    fixtures_dir.mkdir(parents=True)
     sources_ttl = tmp_path / "sources.ttl"
     implementations_ttl = ledger_dir / "implementations.ttl"
     testcases_ttl = ledger_dir / "testcases.ttl"
@@ -108,14 +110,17 @@ def isolated_ledger(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
         monkeypatch.setattr(mod, "TESTCASES_TTL", testcases_ttl)
         monkeypatch.setattr(mod, "RUNS_DIR", runs_dir)
     monkeypatch.setattr(cli_module, "runs_ttl", lambda slug: runs_dir / f"{slug}.ttl")
-
-    # view.py imports fixtures_dir_for from .graph; a nonexistent fixtures
-    # dir is handled gracefully (view.py shows "(missing on disk)"), so no
-    # separate FIXTURES_DIR isolation is needed for these tests.
+    # graph.py's fixtures_dir_for() reads its own module's FIXTURES_DIR at
+    # call time -- patching it here is what keeps `svt testcase add`'s
+    # real fixture-file-copying behavior from touching the actual
+    # project's ledger/fixtures/ when exercised against this isolated
+    # ledger.
+    monkeypatch.setattr(graph_module, "FIXTURES_DIR", fixtures_dir)
 
     return {
         "run_iri": run_iri,
         "runs_dir": runs_dir,
+        "fixtures_dir": fixtures_dir,
         "testcase": FAKE_TESTCASE,
         "implementation": FAKE_IMPLEMENTATION,
         "version": FAKE_COMMIT,

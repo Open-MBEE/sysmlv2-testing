@@ -203,14 +203,13 @@ def citation_add(
     rationale: Optional[str] = typer.Option(None, "--rationale"),
 ) -> None:
     doc_iri = ids.slug_id("spec", document)
-    existing = load_graph(SOURCES_TTL)
-    if (doc_iri, RDF.type, SVT.SpecDocument) not in existing:
+    g = load_graph(SOURCES_TTL)
+    if (doc_iri, RDF.type, SVT.SpecDocument) not in g:
         typer.echo(
             f"error: unknown document {document!r} (register it first with `svt document add`)",
             err=True,
         )
         raise typer.Exit(2)
-    g = load_graph(SOURCES_TTL)
     iri = ids.slug_id("citation", id_)
     g.add((iri, RDF.type, SVT.SpecCitation))
     g.add((iri, SVT.citesDocument, doc_iri))
@@ -223,8 +222,7 @@ def citation_add(
     typer.echo(str(iri))
 
 
-def _existing_citation_iri(id_: str) -> URIRef:
-    g = load_graph(SOURCES_TTL)
+def _existing_citation_iri(g: Graph, id_: str) -> URIRef:
     iri = ids.slug_id("citation", id_)
     if (iri, RDF.type, SVT.SpecCitation) not in g:
         typer.echo(f"error: unknown citation {id_!r}", err=True)
@@ -240,8 +238,8 @@ def citation_set_quote(
     """Correct a SpecCitation's svt:quote in place -- e.g. once a closer
     read of the actual PDF shows the recorded text isn't truly verbatim
     (invented, paraphrased, or conflated with a different passage)."""
-    iri = _existing_citation_iri(id_)
     g = load_graph(SOURCES_TTL)
+    iri = _existing_citation_iri(g, id_)
     g.remove((iri, SVT.quote, None))
     g.add((iri, SVT.quote, Literal(quote)))
     _gate_and_save(g, SOURCES_TTL)
@@ -256,8 +254,8 @@ def citation_set_page(
     """Correct a SpecCitation's svt:page in place -- e.g. once checked
     against the actual PDF and the quoted text turns out to live on a
     different page than first recorded."""
-    iri = _existing_citation_iri(id_)
     g = load_graph(SOURCES_TTL)
+    iri = _existing_citation_iri(g, id_)
     g.remove((iri, SVT.page, None))
     g.add((iri, SVT.page, Literal(page)))
     _gate_and_save(g, SOURCES_TTL)
@@ -340,13 +338,19 @@ def testcase_add(
     for citation_iri in citation_iris:
         g.add((iri, SVT.groundedIn, citation_iri))
 
+    for src in input_file:
+        g.add((iri, SVT.hasInputFile, Literal(src.name)))
+    # Gate before touching disk -- a SHACL-rejected write must leave no
+    # trace, fixture files included. Copying first and gating after (the
+    # previous order) meant a rejected `testcase add` still left files
+    # sitting under ledger/fixtures/<id>/, even though _gate_and_save's
+    # whole point is "nothing is written if it fails."
+    _gate_and_save(g, TESTCASES_TTL)
     fixtures_dir = fixtures_dir_for(id_)
     fixtures_dir.mkdir(parents=True, exist_ok=True)
     for src in input_file:
         dest = fixtures_dir / src.name
         dest.write_bytes(src.read_bytes())
-        g.add((iri, SVT.hasInputFile, Literal(src.name)))
-    _gate_and_save(g, TESTCASES_TTL)
     typer.echo(str(iri))
 
 
@@ -398,8 +402,12 @@ def testcase_set_expected(
     one predicate). Unlike `version set-stable`, this is not meant to
     preserve history -- it's fixing a claim that was wrong, e.g. once a
     real spec citation settles what should have been asserted all along.
-    Existing TestRuns against this TestCase are computed under the old
-    value and become stale; regenerate them (see AGENTS.md)."""
+    Existing TestRuns against this TestCase were computed under the old
+    value and are now stale evidence for the new one -- there is no
+    delete/supersede mechanism for a TestRun (append-only, like
+    everything else in ledger/runs/), so the fix is simply to `svt run`
+    again: the fresh TestRun is the current evidence, the old one stays
+    in the ledger as history of what this claim used to say."""
     g = load_graph(TESTCASES_TTL)
     iri = ids.slug_id("testcase", id_)
     if (iri, RDF.type, SVT.TestCase) not in g:
@@ -418,9 +426,13 @@ def testcase_set_expected(
 NOT_A_HUMAN = {"svt", "svt-cli", "cli", "claude", "llm", "ai", "agent", "bot", "assistant"}
 
 
-def _mint_person(g: Graph, name: str) -> URIRef:
+def _mint_person(ledger: Graph, g: Graph, name: str) -> URIRef:
     """Mint (or reuse) a prov:Person record for ``name`` inside graph
-    ``g``. Shared by every command that attributes a record to a human
+    ``g``, checking the conflicting-label guard against the already-loaded
+    full ``ledger`` (never re-parses it here -- follow the same pattern as
+    ``_resolve_testcase_iri``/``_resolve_version_iri``/``_resolve_run_iri``,
+    which all take a pre-loaded ledger rather than loading their own
+    copy). Shared by every command that attributes a record to a human
     (testcase validate, testrun annotate, testrun link-issue) so the
     denylist refusal can never quietly diverge at one call site -- that
     denylist is the actual point of AGENTS.md's "an agent must never
@@ -449,7 +461,7 @@ def _mint_person(g: Graph, name: str) -> URIRef:
         )
         raise typer.Exit(2)
     person_iri = ids.slug_id("person", name)
-    existing_label = load_full_ledger().value(person_iri, RDFS.label)
+    existing_label = ledger.value(person_iri, RDFS.label)
     if existing_label is not None and str(existing_label) != name:
         typer.echo(
             f"error: --by {name!r} resolves to the same person as "
@@ -489,6 +501,12 @@ def _parse_dt(value: object) -> datetime:
     if s.endswith("Z"):
         s = s[:-1] + "+00:00"
     return datetime.fromisoformat(s)
+
+
+def _format_candidates(candidates: list[tuple[URIRef, object]]) -> str:
+    """One timestamp per line, sorted for determinism -- shared by both
+    of _resolve_run_iri's "which TestRun did you mean" error messages."""
+    return "\n".join(f"  {started}" for _, started in sorted(candidates, key=lambda c: str(c[1])))
 
 
 def _resolve_run_iri(
@@ -532,8 +550,7 @@ def _resolve_run_iri(
         if len(matches) != 1:
             typer.echo(
                 f"error: no TestRun with prov:startedAtTime matching --at {at!r} -- "
-                "candidates:\n"
-                + "\n".join(f"  {started}" for _, started in sorted(candidates, key=lambda c: str(c[1]))),
+                "candidates:\n" + _format_candidates(candidates),
                 err=True,
             )
             raise typer.Exit(2)
@@ -542,8 +559,7 @@ def _resolve_run_iri(
         typer.echo(
             f"error: {len(candidates)} TestRuns match testcase={testcase!r} "
             f"implementation={implementation!r} version={version!r} -- "
-            "disambiguate with --at, one of:\n"
-            + "\n".join(f"  {started}" for _, started in sorted(candidates, key=lambda c: str(c[1]))),
+            "disambiguate with --at, one of:\n" + _format_candidates(candidates),
             err=True,
         )
         raise typer.Exit(2)
@@ -564,7 +580,8 @@ def testcase_validate(
     judgment; an agent should never invoke it on a TestCase it authored
     itself, and never with a non-human --by name."""
     g = load_graph(TESTCASES_TTL)
-    person_iri = _mint_person(g, by)
+    ledger = load_full_ledger()
+    person_iri = _mint_person(ledger, g, by)
     iri = _resolve_testcase_iri(g, id_)
     ts = _now()
     validation_iri = ids.mint("validation", f"{id_}|{by}|{ts}")
@@ -596,7 +613,7 @@ def testrun_annotate(
     ledger = load_full_ledger()
     run_iri = _resolve_run_iri(ledger, testcase, implementation, version, at=at)
     g = load_graph(runs_ttl(implementation))
-    person_iri = _mint_person(g, by)
+    person_iri = _mint_person(ledger, g, by)
     ts = _now()
     # comment folded into the key (not just testcase|impl|version|by|ts):
     # two different observations minted within the same wall-clock second
@@ -636,7 +653,7 @@ def testrun_link_issue(
     ledger = load_full_ledger()
     run_iri = _resolve_run_iri(ledger, testcase, implementation, version, at=at)
     g = load_graph(runs_ttl(implementation))
-    person_iri = _mint_person(g, by)
+    person_iri = _mint_person(ledger, g, by)
     ts = _now()
     # url folded into the key -- same reasoning as annotate's comment above.
     issue_iri = ids.mint("issuelink", f"{testcase}|{implementation}|{version}|{by}|{url}|{ts}")
@@ -790,9 +807,16 @@ def report_cmd(
     implementation: Optional[str] = typer.Option(None, "--implementation"),
     stable_only: bool = typer.Option(False, "--stable-only"),
 ) -> None:
+    from adapters.compare import OUTCOMES  # noqa: PLC0415
+
     g = load_full_ledger()
-    filter_impl_iri = ids.slug_id("implementation", implementation) if implementation else None
-    counts = {o: 0 for o in ("passed", "failed", "cantTell", "inapplicable", "untested")}
+    filter_impl_iri = None
+    if implementation is not None:
+        filter_impl_iri = ids.slug_id("implementation", implementation)
+        if (filter_impl_iri, RDF.type, SVT.Implementation) not in g:
+            typer.echo(f"error: unknown implementation {implementation!r}", err=True)
+            raise typer.Exit(2)
+    counts = {o: 0 for o in OUTCOMES}
     for run in g.subjects(RDF.type, SVT.TestRun):
         version_iri = g.value(run, EARL.subject)
         impl_iri = g.value(version_iri, SVT.ofImplementation) if version_iri else None
@@ -851,6 +875,10 @@ def view_cmd(
     if testcase is not None:
         name_parts.append(f"testcase-{testcase}")
     if implementation is not None:
+        # Already-prefixed by "testcase-<id>" above when both filters are
+        # given (report kind 1) -- the bare slug reads fine appended to
+        # that. Filtered by --implementation alone (no --testcase), there's
+        # no "testcase-" prefix to attach to, so it needs its own label.
         name_parts.append(implementation if testcase is not None else f"implementation-{implementation}")
     name = "-".join(name_parts) + ".md" if name_parts else "all.md"
     path = reports_dir / name

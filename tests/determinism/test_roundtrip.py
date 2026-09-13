@@ -5,12 +5,22 @@ test is the check on that guarantee, not a description of intent."""
 
 from rdflib import Graph
 
-from sysmlv2_testing.namespaces import IMPLEMENTATIONS_TTL, PREFIXES, RUNS_DIR, TESTCASES_TTL
+from sysmlv2_testing.namespaces import (
+    IMPLEMENTATIONS_TTL,
+    PREFIXES,
+    RUNS_DIR,
+    SOURCES_TTL,
+    TESTCASES_TTL,
+)
 from sysmlv2_testing.serialize import canonical_turtle
 
 
 def _ledger_files():
-    files = [p for p in (IMPLEMENTATIONS_TTL, TESTCASES_TTL) if p.exists()]
+    # SOURCES_TTL is written by document add / citation add / set-quote /
+    # set-page -- same "the CLI is the only writer" guarantee applies to
+    # it as to IMPLEMENTATIONS_TTL/TESTCASES_TTL/RUNS_DIR; it must not be
+    # silently exempt from this check.
+    files = [p for p in (SOURCES_TTL, IMPLEMENTATIONS_TTL, TESTCASES_TTL) if p.exists()]
     if RUNS_DIR.exists():
         files.extend(sorted(RUNS_DIR.glob("*.ttl")))
     return files

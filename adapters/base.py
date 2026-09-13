@@ -29,6 +29,11 @@ class ResolutionCheck:
 
 @dataclass(frozen=True)
 class TestCaseSpec:
+    # Not a pytest test class -- the name just collides with pytest's
+    # default `Test*` discovery pattern. Silences the collection warning
+    # this triggers on every test run.
+    __test__ = False
+
     input_files: list[Path]
     method: str
     expected: str | None

@@ -17,7 +17,11 @@ from __future__ import annotations
 
 from .base import RawResult, TestCaseSpec
 
-_OUTCOMES = ("passed", "failed", "cantTell", "inapplicable", "untested")
+# The closed set of outcomes -- mirrors shapes/testrun.shapes.ttl's
+# TestResultOutcomeShape sh:in list (that's the SHACL-enforced source of
+# truth for the ledger itself; this is the single Python-side copy other
+# code should import rather than re-typing the same five strings).
+OUTCOMES = ("passed", "failed", "cantTell", "inapplicable", "untested")
 
 
 def compare(spec: TestCaseSpec, result: RawResult) -> tuple[str, str | None, str]:
