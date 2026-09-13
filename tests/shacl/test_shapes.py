@@ -26,6 +26,7 @@ EXPECTED_VIOLATIONS = {
     "testcase_expected_without_grounding": "TestCaseGroundingRequiredShape",
     "annotation_missing_person": "AnnotationAssociatedWithShape",
     "issuelink_missing_url": "IssueLinkIssueURLShape",
+    "specdocument_missing_sha256": "SpecDocumentSha256Shape",
 }
 
 

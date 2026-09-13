@@ -1,0 +1,7 @@
+@prefix svt: <https://w3id.org/sysmlv2-testing#> .
+@prefix svtid: <https://w3id.org/sysmlv2-testing/id/> .
+
+svtid:spec-broken a svt:SpecDocument ;
+    svt:docNumber "formal/0000-00-00" ;
+    svt:localPath "sources/local/broken.pdf" .
+# missing svt:sha256 -- violates svt:SpecDocumentSha256Shape

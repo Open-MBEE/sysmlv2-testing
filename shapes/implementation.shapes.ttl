@@ -8,7 +8,7 @@
 svt:ImplementationShape a sh:NodeShape ;
     sh:targetClass svt:Implementation ;
     sh:property svt:ImplementationNameShape, svt:ImplementationRepositoryURLShape,
-        svt:ImplementationPrimaryLanguageShape .
+        svt:ImplementationPrimaryLanguageShape, svt:ImplementationHasVersionShape .
 
 svt:ImplementationNameShape a sh:PropertyShape ;
     sh:path svt:name ;
@@ -29,3 +29,9 @@ svt:ImplementationPrimaryLanguageShape a sh:PropertyShape ;
     sh:maxCount 1 ;
     sh:datatype xsd:string ;
     sh:message "an Implementation must have exactly one svt:primaryLanguage" .
+
+svt:ImplementationHasVersionShape a sh:PropertyShape ;
+    sh:path svt:hasVersion ;
+    sh:nodeKind sh:IRI ;
+    sh:class svt:Version ;
+    sh:message "every svt:hasVersion value must be a real svt:Version (the inverse of svt:ofImplementation, written by `version add`) -- unbounded and optional (0 or more), since a freshly-registered Implementation has none yet" .
