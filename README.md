@@ -69,25 +69,12 @@ uv run svt report           # pass/fail/cantTell/inapplicable/untested census
 uv run svt view             # compile a readable Markdown report (reports/, gitignored)
 ```
 
-To ledger a new test, see
-`.claude/skills/ledger-testing/SKILL.md` — or in short:
-
-```bash
-uv run svt implementation add --name <slug> --repo <url> --language <lang>
-uv run svt version add --implementation <slug> --commit <full-git-sha>
-uv run svt document add --id <slug> --doc-number "..." --title "..." \
-  --local-path sources/local/<file>.pdf --sha256 <hex>          # if citing a new source
-uv run svt citation add --id <slug> --document <doc-id> \
-  --section "..." --page "..." --quote "..." [--rationale "..."]
-uv run svt testcase add --id <slug> --description "..." \
-  --input-file <path>... --method structural-check --expected clean \
-  --grounds <citation-id>
-svt testcase validate --id <slug> --by <your name>   # a human step, not an agent step
-uv run svt run --testcase <slug> --implementation <slug> --version <commit>
-uv run svt view --testcase <slug>
-svt testrun annotate --testcase <slug> --implementation <slug> --version <commit> \
-  --by <your name> --comment "..."                    # optional, after review
-```
+To ledger a new test end to end, see **`docs/workflow.md`** — the
+canonical, step-by-step procedure (construct → verify → human-validate →
+run → report → review → issue-decide) — or `docs/walkthrough.md` for a
+full worked example following those exact steps. The
+`ledger-testing` skill (`.claude/skills/ledger-testing/SKILL.md`) covers
+the same steps framed for an agent to follow.
 
 ## What's in the ledger already
 

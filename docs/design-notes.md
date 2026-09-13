@@ -161,21 +161,16 @@ every citation's `svt:rationale` in this repo up to this point was
 authored by Claude in a single session; being SHACL-valid RDF never
 implied any of it was checked against the spec by a person.
 
-The fix (see AGENTS.md's "Construction vs. validation: the LLM's role is
-bounded" for the normative contract): a new `svt:Validation` record — a
-named `prov:Person`, never this repo's own `svt-cli` agent identity,
-confirming they read the cited spec text and it says what the claim needs
-it to say — is now required before `svt run` will execute a TestCase at
-all (`src/sysmlv2_testing/cli.py`'s `run_cmd`, the `_gate_and_save`-style
-check right after the version-existence check). `svt testcase validate
---id <id> --by <name>` is the only way to record one, and it refuses a
-denylist of LLM/agent-flavored `--by` names. **All ten TestCases seeded so
-far are, as of this commit, unvalidated under this gate** — every one was
-authored by Claude, and Claude will not run `svt testcase validate`
-against its own claims, since that would defeat the entire point of the
-gate. `svt run` against any of them refuses with the exact command to fix
-it; Z validates each one himself, on his own schedule, once he's read the
-cited spec text and confirms it.
+The fix — a new `svt:Validation` record, and `svt run` refusing without
+one — is the normative contract in `AGENTS.md`; the exact commands are
+`docs/workflow.md`'s step 3. **All ten TestCases seeded so far are, as of
+this commit, unvalidated under this gate** — every one was authored by
+Claude, and Claude will not run `svt testcase validate` against its own
+claims, since that would defeat the entire point of the gate. `svt run`
+against any of them refuses with the exact command to fix it; Z
+validates each one himself, on his own schedule, once he's read the
+cited spec text and confirms it. (Two have since been validated and run
+for real — see `docs/walkthrough.md`.)
 
 The grounding requirement (`svt:expected`/`svt:checksResolution` implies
 at least one `svt:groundedIn` citation) was already a convention; it is

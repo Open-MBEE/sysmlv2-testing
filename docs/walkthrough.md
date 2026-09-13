@@ -1,25 +1,25 @@
 # Walkthrough: one real pass, end to end
 
-A worked example of the full pipeline this repo is built around, done
-once, deliberately, before scaling up to running many test cases:
-construct → verify construction → human-validate → run → report → human
-review/annotate → decide-and-link-an-issue. Distinct from
-`docs/design-notes.md` (retrospective rationale for past decisions) and
-`AGENTS.md`/the skill (the normative contract) -- this is a runbook you
-can literally re-follow, with a real example at every step.
+A worked example following `docs/workflow.md`'s canonical seven-step
+procedure, done for real, twice, with real evidence at every step --
+`docs/workflow.md` is the generic *how*; this is the concrete example.
+Distinct from `docs/design-notes.md` (retrospective rationale for past
+decisions).
 
-Two of the seven steps below are **governance-gated to a human, not an
-agent** (see AGENTS.md's "Construction vs. validation"): step 3
-(validate) and step 7 (decide on an issue). An agent must never perform
-either on its own behalf, even to "finish the demo" -- that would defeat
-the entire point of the gate. When asked to run step 3 directly (even
-with the human's own real name supplied), the honest answer was to
-decline and hand back the one-line command instead -- see the
-transcript this walkthrough came from. So this is, honestly, a
-two-session document in practice: an agent got it to the point where a
-human's judgment was the only thing missing (steps 1-2), a human ran
-step 3 himself, and the agent picked back up for the purely mechanical
-steps 4-5. Step 7 is still the human's alone.
+Steps 3 (validate), 6 (annotate), and 7 (decide on an issue) are
+**governance-gated to a human, not an agent** (see
+`docs/workflow.md`/`AGENTS.md` -- the same `NOT_A_HUMAN` denylist covers
+all three commands). An agent must never perform any of them on its own
+behalf, even to "finish the demo" -- that would defeat the entire point
+of the gate. When asked to run step 3 directly (even with the human's
+own real name supplied), the honest answer was to decline and hand back
+the one-line command instead -- see the transcript this walkthrough came
+from. So this was, honestly, a two-session document in practice: an
+agent got it to the point where a human's judgment was the only thing
+missing (steps 1-2), a human ran step 3 himself, and the agent picked
+back up for the purely mechanical steps 4-5. Steps 6-7 were the human's
+alone -- both examples below ended up not needing an issue, which is a
+perfectly fine outcome.
 
 ## Why this exists
 
@@ -165,16 +165,37 @@ now logged through the real pipeline (no LLM in this step, ever --
 `adapters/compare.py` decided `passed` because `actual == expected ==
 "violated"`, not me).
 
-### Step 5 — Report *(done)*
+### Step 5 — Report, both kinds *(done)*
+
+This TestCase was later also run against OpenSysML and sysml-toolkit (not
+shown in steps 3-4 above, which focus on the Pilot Implementation) --
+`structural-check` is supported by all three adapters, so this became the
+vehicle for a genuine 3-way comparison. All three: `passed`, `actual:
+violated`.
+
+**Kind 1** (one TestCase against one Implementation):
+
+```bash
+uv run svt view --testcase membership-visibility-private-rejected --implementation pilot-implementation
+```
+
+Committed snapshot:
+[`docs/walkthrough-reports/membership-visibility-private-rejected--pilot-implementation.md`](walkthrough-reports/membership-visibility-private-rejected--pilot-implementation.md).
+
+**Kind 2** (cross-implementation comparison):
 
 ```bash
 uv run svt view --testcase membership-visibility-private-rejected
 ```
 
-Shows `VALIDATION: confirmed by Zargham (2026-09-13T02:00:39+00:00)`,
-the grounding, the real fixture, and the run's full real command/exit
-code/stdout/stderr -- see `reports/testcase-membership-visibility-private-rejected.md`
-(gitignored, regenerate any time with the command above).
+Committed snapshot:
+[`docs/walkthrough-reports/membership-visibility-private-rejected--all-implementations.md`](walkthrough-reports/membership-visibility-private-rejected--all-implementations.md)
+-- shows all three implementations agreeing, side by side, each with its
+own real command/exit code/stdout/stderr.
+
+Both regenerate live (gitignored, ephemeral) under `reports/`; the two
+committed files above are point-in-time snapshots kept specifically as
+this walkthrough's worked examples of the two report kinds.
 
 ### Step 6 — Human review + operator annotation *(next -- your call)*
 
@@ -310,15 +331,33 @@ explicit cleanup pass, not something to silently patch mid-walkthrough:
    asymmetry.** Accepted deliberately -- renaming the existing top-level
    `run` would be a breaking CLI change for no real benefit -- but worth
    naming explicitly rather than looking like an oversight.
-5. **AGENTS.md / the skill / README.md** should be spot-checked against
-   actual current CLI behavior now that `citation set-quote`/`set-page`
-   and `testrun annotate`/`link-issue` exist -- not assumed still
-   accurate just because new sections were appended.
+5. **AGENTS.md / the skill / README.md** were duplicating the same
+   step-by-step mechanics in three (then four) places, drifting further
+   apart each time a command was added -- **resolved in the documentation
+   pass**: `docs/workflow.md` is now the one canonical step list; the
+   other three point at it instead of re-stating it.
+6. **`toolchain/get-sysml-toolkit.sh` assumed the wrong tarball layout**
+   (found and fixed while getting a real 3-way comparison for report
+   kind 2, below): it expected a bare `sysmlv2` binary at the top level;
+   the real v0.6.0 release asset extracts into its own subdirectory.
+   Verified by re-running the corrected script end-to-end.
+7. **`README.md` claimed sysml-toolkit's release vendors an OMG stdlib**
+   (`spec-refs/SysML-v2-Release/sysml.library`) -- checked directly
+   against the real v0.6.0 asset, found false (the release contains only
+   the binary, `LICENSE`, and `README.md`), corrected to point at a real
+   stdlib source instead.
 
 ## Verification this pass ran
 
-- `uv run pytest -q` -- 38 passed.
+- `uv run pytest -q` -- 40 passed.
 - `uv run svt verify` -- clean.
+- Report kind 1's `--implementation` filter: correctly drops every other
+  implementation's name/command/output from a filtered report (tested
+  against a TestCase with real multi-implementation runs), and is
+  deterministic across repeated renders.
+- Report kind 2's cross-comparison: genuine 3-way data for
+  `membership-visibility-private-rejected` -- Pilot, OpenSysML, and
+  sysml-toolkit all `passed`, all `actual: violated`.
 - New SHACL shapes (`AnnotationShape`, `IssueLinkShape`): counterexamples
   each fail exactly the shape they target; `_conforms.ttl` passes clean
   with both new classes represented.

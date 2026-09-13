@@ -48,56 +48,26 @@ and let the comparator decide.
 The rule above covers *execution* (no LLM in run/compare/log). It says
 nothing about *construction* — and an LLM constructing a TestCase via the
 CLI can still produce SHACL-valid RDF around an invented claim. Being
-structurally well-formed is not the same thing as being true. So:
+structurally well-formed is not the same thing as being true. The full
+construct → SHACL-gate → human-validate → run → report → human review →
+issue-decide sequence, with the exact commands for each step, is
+`docs/workflow.md`; the two normative rules that must live here, not
+just there:
 
-- **Construct** — an agent may draft a `TestCase` via `svt testcase add`
-  (description, method, expected/`--resolves`, `--grounds`). This is
-  fine — the CLI's own gate keeps it correct-by-construction.
-- **SHACL-gate** — every write already goes through `_gate_and_save`
-  (`src/sysmlv2_testing/cli.py`). This confirms the RDF is well-formed
-  and, since the grounding-required shape landed, that any `expected`/
-  `checksResolution` cites at least one `SpecCitation`. It does **not**
-  confirm the citation actually says what the claim needs it to say —
-  that's still just an LLM's or a human's assertion at this point.
-- **Human-validate** — `svt testcase validate --id <id> --by <name>`
-  records that a **named human** (never an LLM/agent name — the CLI
-  refuses a denylist of those) actually read the cited spec text and
-  confirmed the claim. This is the step that makes a claim trustworthy,
-  and it is the one step an agent must never perform on its own behalf.
-- **Run** — `svt run` refuses outright if no `svt:Validation` record
-  exists for the target TestCase. Constructing and SHACL-gating a claim
-  is necessary but not sufficient to make it runnable.
-
-**If you are an agent: never call `svt testcase validate` for a TestCase
-you authored, or with any name other than the actual human directing your
-work.** Doing so would make the ledger indistinguishable from one where a
-human genuinely checked every claim against the spec, which is the exact
-failure mode this gate exists to prevent.
-
-## Post-run human review: annotation and issue-linking
-
-Once a `TestRun` exists, two more human-only actions are available --
-distinct from `Validation`, which is about the TestCase's claim *before*
-any run happens:
-
-- **`svt testrun annotate --testcase <id> --implementation <slug>
-  --version <commit> --by <name> --comment "..."`** records a human's
-  free-text observation about one specific, already-completed `TestRun`
-  (`svt:Annotation`).
-- **`svt testrun link-issue --testcase <id> --implementation <slug>
-  --version <commit> --by <name> --url <issue-url> [--label "..."]`**
-  records that a `TestRun` relates to an external issue-tracker entry
-  (`svt:IssueLink`) -- a real, queryable fact instead of prose buried in
-  `svt:stderr`/`earl:info` or a `docs/design-notes.md` credit line.
-
-Both are `prov:Activity`-typed and append-only (a correction is a *new*
-record, never an edit), gated by the same `NOT_A_HUMAN` denylist as
-`svt testcase validate` -- **an agent must never run either of these on
-its own behalf**, same reasoning as validation. Both live under a new
-`svt testrun ...` sub-app, a deliberate asymmetry with the top-level `svt
-run` command (renaming `run` would be a breaking change for no benefit).
-See `docs/walkthrough.md` for a full worked example of the entire
-pipeline, construction through issue-linking, in one real pass.
+- **`svt testcase validate`** records that a **named human** (never an
+  LLM/agent name — the CLI refuses a denylist of those) actually read
+  the cited spec text and confirmed the claim. This is the step that
+  makes a claim trustworthy, and it is the one step an agent must never
+  perform on its own behalf, for a TestCase it authored or with any
+  `--by` name other than the actual human directing the work — doing so
+  would make the ledger indistinguishable from one where a human
+  genuinely checked every claim, the exact failure mode this gate
+  exists to prevent. `svt run` refuses outright without this record.
+- **`svt testrun annotate`/`link-issue`** (post-run: a human's comment
+  on a completed `TestRun`, or a link to an external issue) are gated
+  by the same denylist and the same rule — an agent must never run
+  either on its own behalf. See `docs/walkthrough.md` for a worked
+  example of exactly that boundary being tested and held.
 
 **`svt:description` is a requirement statement, not commentary.** Write
 it the way the spec states the requirement — it should read identically
@@ -120,13 +90,11 @@ tool's behavior the citation settles — that is rationale's actual job.
 | Sources | `sources/sources.ttl` (committed), `sources/local/` (gitignored) | The two OMG spec PDFs are copyrighted and held locally only. `sources.ttl`'s sha256 entries are how anyone confirms their own copy is the same edition — keep them in sync if a PDF is replaced. |
 | Adapters/toolchain | `adapters/`, `toolchain/` | Plain code. A new implementation gets a new adapter module implementing `adapters.base.Adapter`; it should raise `UnsupportedMethod` honestly rather than fake a result for a method it can't perform. |
 
-## Adding a test case, in one sentence
+## Adding a test case
 
-Use the `ledger-testing` skill (`.claude/skills/ledger-testing/SKILL.md`),
-or directly: `svt testcase add` with your fixture files, ground it,
-**have a human run `svt testcase validate`**, then `svt run` it against
-each `Implementation`/`Version` you care about, then `svt report`. Once a
-run exists, a human may also `svt testrun annotate`/`link-issue` it.
+See `docs/workflow.md` for the full step-by-step procedure, or the
+`ledger-testing` skill (`.claude/skills/ledger-testing/SKILL.md`) for the
+same steps framed for an agent to follow.
 
 ## Reproducibility
 
