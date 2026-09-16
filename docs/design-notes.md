@@ -436,6 +436,34 @@ The fix is a refusal, not a default — claiming independent confirmation
 anonymously is exactly the claim nobody could check later, so `svt run` now
 explains that `--as` is needed and how to register a Party.
 
+**The local build and the release are two Versions, and now say so.** Nine
+sysml-toolkit runs sat under the v0.6.0 *release tag* while their
+`svt:command` plainly named a *local* build at `target/release/sysmlv2`.
+Pinning the release digest to that Version would have made the ledger claim
+something its own evidence contradicted. Instead the local build is
+registered as its own Version (`main@29d57f4`, the merge commit the build
+came from, digest `87da32db…`), the nine runs were moved onto it by
+load/remove/canonical-resave, and the full suite was then run against the
+release asset under the v0.6.0 tag. Both Versions now hold nine runs, each
+under the artifact that produced it, and their outcomes agree — which is
+now recorded evidence rather than an assumption.
+
+Moving run records is ledger surgery, and a narrow Z-authorized exception
+on the same pre-launch grounds as `689a1ae` and `a6a3275`. The move script
+refused to touch any run it could not positively identify, which caught two
+`earl:inapplicable` records whose command is `(unsupported)`: no binary ran
+for those at all, so they belong with their siblings rather than to either
+artifact.
+
+**And the harness no longer lets this happen again.** The original hole was
+not that someone mislabelled a Version — it is that `svt run` believed
+`--version` and never checked. So a run against a Version with **no** pinned
+artifact is now refused outright whenever the artifact is determinable, not
+merely noted: a Version label is not evidence. Pinning is a deliberate act
+by someone who knows which artifact they hold, and from then on every run is
+verified against it. Where an adapter cannot fingerprint its tool there is
+nothing to contradict and the run proceeds.
+
 **Not done: back-dating digests onto existing runs.** Those runs used the
 dev build and predate the pin. Asserting they used the pinned artifact
 would be the false-provenance claim this whole change exists to prevent —

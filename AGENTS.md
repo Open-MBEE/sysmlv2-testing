@@ -146,10 +146,15 @@ same steps framed for an agent to follow.
   reproducible from the ledger alone**, and it is now enforced rather than
   asserted: every `Invocation` records `svt:toolDigest`, the sha256 of the
   tool that actually produced its output, and `svt run` refuses to write a
-  run whose tool does not match the digest pinned on the `Version` it names.
-  This was a real hole — `svt run --version` never reaches an adapter (each
-  picks its tool from the environment), so until the digest existed a
-  `TestRun`'s `earl:subject` was a label nothing checked.
+  run whose tool does not match the digest pinned on the `Version` it names
+  — and refuses to run at all against a `Version` with **no** pinned digest
+  when the artifact is determinable, because a Version label is not
+  evidence. Pin first, deliberately, then the check verifies.
+  This was a real hole, not a theoretical one — `svt run --version` never
+  reaches an adapter (each picks its tool from the environment), so this
+  ledger held nine runs labelled with the sysml-toolkit v0.6.0 *release
+  tag* that a *local build* had actually produced. They now sit under their
+  own Version for the build that made them.
 - **Pin an artifact others can obtain.** sysml-toolkit's release asset and a
   local build of the byte-identical tree are different bytes and *both
   report `sysmlv2 0.6.0`* — the self-reported version cannot tell them

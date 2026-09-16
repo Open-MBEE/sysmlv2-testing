@@ -95,11 +95,13 @@ its method can check is the specific failure this is looking for.
 uv run svt run --testcase <slug> --implementation <slug> --version <commit>
 ```
 
-If the target `Version` has an `svt:artifactDigest`, the run is refused
-outright when the tool on your PATH is not that artifact — a run must never
-be recorded against a Version it did not execute. If it has no digest yet,
-the run proceeds and prints the `svt version add-artifact-digest` command to
-pin what just ran. Pin something others can obtain: a release asset and a
+A run is refused outright when the tool on your PATH is not one of the
+artifacts pinned on the target `Version` — and equally when that Version has
+**no** pinned artifact at all, since then nothing could verify the claim.
+Either way the digest of what you have is printed, with the
+`svt version add-artifact-digest` command to pin it if it genuinely is that
+Version's artifact, or the advice to register it as its own Version if it is
+a different build. Pin something others can obtain: a release asset and a
 local build of the identical tree differ in bytes while reporting the same
 version string, so only the digest distinguishes them.
 

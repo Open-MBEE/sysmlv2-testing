@@ -57,6 +57,7 @@ package Usage {
 |---|---|---|---|
 | opensysml | `2b6c1cf6c31266396899a90d3290cfbdf44019b9` | passed | violated |
 | pilot-implementation | `692170b71867353b8f90341e61556f49a5beb0e5` | passed | violated |
+| sysml-toolkit | `29d57f43797a3bebc7f39ed4cc6cac6dfe9b3c73` | passed | violated |
 | sysml-toolkit | `3a13c64adb93f1d069ce021c598318587126044a` | passed | violated |
 
 #### opensysml @ `2b6c1cf6c31266396899a90d3290cfbdf44019b9` (v0.4.0) -- 2026-09-13T02:35:13+00:00
@@ -109,7 +110,7 @@ log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more in
 
 ```
 
-#### sysml-toolkit @ `3a13c64adb93f1d069ce021c598318587126044a` (v0.6.0) -- 2026-09-13T04:36:12+00:00
+#### sysml-toolkit @ `29d57f43797a3bebc7f39ed4cc6cac6dfe9b3c73` (v0.6.0 source, local build (main@29d57f4)) -- 2026-09-13T04:36:12+00:00
 
 - **outcome**: `passed`
 - **actual**: `violated`
@@ -119,6 +120,35 @@ log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more in
 - **exit code**: `1`
 - **input digest**: `sha256:de9f631acd37024ea472b26f505839b98e889c27830b7dd738cb60aa56c5e4b2`
 - **started at**: 2026-09-13T04:36:12+00:00
+
+stdout:
+
+```
+
+```
+
+stderr:
+
+```
+warning: unresolved reference `Lib::Widget`
+  --> /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/membership-visibility-private-rejected/private-visibility.sysml:6:14
+   |
+   |     part w : Lib::Widget;
+
+1 warning(s)
+--strict: warnings are failures
+
+```
+
+#### sysml-toolkit @ `3a13c64adb93f1d069ce021c598318587126044a` (v0.6.0) -- 2026-09-16T03:56:46+00:00
+
+- **outcome**: `passed`
+- **actual**: `violated`
+- **info**: expected='violated' actual='violated'
+- **command**: `/Users/z/Documents/GitHub/sysmlv2-testing/.cache/sysml-toolkit/v0.6.0/sysmlv2-0.6.0-aarch64-apple-darwin/sysmlv2 check --lib /Users/z/Documents/GitHub/sysml-toolkit/spec-refs/SysML-v2-Release/sysml.library --strict /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/membership-visibility-private-rejected/private-visibility.sysml`
+- **exit code**: `1`
+- **input digest**: `sha256:de9f631acd37024ea472b26f505839b98e889c27830b7dd738cb60aa56c5e4b2`
+- **started at**: 2026-09-16T03:56:46+00:00
 
 stdout:
 

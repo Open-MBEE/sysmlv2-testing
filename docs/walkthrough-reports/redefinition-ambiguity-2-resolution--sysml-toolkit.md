@@ -77,9 +77,10 @@ package UsageTwo {
 
 | Implementation | Version | Outcome | Actual |
 |---|---|---|---|
+| sysml-toolkit | `29d57f43797a3bebc7f39ed4cc6cac6dfe9b3c73` | failed | UsageTwo::c::@0->UsageTwo::c::@2; UsageTwo::c::@1->UsageTwo::c::@1 |
 | sysml-toolkit | `3a13c64adb93f1d069ce021c598318587126044a` | failed | UsageTwo::c::@0->UsageTwo::c::@2; UsageTwo::c::@1->UsageTwo::c::@1 |
 
-#### sysml-toolkit @ `3a13c64adb93f1d069ce021c598318587126044a` (v0.6.0) -- 2026-09-13T00:19:09+00:00
+#### sysml-toolkit @ `29d57f43797a3bebc7f39ed4cc6cac6dfe9b3c73` (v0.6.0 source, local build (main@29d57f4)) -- 2026-09-13T00:19:09+00:00
 
 - **outcome**: `failed`
 - **actual**: `UsageTwo::c::@0->UsageTwo::c::@2; UsageTwo::c::@1->UsageTwo::c::@1`
@@ -89,6 +90,30 @@ package UsageTwo {
 - **exit code**: `0`
 - **input digest**: `sha256:dd8e5e69f050f6548c2e6e2e7cb21b17e84b79019c80fd3ffacb29d95c05e35a`
 - **started at**: 2026-09-13T00:19:09+00:00
+
+stdout:
+
+```
+UsageTwo::c::@0	UsageTwo::c::@2
+UsageTwo::c::@1	UsageTwo::c::@1
+
+```
+
+stderr:
+
+```
+
+```
+
+#### sysml-toolkit @ `3a13c64adb93f1d069ce021c598318587126044a` (v0.6.0) -- 2026-09-16T03:56:48+00:00
+
+- **outcome**: `failed`
+- **actual**: `UsageTwo::c::@0->UsageTwo::c::@2; UsageTwo::c::@1->UsageTwo::c::@1`
+- **info**: 2 resolution check(s), all_match=False
+- **command**: `/Users/z/Documents/GitHub/sysmlv2-testing/.cache/sysml-toolkit/v0.6.0/sysmlv2-0.6.0-aarch64-apple-darwin/sysmlv2 convert --lib /Users/z/Documents/GitHub/sysml-toolkit/spec-refs/SysML-v2-Release/sysml.library --to compact-json /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/redefinition-ambiguity-2-resolution/lib.sysml /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/redefinition-ambiguity-2-resolution/usage-two-ok.sysml -o /var/folders/_z/k9fkf53x4q7dm02s4lr__qq00000gn/T/tmpurq8_cy9/model.json`
+- **exit code**: `0`
+- **input digest**: `sha256:dd8e5e69f050f6548c2e6e2e7cb21b17e84b79019c80fd3ffacb29d95c05e35a`
+- **started at**: 2026-09-16T03:56:48+00:00
 
 stdout:
 

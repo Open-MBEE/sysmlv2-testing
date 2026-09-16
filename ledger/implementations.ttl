@@ -22,7 +22,8 @@ svtid:implementation-pilot-implementation
 
 svtid:implementation-sysml-toolkit
     a svt:Implementation ;
-    svt:hasVersion svtid:version-cdc8cdb3385265b0 ;
+    svt:hasVersion svtid:version-6039db9099bbd218,
+        svtid:version-cdc8cdb3385265b0 ;
     svt:name "sysml-toolkit" ;
     svt:primaryLanguage "Rust" ;
     svt:repositoryURL "https://github.com/Open-MBEE/sysml-toolkit"^^xsd:anyURI .
@@ -61,6 +62,14 @@ svtid:version-43b25328b26cade7
     svt:ofImplementation svtid:implementation-opensysml ;
     svt:sourceURL "https://github.com/Open-MBEE/OpenSysML/releases/tag/v0.8.0"^^xsd:anyURI ;
     svt:versionLabel "v0.8.0" .
+
+svtid:version-6039db9099bbd218
+    a svt:Version ;
+    svt:artifactDigest "87da32dbe07aa2e982ade7bbb1b25d4aa576487a92ec6f18e3994d1296620cf1" ;
+    svt:commitHash "29d57f43797a3bebc7f39ed4cc6cac6dfe9b3c73" ;
+    svt:ofImplementation svtid:implementation-sysml-toolkit ;
+    svt:sourceURL "https://github.com/Open-MBEE/sysml-toolkit/commit/29d57f43797a3bebc7f39ed4cc6cac6dfe9b3c73"^^xsd:anyURI ;
+    svt:versionLabel "v0.6.0 source, local build (main@29d57f4)" .
 
 svtid:version-cdc8cdb3385265b0
     a svt:Version ;

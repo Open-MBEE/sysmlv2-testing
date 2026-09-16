@@ -91,13 +91,22 @@ def _runs():
             if (r, RDF.type, SVT.TestRun) in g]
 
 
-def test_unpinned_version_records_what_ran_and_says_how_to_pin(ready):
-    """Nothing existing breaks: a Version with no artifactDigest still runs,
-    and the digest is surfaced so it can be pinned rather than guessed."""
-    result = _ok(_run(ready))
+def test_unpinned_version_is_refused_and_says_how_to_pin(ready):
+    """A Version label is not evidence. This ledger held nine runs labelled
+    with a release tag that a local build had actually produced, because the
+    harness believed --version and nothing ever checked. If the artifact is
+    determinable it must be pinned first."""
+    result = _run(ready)
+    assert result.exit_code == 2, result.output
     assert "has no svt:artifactDigest" in result.output
     assert "add-artifact-digest" in result.output
+    assert "a" * 64 in result.output, "must surface the digest so it can be pinned, not guessed"
+    assert _runs() == []
 
+
+def test_pinning_then_running_records_what_ran(ready):
+    _ok(_pin(ready, "a" * 64))
+    _ok(_run(ready))
     g = load_full_ledger()
     inv = g.value(_runs()[0], SVT.hasInvocation)
     assert str(g.value(inv, SVT.toolDigest)) == "a" * 64

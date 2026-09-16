@@ -46,9 +46,11 @@ verdict.
 ## The run must be the artifact the Version names
 
 Every `svt:Invocation` records `svt:toolDigest` — the sha256 of the tool
-that actually produced its output. When the target `Version` pins an
-`svt:artifactDigest` and they differ, `svt run` **refuses and writes
-nothing**. Fix the environment so it points at the pinned artifact, or
+that actually produced its output. `svt run` **refuses and writes nothing**
+both when that digest is not among those pinned on the target `Version`,
+and when the Version pins none at all — a Version label is not evidence, and
+this ledger once held nine runs labelled with a release tag that a local
+build had produced. Fix the environment so it points at the pinned artifact, or
 register what you have as its own `Version` with `svt version add`. Never
 work around it: recording a run against a Version it did not execute is
 precisely the false provenance this ledger exists to prevent.

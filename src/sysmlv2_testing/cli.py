@@ -1050,12 +1050,25 @@ def run_cmd(
         )
         raise typer.Exit(2)
     if not pinned and tool_digest is not None:
+        # Refuse, don't just note. Recording against an unpinned Version is
+        # how this ledger came to hold nine runs labelled with a release tag
+        # that were actually produced by a local build: the operator types
+        # --version, the harness believes it, and nothing ever checks. If
+        # the artifact is determinable it must be pinned first -- a
+        # deliberate act by someone who knows which artifact they have --
+        # and from then on the check above verifies it.
         typer.echo(
-            f"note: {version!r} has no svt:artifactDigest, so nothing verifies what ran.\n"
-            f"  Pin it with:  svt version add-artifact-digest --implementation "
-            f"{implementation} --version {version} --digest {tool_digest}",
+            f"error: {version!r} has no svt:artifactDigest, so nothing would verify that\n"
+            f"  this run used it -- and a Version label is not evidence. Nothing written.\n"
+            f"    the tool that just ran: {tool_digest}\n"
+            f"    it reports: {tool_version or '(no self-reported version)'}\n"
+            "  If that is genuinely this Version's artifact, pin it and re-run:\n"
+            f"    svt version add-artifact-digest --implementation {implementation} "
+            f"--version {version} --digest {tool_digest}\n"
+            "  If it is a different build, register it as its own Version instead.",
             err=True,
         )
+        raise typer.Exit(2)
 
     # The evidence is folded into the mint key, not just (testcase,
     # implementation, version, ts). ts is second-resolution, so two runs
