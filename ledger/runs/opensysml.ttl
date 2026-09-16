@@ -112,6 +112,15 @@ svtid:invocation-d7466e9771590b36
     svt:stderr "" ;
     svt:stdout "clean" .
 
+svtid:invocation-f522ad2df1c81c4c
+    a svt:Invocation ;
+    prov:startedAtTime "2026-09-16T02:50:39+00:00"^^xsd:dateTime ;
+    svt:command "Model.execute_state('StateDemo::Surface::condition', events=['EngagementEvent'])" ;
+    svt:exitCode "0"^^xsd:integer ;
+    svt:inputDigest "a42791bd6ee2f43cb1ef27ea1dd8197ff401212039cde225961d6167bd0e4d0a" ;
+    svt:stderr "" ;
+    svt:stdout "dormant,active" .
+
 svtid:reproduction-b04ed708ad449ab5
     a svt:Reproduction ;
     earl:result svtid:result-b04ed708ad449ab5 ;
@@ -183,6 +192,12 @@ svtid:result-d7466e9771590b36
     earl:info "expected='clean' actual='clean'" ;
     earl:outcome earl:passed ;
     svt:actual "clean" .
+
+svtid:result-f522ad2df1c81c4c
+    a earl:TestResult ;
+    earl:info "expected='dormant,active' actual='dormant,active'" ;
+    earl:outcome earl:passed ;
+    svt:actual "dormant,active" .
 
 svtid:run-028809c427cb28e0
     a svt:TestRun ;
@@ -284,3 +299,14 @@ svtid:run-d7466e9771590b36
     earl:test svtid:testcase-redefinition-ambiguity-2 ;
     prov:startedAtTime "2026-09-12T21:18:40+00:00"^^xsd:dateTime ;
     svt:hasInvocation svtid:invocation-d7466e9771590b36 .
+
+svtid:run-f522ad2df1c81c4c
+    a svt:TestRun ;
+    earl:assertedBy svtid:agent-svt-cli ;
+    earl:mode earl:automatic ;
+    earl:result svtid:result-f522ad2df1c81c4c ;
+    earl:subject svtid:version-43b25328b26cade7 ;
+    earl:test svtid:testcase-state-machine-transitions-on-event ;
+    prov:startedAtTime "2026-09-16T02:50:39+00:00"^^xsd:dateTime ;
+    svt:hasInvocation svtid:invocation-f522ad2df1c81c4c ;
+    svt:ranBy svtid:party-devin-linux-x86-64 .
