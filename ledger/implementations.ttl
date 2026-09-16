@@ -47,6 +47,7 @@ svtid:stability-ed12f863eecc337f
 
 svtid:version-26283fd33076c9d6
     a svt:Version ;
+    svt:artifactDigest "891a0cbb55f956a059b762a38430f01ccc6aa1fd1aa81d1428b52ff9489307cc" ;
     svt:commitHash "692170b71867353b8f90341e61556f49a5beb0e5" ;
     svt:ofImplementation svtid:implementation-pilot-implementation ;
     svt:sourceURL "https://github.com/Systems-Modeling/SysML-v2-Pilot-Implementation/commit/692170b71867353b8f90341e61556f49a5beb0e5"^^xsd:anyURI ;
@@ -54,7 +55,8 @@ svtid:version-26283fd33076c9d6
 
 svtid:version-43b25328b26cade7
     a svt:Version ;
-    svt:artifactDigest "229d129b0051e008aab3bd077fd3087b82f322f15ad91135effdd3f65aae197c" ;
+    svt:artifactDigest "229d129b0051e008aab3bd077fd3087b82f322f15ad91135effdd3f65aae197c",
+        "7a18e07bc3994bcc5965667ef7abee18efe015923b480e658a89644918b3af51" ;
     svt:commitHash "238aed650b2cd102191039a88c29a67b09d82271" ;
     svt:ofImplementation svtid:implementation-opensysml ;
     svt:sourceURL "https://github.com/Open-MBEE/OpenSysML/releases/tag/v0.8.0"^^xsd:anyURI ;
@@ -62,6 +64,7 @@ svtid:version-43b25328b26cade7
 
 svtid:version-cdc8cdb3385265b0
     a svt:Version ;
+    svt:artifactDigest "32dcc65375614975fde29b86f12745015d2b691768a00f14f22987ad4ff768b4" ;
     svt:commitHash "3a13c64adb93f1d069ce021c598318587126044a" ;
     svt:ofImplementation svtid:implementation-sysml-toolkit ;
     svt:sourceURL "https://github.com/Open-MBEE/sysml-toolkit/releases/tag/v0.6.0"^^xsd:anyURI ;
@@ -69,6 +72,7 @@ svtid:version-cdc8cdb3385265b0
 
 svtid:version-f69111dc2adf2203
     a svt:Version ;
+    svt:artifactDigest "1f3bf8caba84d60949add1426cb3be92d4e6ffe50ae6530ab3fea8dd9430a368" ;
     svt:commitHash "2b6c1cf6c31266396899a90d3290cfbdf44019b9" ;
     svt:ofImplementation svtid:implementation-opensysml ;
     svt:sourceURL "https://github.com/Open-MBEE/OpenSysML/releases/tag/v0.4.0"^^xsd:anyURI ;

@@ -1,0 +1,17 @@
+@prefix svt: <https://w3id.org/sysmlv2-testing#> .
+@prefix svtid: <https://w3id.org/sysmlv2-testing/id/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+svtid:invocation-broken a svt:Invocation ;
+    svt:command "sysmlv2 check --strict input.sysml" ;
+    svt:exitCode 0 ;
+    svt:stdout "clean" ;
+    svt:stderr "" ;
+    svt:inputDigest "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855" ;
+    svt:toolDigest "sysmlv2 0.6.0" ;
+    prov:startedAtTime "2026-01-01T00:00:00"^^xsd:dateTime .
+# svt:toolDigest holding a version string rather than a sha256 -- the exact
+# confusion the pair exists to prevent, since the release asset and a local
+# build of the identical tree report the SAME version string and differ only
+# by digest. Violates svt:InvocationToolDigestShape.

@@ -95,6 +95,14 @@ its method can check is the specific failure this is looking for.
 uv run svt run --testcase <slug> --implementation <slug> --version <commit>
 ```
 
+If the target `Version` has an `svt:artifactDigest`, the run is refused
+outright when the tool on your PATH is not that artifact — a run must never
+be recorded against a Version it did not execute. If it has no digest yet,
+the run proceeds and prints the `svt version add-artifact-digest` command to
+pin what just ran. Pin something others can obtain: a release asset and a
+local build of the identical tree differ in bytes while reporting the same
+version string, so only the digest distinguishes them.
+
 Add `--as <party-id>` (registered with `svt party add`) to say which
 machine this is. Re-running an already-recorded test does **not** create a
 second TestRun: the same party getting the same answer from the same input

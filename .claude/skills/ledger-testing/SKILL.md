@@ -43,6 +43,20 @@ names (`ScalarValues`, `Parts::Part`, `Connections`) that the TestCase
 never meant to test, stop and check the environment before believing the
 verdict.
 
+## The run must be the artifact the Version names
+
+Every `svt:Invocation` records `svt:toolDigest` — the sha256 of the tool
+that actually produced its output. When the target `Version` pins an
+`svt:artifactDigest` and they differ, `svt run` **refuses and writes
+nothing**. Fix the environment so it points at the pinned artifact, or
+register what you have as its own `Version` with `svt version add`. Never
+work around it: recording a run against a Version it did not execute is
+precisely the false provenance this ledger exists to prevent.
+
+A tool's self-reported version is *not* sufficient to tell artifacts apart —
+sysml-toolkit's release asset and a local build of the identical source tree
+both say `sysmlv2 0.6.0`. Only the digest catches it.
+
 ## Re-running is safe: it will not duplicate
 
 `svt run` against an already-recorded (testcase, implementation, version)

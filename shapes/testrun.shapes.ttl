@@ -108,7 +108,24 @@ svt:InvocationShape a sh:NodeShape ;
     sh:targetClass svt:Invocation ;
     sh:property svt:InvocationCommandShape, svt:InvocationExitCodeShape,
         svt:InvocationStdoutShape, svt:InvocationStderrShape,
-        svt:InvocationInputDigestShape, svt:InvocationStartedAtTimeShape .
+        svt:InvocationInputDigestShape, svt:InvocationStartedAtTimeShape,
+        svt:InvocationToolVersionShape, svt:InvocationToolDigestShape .
+
+# Optional: an adapter that cannot determine them still records a run, and
+# the runs made before this existed keep validating. The digest carries the
+# same lowercase-hex sha256 pattern as svt:inputDigest.
+svt:InvocationToolVersionShape a sh:PropertyShape ;
+    sh:path svt:toolVersion ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+    sh:message "svt:toolVersion, when present, must be a single literal" .
+
+svt:InvocationToolDigestShape a sh:PropertyShape ;
+    sh:path svt:toolDigest ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+    sh:pattern "^[0-9a-f]{64}$" ;
+    sh:message "svt:toolDigest, when present, must be a lowercase-hex sha256 (64 chars)" .
 
 svt:InvocationCommandShape a sh:PropertyShape ;
     sh:path svt:command ;

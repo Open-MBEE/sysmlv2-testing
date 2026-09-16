@@ -20,8 +20,16 @@ from __future__ import annotations
 
 import os
 import subprocess
+from pathlib import Path
 
-from .base import Adapter, RawResult, TestCaseSpec, UnsupportedMethod
+from .base import (
+    Adapter,
+    RawResult,
+    TestCaseSpec,
+    UnsupportedMethod,
+    digest_of,
+    with_fingerprint,
+)
 
 
 def _classpath() -> str:
@@ -65,14 +73,25 @@ def _library_dir() -> str:
     return lib_dir
 
 
+def _tool_fingerprint() -> tuple[str | None, str | None]:
+    """The Pilot ships no release artifact -- the jar is built locally by
+    toolchain/get-pilot-jar.sh -- so it self-reports no version and its
+    digest is honestly specific to one build. Recorded anyway: knowing two
+    runs used the same jar is worth something even when nobody else can
+    obtain that jar."""
+    classpath = os.environ.get("PILOT_GLUE_CLASSPATH", "")
+    jar = next((e for e in classpath.split(":") if e.endswith(".jar")), None)
+    return None, digest_of(Path(jar)) if jar else None
+
+
 class PilotAdapter(Adapter):
     slug = "pilot-implementation"
 
     def run(self, spec: TestCaseSpec) -> RawResult:
         if spec.method == "structural-check":
-            return self._structural_check(spec)
+            return with_fingerprint(self._structural_check(spec), *_tool_fingerprint())
         if spec.method == "reference-resolution":
-            return self._reference_resolution(spec)
+            return with_fingerprint(self._reference_resolution(spec), *_tool_fingerprint())
         raise UnsupportedMethod(
             f"pilot-implementation adapter has no handler for method {spec.method!r} "
             "(the Pilot's SysMLInteractive engine exposes parse/validate and "

@@ -33,6 +33,7 @@ EXPECTED_VIOLATIONS = {
     "reproduction_result_mismatch": "ReproductionMatchesRunShape",
     "reproduction_same_party": "ReproductionDistinctPartyShape",
     "testrun_redundant_duplicate": "TestRunNoRedundantDuplicateShape",
+    "invocation_bad_tool_digest": "InvocationToolDigestShape",
     "annotation_missing_person": "AnnotationAssociatedWithShape",
     "issuelink_missing_url": "IssueLinkIssueURLShape",
     "specdocument_missing_sha256": "SpecDocumentSha256Shape",

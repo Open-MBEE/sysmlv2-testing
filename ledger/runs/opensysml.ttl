@@ -121,6 +121,17 @@ svtid:invocation-f522ad2df1c81c4c
     svt:stderr "" ;
     svt:stdout "dormant,active" .
 
+svtid:invocation-fef0ff028c20bcfd
+    a svt:Invocation ;
+    prov:startedAtTime "2026-09-16T03:42:19+00:00"^^xsd:dateTime ;
+    svt:command "Model.execute_state('StateDemo::Surface::condition', events=['EngagementEvent'])" ;
+    svt:exitCode "0"^^xsd:integer ;
+    svt:inputDigest "a42791bd6ee2f43cb1ef27ea1dd8197ff401212039cde225961d6167bd0e4d0a" ;
+    svt:stderr "" ;
+    svt:stdout "dormant,active" ;
+    svt:toolDigest "7a18e07bc3994bcc5965667ef7abee18efe015923b480e658a89644918b3af51" ;
+    svt:toolVersion "v0.8.0" .
+
 svtid:reproduction-b04ed708ad449ab5
     a svt:Reproduction ;
     earl:result svtid:result-b04ed708ad449ab5 ;
@@ -128,6 +139,14 @@ svtid:reproduction-b04ed708ad449ab5
     svt:concernsRun svtid:run-29d5c83c1e3dbdf2 ;
     svt:hasInvocation svtid:invocation-b04ed708ad449ab5 ;
     svt:ranBy svtid:party-devin-linux-x86-64 .
+
+svtid:reproduction-fef0ff028c20bcfd
+    a svt:Reproduction ;
+    earl:result svtid:result-fef0ff028c20bcfd ;
+    prov:startedAtTime "2026-09-16T03:42:19+00:00"^^xsd:dateTime ;
+    svt:concernsRun svtid:run-f522ad2df1c81c4c ;
+    svt:hasInvocation svtid:invocation-fef0ff028c20bcfd ;
+    svt:ranBy svtid:party-zargham-macbook .
 
 svtid:result-028809c427cb28e0
     a earl:TestResult ;
@@ -199,6 +218,12 @@ svtid:result-f522ad2df1c81c4c
     earl:outcome earl:passed ;
     svt:actual "dormant,active" .
 
+svtid:result-fef0ff028c20bcfd
+    a earl:TestResult ;
+    earl:info "expected='dormant,active' actual='dormant,active'" ;
+    earl:outcome earl:passed ;
+    svt:actual "dormant,active" .
+
 svtid:run-028809c427cb28e0
     a svt:TestRun ;
     earl:assertedBy svtid:agent-svt-cli ;
@@ -228,7 +253,8 @@ svtid:run-29d5c83c1e3dbdf2
     earl:test svtid:testcase-state-machine-transitions-on-event ;
     prov:startedAtTime "2026-09-13T02:10:38+00:00"^^xsd:dateTime ;
     svt:hasInvocation svtid:invocation-29d5c83c1e3dbdf2 ;
-    svt:reconfirmedAt "2026-09-16T01:31:11+00:00"^^xsd:dateTime .
+    svt:reconfirmedAt "2026-09-16T01:31:11+00:00"^^xsd:dateTime,
+        "2026-09-16T03:40:05+00:00"^^xsd:dateTime .
 
 svtid:run-59a9dc1ec284415e
     a svt:TestRun ;

@@ -10,15 +10,40 @@ from __future__ import annotations
 
 import json
 import os
+import shutil
 import subprocess
 import tempfile
 from pathlib import Path
 
-from .base import Adapter, RawResult, TestCaseSpec, UnsupportedMethod
+from .base import (
+    Adapter,
+    RawResult,
+    TestCaseSpec,
+    UnsupportedMethod,
+    digest_of,
+    with_fingerprint,
+)
 
 
 def _binary() -> str:
     return os.environ.get("SYSMLV2_BIN", "sysmlv2")
+
+
+def _tool_fingerprint() -> tuple[str | None, str | None]:
+    """`sysmlv2 --version` for the self-reported string, plus the sha256 of
+    the binary actually on SYSMLV2_BIN. The digest is the load-bearing half:
+    a release asset and a local build of the identical tree are different
+    bytes, and only the release one is obtainable by anyone else."""
+    binary = _binary()
+    path = shutil.which(binary) or binary
+    version = None
+    try:
+        proc = subprocess.run([binary, "--version"], capture_output=True, text=True, timeout=30)
+        if proc.returncode == 0:
+            version = proc.stdout.strip() or None
+    except (OSError, subprocess.SubprocessError):
+        version = None
+    return version, digest_of(Path(path))
 
 
 def _lib_dir() -> str:
@@ -120,9 +145,9 @@ class SysmlToolkitAdapter(Adapter):
 
     def run(self, spec: TestCaseSpec) -> RawResult:
         if spec.method == "structural-check":
-            return self._structural_check(spec)
+            return with_fingerprint(self._structural_check(spec), *_tool_fingerprint())
         if spec.method == "reference-resolution":
-            return self._reference_resolution(spec)
+            return with_fingerprint(self._reference_resolution(spec), *_tool_fingerprint())
         # sysml-toolkit's `verify`/`query` evaluate a constraint at its
         # declaration site only, not a specific usage's redefined
         # bindings (BrandFootprintML ISSUES-PROPOSED.md #1) -- there is

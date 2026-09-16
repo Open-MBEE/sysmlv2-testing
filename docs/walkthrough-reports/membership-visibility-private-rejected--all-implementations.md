@@ -114,6 +114,7 @@ log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more in
 - **outcome**: `passed`
 - **actual**: `violated`
 - **info**: expected='violated' actual='violated'
+- **reconfirmed** by the same party (2026-09-16T03:37:22+00:00) -- identical result, no new record
 - **command**: `/Users/z/Documents/GitHub/sysml-toolkit/target/release/sysmlv2 check --lib /Users/z/Documents/GitHub/sysml-toolkit/spec-refs/SysML-v2-Release/sysml.library --strict /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/membership-visibility-private-rejected/private-visibility.sysml`
 - **exit code**: `1`
 - **input digest**: `sha256:de9f631acd37024ea472b26f505839b98e889c27830b7dd738cb60aa56c5e4b2`

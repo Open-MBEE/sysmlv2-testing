@@ -354,6 +354,94 @@ Two things fell out of this that are worth noting:
   agree were flagged redundant. They are not: different inputs are
   different evidence. The digest is part of the comparison now.
 
+## The first cross-party reproduction, and the hole it exposed
+
+Issue #1 asked for an independent replication. Jason Han's agent returned
+PR #2, which did exactly the right two things: a `svt:Reproduction` of the
+v0.4.0 `state-machine-transitions-on-event` run from
+`party-devin-linux-x86-64`, and — separately — a newly registered OpenSysML
+**v0.8.0** plus its own `TestRun`, because a different Version is new
+evidence, not a reproduction. The model held up on contact with a second
+machine, and Jason's v0.8.0 record was the first in this ledger to carry an
+`svt:artifactDigest` at all.
+
+Getting there exposed a hole the ledger had been claiming was closed.
+AGENTS.md said a `Version`'s `commitHash` and `artifactDigest` make a
+`TestRun` "reproducible from the ledger alone". In fact:
+
+- **`svt run --version` never reached an adapter.** `TestCaseSpec` carries
+  no version; each adapter picks its tool from a free-form env var
+  (`OPENSYSML_VERSION`, `SYSMLV2_BIN`, `PILOT_GLUE_CLASSPATH`). A run could
+  be recorded against a Version it had not executed, and nothing would
+  notice.
+- **No pre-existing Version had an `artifactDigest`.** All three were
+  `commitHash` only.
+
+Jason's own point compounded it: the OpenSysML client deliberately
+decouples its version from the gRPC server binary ("the client grabs the
+latest supported binary"), with `OPENSYSML_GRPC_VERSION` as the lever. Our
+adapter passed its own `OPENSYSML_VERSION` explicitly to `ensure_binary`,
+so anyone pinning the server the documented upstream way was **silently
+overridden** — the wrong binary, a plausible result, recorded without
+complaint. That variable is now honoured as a fallback.
+
+The fix is the same shape as the standard-library guards: log what ran, and
+refuse to record a contradiction. Every `svt:Invocation` now carries
+`svt:toolVersion` and `svt:toolDigest` — what the tool said it was, and the
+sha256 of the binary that actually answered. When the target Version pins an
+`svt:artifactDigest` and the running tool's digest differs, `svt run`
+refuses and writes nothing. Where no digest is pinned it records what ran
+and prints the `svt version add-artifact-digest` command, so nothing
+existing breaks.
+
+**The digest is the load-bearing half, and this is not theoretical.**
+sysml-toolkit's release asset (`32dcc653…`) and the local dev build every
+recorded run actually used (`87da32db…`) are built from byte-identical
+source — `git diff 3a13c64a HEAD` is empty — and *both report `sysmlv2
+0.6.0`*. The self-reported version cannot tell them apart. Only the digest
+can, and it does: pointing `SYSMLV2_BIN` at the dev build now fails with
+both hashes printed.
+
+All four Versions are pinned. sysml-toolkit is pinned to the **release
+asset**, not the dev build, because a digest nobody else can obtain pins
+nothing — verified first that the release asset reproduces every recorded
+sysml-toolkit outcome, so this is a build-provenance change and not a
+behavioural one. The Pilot's digest is honestly a local build: it ships no
+release artifact, so a second party must register their own Version rather
+than match ours.
+
+**A digest pins a platform, not just a release — found immediately.** The
+first cut made `svt:artifactDigest` single-valued, and the very next run
+proved that wrong: Jason's OpenSysML v0.8.0 artifact on Linux x86_64 is
+`229d129b…`, the same release on macOS arm64 is `7a18e07b…`. Both are
+genuinely v0.8.0, both verified by the client against upstream's own pinned
+digests — a release simply ships one artifact per platform. A single-valued
+pin therefore refuses every other party's *correct* run, which would have
+broken the cross-party reproduction this was all built for, on Jason's very
+next attempt.
+
+So `svt:artifactDigest` is multivalued, and a run is accepted when its
+`svt:toolDigest` matches any recorded value. This does refine what the
+property means — from "the artifact" to "one known-good artifact of this
+release" — which AGENTS.md's Vocabulary tier normally forbids. It is
+justified here on two grounds: the original meaning was simply wrong about
+how releases are distributed, and no past `TestRun` depended on it, because
+no Version carried a digest at all until this change. Each value is added by
+a deliberate `svt version add-artifact-digest`, never inferred from a run.
+
+The same pass turned up a crash in the Reproduction path: an *unattributed*
+re-run of a run made by a named Party took the reproduction branch and then
+failed an assertion, because a `svt:Reproduction` requires a `svt:ranBy`.
+The fix is a refusal, not a default — claiming independent confirmation
+anonymously is exactly the claim nobody could check later, so `svt run` now
+explains that `--as` is needed and how to register a Party.
+
+**Not done: back-dating digests onto existing runs.** Those runs used the
+dev build and predate the pin. Asserting they used the pinned artifact
+would be the false-provenance claim this whole change exists to prevent —
+the same reasoning that left the earlier runs unattributed rather than
+backfilled with a Party.
+
 ## Why `expected` can still be unset
 
 `svt:expected` is only ever set once it's actually grounded. A test case

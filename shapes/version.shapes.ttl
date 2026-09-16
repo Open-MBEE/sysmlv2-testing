@@ -24,12 +24,15 @@ svt:VersionCommitHashShape a sh:PropertyShape ;
     sh:pattern "^[0-9a-f]{7,40}$" ;
     sh:message "svt:commitHash must be a lowercase-hex git SHA (7-40 chars), required and exactly one" .
 
+# Multivalued, deliberately: a release ships one artifact per platform, so
+# a single digest pins a single platform and would refuse every other
+# party's correct run of the same release. Each value is one known-good
+# artifact of this Version, added by a deliberate act.
 svt:VersionArtifactDigestShape a sh:PropertyShape ;
     sh:path svt:artifactDigest ;
-    sh:maxCount 1 ;
     sh:datatype xsd:string ;
     sh:pattern "^[0-9a-f]{64}$" ;
-    sh:message "svt:artifactDigest, when present, must be a lowercase-hex sha256 (64 chars)" .
+    sh:message "each svt:artifactDigest must be a lowercase-hex sha256 (64 chars); several are allowed, one per platform artifact of this release" .
 
 svt:VersionLabelShape a sh:PropertyShape ;
     sh:path svt:versionLabel ;

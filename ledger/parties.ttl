@@ -9,3 +9,8 @@ svtid:party-devin-linux-x86-64
     a prov:SoftwareAgent,
         svt:Party ;
     rdfs:label "Ubuntu 22.04.5 LTS, x86_64 (Devin cloud VM)" .
+
+svtid:party-zargham-macbook
+    a prov:SoftwareAgent,
+        svt:Party ;
+    rdfs:label "macOS 15, arm64 (Zargham's MacBook)" .

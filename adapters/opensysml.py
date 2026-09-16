@@ -10,9 +10,39 @@ from __future__ import annotations
 
 import os
 
-from .base import Adapter, RawResult, TestCaseSpec, UnsupportedMethod
+from .base import Adapter, RawResult, TestCaseSpec, UnsupportedMethod, with_fingerprint
 
 DEFAULT_VERSION = "v0.4.0"
+
+
+def _requested_version() -> str:
+    """OPENSYSML_VERSION, then OPENSYSML_GRPC_VERSION, then the default.
+
+    The second is the upstream client's own variable. This adapter passes a
+    version explicitly to ensure_binary(), which overrides it -- so without
+    this fallback, somebody pinning the server the documented upstream way
+    would be silently ignored and get a different binary than they asked
+    for, with a plausible-looking result recorded against it.
+    """
+    return (
+        os.environ.get("OPENSYSML_VERSION")
+        or os.environ.get("OPENSYSML_GRPC_VERSION")
+        or DEFAULT_VERSION
+    )
+
+
+def _tool_fingerprint() -> tuple[str | None, str | None]:
+    """What the client says it actually installed: the release version and
+    the sha256 of that binary, straight from its own cache metadata (it
+    verifies the download against upstream's pinned digests, so this is
+    upstream's digest and not merely a hash of whatever is on disk)."""
+    import opensysml.binary
+
+    try:
+        meta = opensysml.binary.read_metadata() or {}
+    except Exception:  # noqa: BLE001 - never fail a run over provenance metadata
+        return None, None
+    return meta.get("version"), meta.get("sha256")
 
 
 class OpenSysMLAdapter(Adapter):
@@ -22,20 +52,25 @@ class OpenSysMLAdapter(Adapter):
         import opensysml
         import opensysml.binary
 
-        version = os.environ.get("OPENSYSML_VERSION", DEFAULT_VERSION)
+        version = _requested_version()
         opensysml.binary.ensure_binary(version=version)
         return opensysml.connect(version=version)
 
     def run(self, spec: TestCaseSpec) -> RawResult:
         content = "\n".join(p.read_text() for p in spec.input_files)
         conn = self._connect()
+        version, digest = _tool_fingerprint()
         try:
             if spec.method == "structural-check":
-                return self._structural_check(conn, content)
+                return with_fingerprint(self._structural_check(conn, content), version, digest)
             if spec.method == "constraint-eval":
-                return self._constraint_eval(conn, content, spec)
+                return with_fingerprint(
+                    self._constraint_eval(conn, content, spec), version, digest
+                )
             if spec.method == "state-execution":
-                return self._state_execution(conn, content, spec)
+                return with_fingerprint(
+                    self._state_execution(conn, content, spec), version, digest
+                )
             if spec.method == "reference-resolution":
                 # Confirmed two ways, not one, not a client-wrapping gap:
                 # (1) the wire protocol's only identity field (SymbolInfo.id

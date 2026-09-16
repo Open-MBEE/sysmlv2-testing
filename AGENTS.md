@@ -141,8 +141,23 @@ same steps framed for an agent to follow.
   an unrelated placeholder); the Pilot Implementation via
   `toolchain/get-pilot-jar.sh` (a one-time local Maven/Tycho build; needs
   a JDK).
-- A `Version`'s `commitHash` (and, where applicable, `artifactDigest`) are
-  both required so a `TestRun` is reproducible from the ledger alone.
+- A `Version`'s `commitHash` identifies the source; its `artifactDigest`
+  identifies the exact binary. **`artifactDigest` is what makes a `TestRun`
+  reproducible from the ledger alone**, and it is now enforced rather than
+  asserted: every `Invocation` records `svt:toolDigest`, the sha256 of the
+  tool that actually produced its output, and `svt run` refuses to write a
+  run whose tool does not match the digest pinned on the `Version` it names.
+  This was a real hole — `svt run --version` never reaches an adapter (each
+  picks its tool from the environment), so until the digest existed a
+  `TestRun`'s `earl:subject` was a label nothing checked.
+- **Pin an artifact others can obtain.** sysml-toolkit's release asset and a
+  local build of the byte-identical tree are different bytes and *both
+  report `sysmlv2 0.6.0`* — the self-reported version cannot tell them
+  apart, only the digest can. Pin the release
+  (`toolchain/get-sysml-toolkit.sh`). Where no release artifact exists — the
+  Pilot, which is built locally by design — the pinned digest is honestly
+  specific to one build, and a second party will have to register their own
+  `Version` rather than reproduce yours.
 
 ## Design source
 

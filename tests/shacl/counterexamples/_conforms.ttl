@@ -12,6 +12,7 @@ svtid:implementation-ok a svt:Implementation ;
 
 svtid:version-ok a svt:Version ;
     svt:ofImplementation svtid:implementation-ok ;
+    svt:artifactDigest "32dcc65375614975fde29b86f12745015d2b691768a00f14f22987ad4ff768b4" ;
     svt:commitHash "abc1234" .
 
 svtid:stability-ok a svt:StabilityDesignation ;
@@ -65,6 +66,8 @@ svtid:result-ok a earl:TestResult ;
     svt:actual "clean" .
 
 svtid:invocation-ok a svt:Invocation ;
+    svt:toolVersion "sysmlv2 0.6.0" ;
+    svt:toolDigest "32dcc65375614975fde29b86f12745015d2b691768a00f14f22987ad4ff768b4" ;
     svt:command "sysmlv2 check --strict input.sysml" ;
     svt:exitCode 0 ;
     svt:stdout "clean" ;

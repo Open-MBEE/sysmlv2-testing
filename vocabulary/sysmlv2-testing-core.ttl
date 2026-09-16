@@ -83,7 +83,7 @@ svt:artifactDigest a owl:DatatypeProperty ;
     rdfs:domain svt:Version ;
     rdfs:range xsd:string ;
     rdfs:label "artifact digest" ;
-    rdfs:comment "sha256 of a built or downloaded binary/jar pinned for this Version, distinct from commitHash." .
+    rdfs:comment "sha256 of one known-good binary/jar of this Version, distinct from commitHash. Multivalued, because a release ships one artifact per platform: pinning a single digest pins a single platform, and would refuse every other party's correct run of the same release -- found the moment a linux party and a macOS party each ran OpenSysML v0.8.0 and produced different, both-valid digests. A run is accepted when its svt:toolDigest matches any recorded value, and each value is added by a deliberate act, never inferred from a run. Where a project ships no release artifact (the Pilot, built locally by design) a digest is honestly specific to one build and a second party registers their own Version instead." .
 
 #################################################################
 # svt:StabilityDesignation — append-only; never overwrite a Version's
@@ -434,6 +434,18 @@ svt:Reproduction a owl:Class ;
     rdfs:subClassOf prov:Activity ;
     rdfs:label "Reproduction" ;
     rdfs:comment "A record that a *different* Party re-ran an existing TestRun over the same svt:inputDigest and got the same outcome and svt:actual. Append-only, like svt:Validation/svt:Annotation/svt:IssueLink, and attached by the same svt:concernsRun property. Deliberately NOT a subclass of svt:TestRun: that would make TestRunShape and every TestRun query pick it up, reintroducing the duplication this class exists to remove. It carries its own svt:hasInvocation and earl:result rather than merely asserting agreement -- so that 'this really is a reproduction' is checked by shapes/reproduction.shapes.ttl against the run it names, never taken on trust." .
+
+svt:toolVersion a owl:DatatypeProperty ;
+    rdfs:domain svt:Invocation ;
+    rdfs:range xsd:string ;
+    rdfs:label "tool version" ;
+    rdfs:comment "What the tool said it was when this Invocation ran, verbatim (e.g. \"sysmlv2 0.6.0\", \"v0.4.0\"). Absent when the tool self-reports nothing -- the Pilot ships no release artifact and reports no version. Logged, never prescribed: this records what answered, it does not choose it." .
+
+svt:toolDigest a owl:DatatypeProperty ;
+    rdfs:domain svt:Invocation ;
+    rdfs:range xsd:string ;
+    rdfs:label "tool digest" ;
+    rdfs:comment "sha256 of the executable or jar that actually produced this Invocation's output. The load-bearing half of the pair: a release asset and a local build of an identical source tree are different bytes, and only one of them is obtainable by anyone else. Until this existed a TestRun's earl:subject was a label nothing checked -- `svt run --version` never reached an adapter, so a run could be recorded against a Version it had not executed. When the target Version carries svt:artifactDigest, `svt run` now refuses to write a run whose toolDigest differs." .
 
 svt:actual a owl:DatatypeProperty ;
     rdfs:domain earl:TestResult ;

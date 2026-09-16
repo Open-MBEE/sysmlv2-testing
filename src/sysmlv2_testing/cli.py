@@ -102,9 +102,15 @@ def _add_invocation(
     stderr: str,
     input_digest: str,
     ts: Literal,
+    tool_version: str | None = None,
+    tool_digest: str | None = None,
 ) -> None:
     """The svt:Invocation triples, shared by a TestRun and a Reproduction."""
     g.add((invocation_iri, RDF.type, SVT.Invocation))
+    if tool_version is not None:
+        g.add((invocation_iri, SVT.toolVersion, Literal(tool_version)))
+    if tool_digest is not None:
+        g.add((invocation_iri, SVT.toolDigest, Literal(tool_digest)))
     g.add((invocation_iri, SVT.command, Literal(command)))
     g.add((invocation_iri, SVT.exitCode, Literal(exit_code, datatype=XSD.integer)))
     g.add((invocation_iri, SVT.stdout, Literal(stdout)))
@@ -222,6 +228,39 @@ def version_add(
         g.add((version_iri, SVT.sourceURL, Literal(source_url, datatype=XSD.anyURI)))
     if artifact_digest:
         g.add((version_iri, SVT.artifactDigest, Literal(artifact_digest)))
+    _gate_and_save(g, IMPLEMENTATIONS_TTL)
+    typer.echo(str(version_iri))
+
+
+@version_app.command("add-artifact-digest")
+def version_add_artifact_digest(
+    implementation: str = typer.Option(..., "--implementation"),
+    version: str = typer.Option(..., "--version", help="the commit hash"),
+    digest: str = typer.Option(..., "--digest", help="sha256 of one platform's artifact of this Version"),
+) -> None:
+    """Pin the exact artifact a Version means, so `svt run` can refuse a run
+    that did not execute it.
+
+    Re-running `version add` would risk a second svt:versionLabel and trip
+    maxCount 1; this follows the `citation set-quote` / `testcase
+    set-expected` correction-path precedent instead.
+
+    Additive, not replacing: a release ships one artifact per platform, and
+    a run is accepted when its svt:toolDigest matches any recorded value. A
+    second party on another OS adds theirs rather than overwriting yours.
+
+    Pin something others can obtain. A release asset and a local build of an
+    identical source tree are different bytes, and pinning the local build
+    pins something nobody else can reproduce -- which defeats the purpose."""
+    g = load_graph(IMPLEMENTATIONS_TTL)
+    version_iri = ids.mint("version", f"{implementation}|{version}")
+    if (version_iri, RDF.type, SVT.Version) not in g:
+        typer.echo(
+            f"error: unknown version {version!r} of {implementation!r} (register it first)",
+            err=True,
+        )
+        raise typer.Exit(2)
+    g.add((version_iri, SVT.artifactDigest, Literal(digest)))
     _gate_and_save(g, IMPLEMENTATIONS_TTL)
     typer.echo(str(version_iri))
 
@@ -986,9 +1025,37 @@ def run_cmd(
     except UnsupportedMethod as exc:
         outcome, actual, info = "inapplicable", None, str(exc)
         command, exit_code, stdout, stderr = "(unsupported)", -1, "", str(exc)
+        tool_version = tool_digest = None
     else:
         outcome, actual, info = compare(spec, raw)
         command, exit_code, stdout, stderr = raw.command, raw.exit_code, raw.stdout, raw.stderr
+        tool_version, tool_digest = raw.tool_version, raw.tool_digest
+
+    # `svt run --version` never reaches an adapter -- each picks its tool from
+    # the environment -- so a Version's artifactDigest is the only thing that
+    # can tie the claim to what ran. When one is pinned, a mismatch must not
+    # become ledger evidence; same rule as the adapters' standard-library
+    # guards, and the reason those exist.
+    pinned = sorted(str(d) for d in ledger.objects(version_iri, SVT.artifactDigest))
+    if pinned and tool_digest is not None and tool_digest not in pinned:
+        typer.echo(
+            f"error: this is not the artifact {version!r} is pinned to -- nothing written.\n"
+            f"    pinned  (svt:artifactDigest): {', '.join(pinned)}\n"
+            f"    running (sha256 of the tool): {tool_digest}\n"
+            f"    tool reports: {tool_version or '(no self-reported version)'}\n"
+            "  Point this implementation's environment at the pinned artifact, or\n"
+            "  register the one you have as its own Version -- do not record a run\n"
+            "  against a Version it did not execute.",
+            err=True,
+        )
+        raise typer.Exit(2)
+    if not pinned and tool_digest is not None:
+        typer.echo(
+            f"note: {version!r} has no svt:artifactDigest, so nothing verifies what ran.\n"
+            f"  Pin it with:  svt version add-artifact-digest --implementation "
+            f"{implementation} --version {version} --digest {tool_digest}",
+            err=True,
+        )
 
     # The evidence is folded into the mint key, not just (testcase,
     # implementation, version, ts). ts is second-resolution, so two runs
@@ -1015,6 +1082,23 @@ def run_cmd(
             _gate_and_save(g, runs_ttl(implementation))
             typer.echo(f"reconfirmed\t{prior}")
             return
+        if party_iri is None:
+            # Different party (unattributed is its own party), same answer --
+            # so this is a reproduction, and a reproduction has to say whose.
+            # Claiming independent confirmation anonymously is exactly the
+            # claim nobody could check later.
+            prior_label = ledger.value(prior_party, RDFS.label) or prior_party
+            typer.echo(
+                f"error: this would independently reproduce {prior}, run by "
+                f"{prior_label} -- but an unattributed run cannot record a "
+                f"reproduction.\n"
+                "  Say which machine you are:\n"
+                "    svt party add --id <machine-id> --label \"<OS, arch>\"\n"
+                f"    svt run --testcase {testcase} --implementation {implementation} "
+                f"--version {version} --as <machine-id>",
+                err=True,
+            )
+            raise typer.Exit(2)
         reproduction_iri = ids.mint("reproduction", f"{invocation_key}|{party}")
         invocation_iri = ids.mint("invocation", f"{invocation_key}|{party}")
         result_iri = ids.mint("result", f"{invocation_key}|{party}")
@@ -1025,7 +1109,10 @@ def run_cmd(
         g.add((reproduction_iri, SVT.hasInvocation, invocation_iri))
         g.add((reproduction_iri, EARL.result, result_iri))
         _add_result(g, result_iri, outcome, info, actual)
-        _add_invocation(g, invocation_iri, command, exit_code, stdout, stderr, input_digest, ts)
+        _add_invocation(
+            g, invocation_iri, command, exit_code, stdout, stderr, input_digest, ts,
+            tool_version, tool_digest,
+        )
         _gate_and_save(g, runs_ttl(implementation))
         typer.echo(f"reproduced\t{reproduction_iri}")
         return
@@ -1070,7 +1157,10 @@ def run_cmd(
     if party_iri is not None:
         g.add((run_iri, SVT.ranBy, party_iri))
     _add_result(g, result_iri, outcome, info, actual)
-    _add_invocation(g, invocation_iri, command, exit_code, stdout, stderr, input_digest, ts)
+    _add_invocation(
+        g, invocation_iri, command, exit_code, stdout, stderr, input_digest, ts,
+        tool_version, tool_digest,
+    )
 
     _gate_and_save(g, runs_ttl(implementation))
     typer.echo(f"{outcome}\t{run_iri}")

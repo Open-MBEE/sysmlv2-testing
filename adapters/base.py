@@ -10,7 +10,8 @@ inside an adapter.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+import hashlib
+from dataclasses import dataclass, replace
 from pathlib import Path
 
 
@@ -49,6 +50,43 @@ class RawResult:
     exit_code: int
     stdout: str
     stderr: str
+    # What actually ran, as opposed to what the ledger is about to claim ran.
+    # `svt run --version` never reaches an adapter -- each picks its tool from
+    # the environment -- so without these a TestRun's earl:subject is a label
+    # nothing checks. Optional with defaults so an adapter that cannot
+    # determine them still works; `svt run` records whatever it gets and
+    # refuses when a digest contradicts the target Version's artifactDigest.
+    tool_version: str | None = None
+    tool_digest: str | None = None
+
+
+def with_fingerprint(result: RawResult, version: str | None, digest: str | None) -> RawResult:
+    """Attach what actually ran to a result an adapter already built.
+
+    Applied once at dispatch rather than at each RawResult construction
+    site, so a new method handler cannot forget it and quietly produce a
+    run with no provenance."""
+    return replace(result, tool_version=version, tool_digest=digest)
+
+
+def digest_of(path: Path) -> str | None:
+    """sha256 of an executable/jar, cached by (path, mtime, size): the Pilot
+    jar is ~137 MB and would otherwise be re-hashed on every invocation."""
+    try:
+        st = path.stat()
+    except OSError:
+        return None
+    key = (str(path), st.st_mtime_ns, st.st_size)
+    if key not in _DIGEST_CACHE:
+        h = hashlib.sha256()
+        with path.open("rb") as fh:
+            for chunk in iter(lambda: fh.read(1024 * 1024), b""):
+                h.update(chunk)
+        _DIGEST_CACHE[key] = h.hexdigest()
+    return _DIGEST_CACHE[key]
+
+
+_DIGEST_CACHE: dict[tuple[str, int, int], str] = {}
 
 
 class Adapter:
