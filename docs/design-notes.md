@@ -234,15 +234,16 @@ claim only admissibility, which is all their method adjudicates; the
 resolution claim already lived on the `-resolution` siblings. Neither had
 a `Validation` record, so no human's confirmation was invalidated.
 
-**Flag for Z, not resolved here:** the three TestCases validated before
-this change (`membership-visibility-private-rejected`,
+Three TestCases (`membership-visibility-private-rejected`,
 `state-machine-transitions-on-event`,
-`redefinition-ambiguity-2-resolution`) now carry an
-`svt:realizesIntent` assertion their `Validation` predates and does not
-cover. Attaching an intent is ordinary construction, the same as
-`svt:description` always was — but re-running `svt testcase validate` on
-those three, once the intents have been read, is the thing that would
-make the record whole, and that is Z's to run, not an agent's.
+`redefinition-ambiguity-2-resolution`) had been validated before this
+change, so their `Validation` predated the `svt:realizesIntent`
+assertion and did not cover it. Attaching an intent is ordinary
+construction, the same as `svt:description` always was — but the record
+was only whole once a human re-read and re-validated them. Z did, and
+their second `Validation` records carry an `svt:note` saying why a
+second record exists. Validation is append-only, so both the original
+and the re-validation stand.
 
 ## Re-running the worked examples found a third bug — in the harness, not the tools
 
@@ -298,9 +299,9 @@ evidence.
 whose correct behavior genuinely isn't settled by the locally-held sources
 should stay unset rather than get a guessed value — a `TestRun` against
 it then mechanically records `earl:cantTell` (see AGENTS.md's "no LLM in
-the run/compare/log path"). None of the five seeded test cases are
-currently in that state, but the mechanism exists for the next one that
-is.
+the run/compare/log path"). No seeded test case is currently in that
+state — every one is grounded and settled — but the mechanism exists for
+the next one that isn't.
 
 ## Construction vs. validation: why the gate exists
 
@@ -318,16 +319,18 @@ implied any of it was checked against the spec by a person.
 
 The fix — a new `svt:Validation` record, and `svt run` refusing without
 one — is the normative contract in `AGENTS.md`; the exact commands are
-`docs/workflow.md`'s step 3. **All ten TestCases seeded so far are, as of
-this commit, unvalidated under this gate** — every one was authored by
+`docs/workflow.md`'s step 3. Every seeded TestCase was authored by
 Claude, and Claude will not run `svt testcase validate` against its own
-claims, since that would defeat the entire point of the gate. `svt run`
-against any of them refuses with the exact command to fix it; Z
-validates each one himself, on his own schedule, once he's read the
-cited spec text and confirms it. (Three have since been validated and
-run for real — see `docs/walkthrough.md`. This count will keep moving as
-Z validates more; treat it as a point-in-time note, not a running
-tally.)
+claims, since that would defeat the entire point of the gate. So each
+one sat unrunnable — `svt run` refusing with the exact command to fix it
+— until Z read the cited spec text and validated it himself.
+
+Z has since validated all of them, so nothing in the ledger is currently
+blocked by this gate. That is a fact about today, not a property of the
+design: every new TestCase starts unvalidated and unrunnable, and the
+gate is exactly as load-bearing for the next one as it was for the
+first. Read `svt view --testcase <id>` for a given TestCase's current
+validation status rather than trusting any count written here.
 
 The grounding requirement (`svt:expected`/`svt:checksResolution` implies
 at least one `svt:groundedIn` citation) was already a convention; it is
@@ -338,29 +341,28 @@ Stage, an earlier, unrelated project of mine with the same
 hallucination-guard discipline) — structurally required, not just a
 habit an author is supposed to remember.
 
-**Flag for Z's own review, not silently rewritten:** the four
-`SpecCitation.rationale` fields that exist as of this commit
-(`citation-assert-constraint-per-usage-evaluation`,
-`citation-check-feature-end-redefinition`,
-`citation-remove-redefined-features`,
-`citation-state-initial-via-entry-succession`) were read back against the
-new "is this narrating a verdict as already settled?" standard. Unlike
-`svt:description` (which this same commit rewords for exactly that
-reason — see the ten `svt testcase set-description` calls in this
-commit's diff), `rationale`'s actual job is connecting a quote to a claim,
-and legitimately may name a specific tool's observed behavior — that is
-not the same failure mode. But at least two of the four go further than
-that: `citation-check-feature-end-redefinition` states outright
-"OpenSysML's rejection...is spec-conformant, and sysml-toolkit's silent
-acceptance of it is a real conformance gap, not an unresolved
-disagreement," and `citation-remove-redefined-features` states
-"independently corroborates BrandFootprintML's own root-cause hypothesis
-that sysml-toolkit's `drop_redefined_hits`...diverges from this normative
-set-based algorithm" — both read less like "here is why this citation
-supports this claim" and more like a settled verdict on a specific
+**Two `SpecCitation.rationale` fields overreached, and were narrowed.**
+Read back against the new "is this narrating a verdict as already
+settled?" standard, `rationale` mostly passes: unlike `svt:description`,
+its actual job is connecting a quote to a claim, and it may legitimately
+name a specific tool's observed behavior — that is not the same failure
+mode. Two went further.
+`citation-check-feature-end-redefinition` had stated that OpenSysML's
+rejection "is spec-conformant, and sysml-toolkit's silent acceptance of
+it is a real conformance gap, not an unresolved disagreement," and
+`citation-remove-redefined-features` that the algorithm "independently
+corroborates BrandFootprintML's own root-cause hypothesis that
+sysml-toolkit's `drop_redefined_hits`...diverges from this normative
+set-based algorithm." Both read less like "here is why this citation
+supports this claim" and more like a settled verdict on a named
 implementation's conformance, asserted with the same confidence as the
-grounding itself. Left as-is deliberately (this plan's scope was the
-construction/validation boundary, not unilaterally re-editing content Z
-should review himself) — worth Z's own judgment on whether either crosses
-the line, and if so, whether the fix is rewording or is itself something
-only a `Validation` pass can settle.
+grounding itself — which is a finding a `TestRun` produces, not
+something a citation establishes.
+
+They were flagged here rather than silently rewritten, and Z's call was
+to narrow them. Doing so needed a `svt citation set-rationale` command,
+which did not exist (`set-quote` and `set-page` did) — a missing update
+path, not a reason to hand-edit `sources/sources.ttl`. Both now keep the
+quote-to-claim reasoning and the honest KerML v1.1 Beta 2 version caveat,
+and drop the conformance verdicts. The findings themselves lost nothing:
+they live in the `TestRun`s and the `IssueLink`, where evidence belongs.

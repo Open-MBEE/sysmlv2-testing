@@ -1,7 +1,7 @@
 # Walkthrough: one real pass, end to end
 
-A worked example following `docs/workflow.md`'s canonical seven-step
-procedure, done for real, twice, with real evidence at every step --
+Worked examples following `docs/workflow.md`'s canonical seven-step
+procedure, done for real, with real evidence at every step --
 `docs/workflow.md` is the generic *how*; this is the concrete example.
 Distinct from `docs/design-notes.md` (retrospective rationale for past
 decisions).
@@ -26,8 +26,8 @@ perfectly fine outcome.
 Z's catch on `redefinition-ambiguity-2-resolution`'s original description
 led to the construction/validation governance model (`svt:Validation`,
 the `svt run` gate -- see `docs/design-notes.md`). Actually *using* that
-gate -- pulling up the real cited spec pages for each of the 9 seeded
-TestCases so Z had something concrete to check, rather than a citation ID
+gate -- pulling up the real cited spec pages for each seeded TestCase so
+Z had something concrete to check, rather than a citation ID
 to trust -- surfaced two real defects in the citations themselves (a
 fabricated code example inside one `svt:quote`, and four off-by-one page
 numbers), all fixed via new `svt citation set-quote`/`set-page`
@@ -396,9 +396,10 @@ the complete list; not re-duplicated here.
 1. **Citation defects in the existing ledger** (fixed this pass, but
    worth noting *why* they went undetected for as long as they did): one
    `svt:quote` had a fabricated code example inside it
-   (`citation-check-feature-end-redefinition`), and four of five
-   citations had an off-by-one `svt:page`. All five were only caught by
-   opening the actual PDF pages, not by re-reading the citation text --
+   (`citation-check-feature-end-redefinition`), and four of the five
+   citations then recorded had an off-by-one `svt:page`. Every one was
+   caught only by opening the actual PDF pages, not by re-reading the
+   citation text --
    the lesson: a citation's own internal consistency (SHACL) says
    nothing about whether it's actually correct, same lesson as
    `svt:Validation`'s whole reason for existing.
@@ -439,7 +440,7 @@ the complete list; not re-duplicated here.
 
 ## Verification this pass ran
 
-- `uv run pytest -q` -- 40 passed.
+- `uv run pytest -q` -- all green.
 - `uv run svt verify` -- clean.
 - Report kind 1's `--implementation` filter: correctly drops every other
   implementation's name/command/output from a filtered report (tested
