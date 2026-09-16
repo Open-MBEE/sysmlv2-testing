@@ -44,6 +44,11 @@ RUNS_DIR = LEDGER_DIR / "runs"
 
 IMPLEMENTATIONS_TTL = LEDGER_DIR / "implementations.ttl"
 TESTCASES_TTL = LEDGER_DIR / "testcases.ttl"
+# Parties (machines/installations that run tests) get their own file rather
+# than sharing implementations.ttl: an Implementation is a tool under test,
+# a Party is whoever ran it, and conflating the two in one file would read
+# as if they were the same kind of thing.
+PARTIES_TTL = LEDGER_DIR / "parties.ttl"
 SOURCES_TTL = SOURCES_DIR / "sources.ttl"
 
 

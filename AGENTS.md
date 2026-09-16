@@ -70,6 +70,21 @@ just there:
   either on its own behalf. See `docs/walkthrough.md` for a worked
   example of exactly that boundary being tested and held.
 
+**Re-running a test is not the same act as testing it.** `svt run` no
+longer writes a TestRun unconditionally. Keyed on `svt:inputDigest` and
+the computed `(outcome, actual)` — never on `svt:command`, which carries
+absolute local paths and cannot match across machines — it writes: a
+`svt:reconfirmedAt` timestamp when the same party gets the same answer
+from the same bytes; a `svt:Reproduction` when a *different*
+`svt:Party` does; and a new `TestRun` with a loud warning when the answer
+differs, because a contradiction over identical inputs is real evidence
+and nothing is retracted. A `svt:Party` is a machine or installation,
+never a person — what a reproduction establishes is that a result is not
+an artifact of one toolchain, and it keeps this step agent-runnable. Two
+TestRuns of one TestCase against one Version that agree on outcome,
+`svt:actual` and input bytes are a SHACL violation; the ledger carried
+such a pair until it was removed by hand, and nothing had stopped it.
+
 **`svt:intent` is the question; `svt:description` is the requirement.**
 Every `TestCase` names exactly one `svt:TestIntent` (`--intent`), whose
 `svt:question` must be an actual question — the trailing `?` is

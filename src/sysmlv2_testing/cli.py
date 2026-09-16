@@ -28,6 +28,7 @@ from .namespaces import (
     EARL,
     IMPLEMENTATIONS_TTL,
     METHODS,
+    PARTIES_TTL,
     PROV,
     RUNS_DIR,
     SOURCES_TTL,
@@ -44,6 +45,9 @@ sys.path.insert(0, str(ROOT))  # adapters/ lives at repo root, not under src/
 app = typer.Typer(help="svt — the sysmlv2-testing ledger CLI. The CLI is the only writer.")
 implementation_app = typer.Typer(help="Register implementations and their versions.")
 version_app = typer.Typer(help="Register versions and stability designations.")
+party_app = typer.Typer(
+    help="Register parties -- one per machine or installation that runs tests."
+)
 intent_app = typer.Typer(
     help="Register test intents -- the question one or more test cases exist to answer."
 )
@@ -57,6 +61,7 @@ testrun_app = typer.Typer(
 )
 app.add_typer(implementation_app, name="implementation")
 app.add_typer(version_app, name="version")
+app.add_typer(party_app, name="party")
 app.add_typer(intent_app, name="intent")
 app.add_typer(testcase_app, name="testcase")
 app.add_typer(document_app, name="document")
@@ -77,13 +82,84 @@ def _now() -> Literal:
     )
 
 
+def _add_result(g: Graph, result_iri: URIRef, outcome: str, info: str, actual: str | None) -> None:
+    """The earl:TestResult triples, shared by a TestRun and a Reproduction
+    -- a Reproduction records what it actually recomputed, not merely that
+    it agreed, which is what lets shapes check the agreement."""
+    g.add((result_iri, RDF.type, EARL.TestResult))
+    g.add((result_iri, EARL.outcome, URIRef(str(EARL) + outcome)))
+    g.add((result_iri, EARL.info, Literal(info)))
+    if actual is not None:
+        g.add((result_iri, SVT.actual, Literal(actual)))
+
+
+def _add_invocation(
+    g: Graph,
+    invocation_iri: URIRef,
+    command: str,
+    exit_code: int,
+    stdout: str,
+    stderr: str,
+    input_digest: str,
+    ts: Literal,
+) -> None:
+    """The svt:Invocation triples, shared by a TestRun and a Reproduction."""
+    g.add((invocation_iri, RDF.type, SVT.Invocation))
+    g.add((invocation_iri, SVT.command, Literal(command)))
+    g.add((invocation_iri, SVT.exitCode, Literal(exit_code, datatype=XSD.integer)))
+    g.add((invocation_iri, SVT.stdout, Literal(stdout)))
+    g.add((invocation_iri, SVT.stderr, Literal(stderr)))
+    g.add((invocation_iri, SVT.inputDigest, Literal(input_digest)))
+    g.add((invocation_iri, PROV.startedAtTime, ts))
+
+
+def _prior_runs(ledger: Graph, tc_iri: URIRef, version_iri: URIRef):
+    """Every existing TestRun of this TestCase against this Version, with
+    its (inputDigest, outcome, actual) -- sorted for determinism."""
+    for run in sorted(ledger.subjects(EARL.test, tc_iri), key=str):
+        if ledger.value(run, EARL.subject) != version_iri:
+            continue
+        result = ledger.value(run, EARL.result)
+        invocation = ledger.value(run, SVT.hasInvocation)
+        if result is None or invocation is None:
+            continue
+        actual = ledger.value(result, SVT.actual)
+        yield (
+            run,
+            str(ledger.value(invocation, SVT.inputDigest)),
+            str(ledger.value(result, EARL.outcome)).rsplit("#", 1)[-1],
+            str(actual) if actual is not None else None,
+        )
+
+
+def _matching_prior_run(ledger, tc_iri, version_iri, input_digest, outcome, actual):
+    """A prior run of the same input bytes that got the same answer -- the
+    one a re-run confirms rather than adds to. Compared on svt:inputDigest
+    and the computed (outcome, actual), never on svt:command: commands
+    carry absolute local paths and so can never match across machines,
+    which is exactly the case this feature exists for."""
+    for run, digest, run_outcome, run_actual in _prior_runs(ledger, tc_iri, version_iri):
+        if digest == input_digest and run_outcome == outcome and run_actual == actual:
+            return run
+    return None
+
+
+def _contradicting_prior_run(ledger, tc_iri, version_iri, input_digest, outcome, actual):
+    """A prior run of the *same* input bytes that got a *different* answer.
+    Not an error -- it is a real finding -- but the operator must be told."""
+    for run, digest, run_outcome, run_actual in _prior_runs(ledger, tc_iri, version_iri):
+        if digest == input_digest and (run_outcome != outcome or run_actual != actual):
+            return run
+    return None
+
+
 def _gate_and_save(modified: Graph, path: Path) -> None:
     """Validate ``modified`` (the new state of one ledger file) against the
     *whole* ledger — every other file as currently on disk, plus these new
     triples — before writing anything. Nothing is written if it fails."""
     shapes = load_shapes()
     union = Graph()
-    for ttl in (SOURCES_TTL, IMPLEMENTATIONS_TTL, TESTCASES_TTL):
+    for ttl in (SOURCES_TTL, IMPLEMENTATIONS_TTL, PARTIES_TTL, TESTCASES_TTL):
         if ttl.exists() and ttl != path:
             union.parse(ttl, format="turtle")
     if RUNS_DIR.exists():
@@ -309,6 +385,41 @@ def _resolved_citation_iris(grounds: List[str]) -> List[URIRef]:
             raise typer.Exit(2)
         iris.append(iri)
     return iris
+
+
+@party_app.command("add")
+def party_add(
+    id_: str = typer.Option(..., "--id", help="slug, e.g. zargham-macbook or ci-linux"),
+    label: str = typer.Option(..., "--label", help="what machine/installation this is"),
+) -> None:
+    """Register a machine or installation that runs tests.
+
+    A Party is deliberately not a person: what a reproduction establishes
+    is that a result is not an artifact of one toolchain, and the machine
+    is what differs. It also keeps `svt run` agent-runnable -- that step
+    is not human-gated, so recording who ran it must never require
+    attributing anything to a prov:Person."""
+    g = load_graph(PARTIES_TTL)
+    iri = ids.slug_id("party", id_)
+    g.add((iri, RDF.type, SVT.Party))
+    g.add((iri, RDF.type, PROV.SoftwareAgent))
+    g.add((iri, RDFS.label, Literal(label)))
+    _gate_and_save(g, PARTIES_TTL)
+    typer.echo(str(iri))
+
+
+def _resolved_party_iri(ledger: Graph, party_id: str) -> URIRef:
+    """Every --as id must already exist as a svt:Party -- same rule as
+    --grounds and --intent, for the same reason: a dangling reference is
+    worse than no reference at all."""
+    iri = ids.slug_id("party", party_id)
+    if (iri, RDF.type, SVT.Party) not in ledger:
+        typer.echo(
+            f"error: unknown party {party_id!r} (register it first with `svt party add`)",
+            err=True,
+        )
+        raise typer.Exit(2)
+    return iri
 
 
 @intent_app.command("add")
@@ -795,6 +906,13 @@ def run_cmd(
     testcase: str = typer.Option(..., "--testcase"),
     implementation: str = typer.Option(..., "--implementation"),
     version: str = typer.Option(..., "--version", help="the commit hash"),
+    party: Optional[str] = typer.Option(
+        None,
+        "--as",
+        help="the svt:Party --id this machine is; omit for unattributed. A re-run "
+        "from a different party that agrees is recorded as a svt:Reproduction, "
+        "never as a second TestRun.",
+    ),
 ) -> None:
     from adapters.base import ResolutionCheck, TestCaseSpec, UnsupportedMethod  # noqa: PLC0415
     from adapters.compare import compare  # noqa: PLC0415
@@ -803,6 +921,7 @@ def run_cmd(
     tc_iri = _resolve_testcase_iri(ledger, testcase)
     impl_iri = ids.slug_id("implementation", implementation)
     version_iri = _resolve_version_iri(ledger, implementation, version)
+    party_iri = _resolved_party_iri(ledger, party) if party is not None else None
 
     # Being SHACL-valid RDF is not the same thing as a human having
     # confirmed this claim against the spec -- construction and structural
@@ -862,7 +981,6 @@ def run_cmd(
     input_digest = ids.sha256_of_files(input_files)
 
     ts = _now()
-    invocation_key = f"{testcase}|{implementation}|{version}|{ts}"
     try:
         raw = mod.ADAPTER.run(spec)
     except UnsupportedMethod as exc:
@@ -872,11 +990,68 @@ def run_cmd(
         outcome, actual, info = compare(spec, raw)
         command, exit_code, stdout, stderr = raw.command, raw.exit_code, raw.stdout, raw.stderr
 
+    # The evidence is folded into the mint key, not just (testcase,
+    # implementation, version, ts). ts is second-resolution, so two runs
+    # inside one second used to collide on identical IRIs and silently
+    # merge their triples -- a landmine documented but never fixed. Two
+    # runs that agree no longer mint anything (they take the reconfirm or
+    # reproduce path below), and two that disagree now differ in the key,
+    # so the collision is gone rather than merely narrowed.
+    invocation_key = f"{testcase}|{implementation}|{version}|{ts}|{input_digest}|{outcome}|{actual}"
+
+    g = load_graph(runs_ttl(implementation))
+
+    # Re-running a test is not the same act as testing it. Decide which of
+    # the three records this is *before* minting anything -- see AGENTS.md
+    # and docs/design-notes.md for why a plain second TestRun is wrong.
+    prior = _matching_prior_run(ledger, tc_iri, version_iri, input_digest, outcome, actual)
+    if prior is not None:
+        prior_party = ledger.value(prior, SVT.ranBy)
+        if prior_party == party_iri:
+            # Same party, same input bytes, same answer: this establishes
+            # nothing new about the tool, only that the result was not a
+            # one-off. A timestamp on the existing run, not a new record.
+            g.add((prior, SVT.reconfirmedAt, ts))
+            _gate_and_save(g, runs_ttl(implementation))
+            typer.echo(f"reconfirmed\t{prior}")
+            return
+        reproduction_iri = ids.mint("reproduction", f"{invocation_key}|{party}")
+        invocation_iri = ids.mint("invocation", f"{invocation_key}|{party}")
+        result_iri = ids.mint("result", f"{invocation_key}|{party}")
+        g.add((reproduction_iri, RDF.type, SVT.Reproduction))
+        g.add((reproduction_iri, SVT.concernsRun, prior))
+        g.add((reproduction_iri, SVT.ranBy, party_iri))
+        g.add((reproduction_iri, PROV.startedAtTime, ts))
+        g.add((reproduction_iri, SVT.hasInvocation, invocation_iri))
+        g.add((reproduction_iri, EARL.result, result_iri))
+        _add_result(g, result_iri, outcome, info, actual)
+        _add_invocation(g, invocation_iri, command, exit_code, stdout, stderr, input_digest, ts)
+        _gate_and_save(g, runs_ttl(implementation))
+        typer.echo(f"reproduced\t{reproduction_iri}")
+        return
+
+    # Not a match. If a run of this exact triple and input bytes exists but
+    # disagrees, that is real evidence -- nondeterminism, or an undeclared
+    # environment dependence -- so it is recorded as its own TestRun and
+    # nothing is retracted. But it must not pass silently.
+    contradicted = _contradicting_prior_run(ledger, tc_iri, version_iri, input_digest, outcome, actual)
+    if contradicted is not None:
+        prior_result = ledger.value(contradicted, EARL.result)
+        prior_outcome = str(ledger.value(prior_result, EARL.outcome)).rsplit("#", 1)[-1]
+        prior_actual = ledger.value(prior_result, SVT.actual)
+        typer.echo(
+            f"WARNING: this contradicts {contradicted} over the same svt:inputDigest.\n"
+            f"    recorded: {prior_outcome} / {prior_actual}\n"
+            f"    now:      {outcome} / {actual}\n"
+            "  Recorded as a NEW TestRun, not a reproduction. Both stand; neither is\n"
+            "  retracted. Check the environment before trusting either.",
+            err=True,
+        )
+
     run_iri = ids.mint("run", invocation_key)
     invocation_iri = ids.mint("invocation", invocation_key)
     result_iri = ids.mint("result", invocation_key)
 
-    g = load_graph(runs_ttl(implementation))
     g.add((AGENT_IRI, RDF.type, EARL.Software))
     g.add((AGENT_IRI, RDF.type, PROV.SoftwareAgent))
     g.add((AGENT_IRI, RDFS.label, Literal("sysmlv2-testing CLI (svt)")))
@@ -892,18 +1067,10 @@ def run_cmd(
     # prov:Activity.
     g.add((run_iri, PROV.startedAtTime, ts))
     g.add((run_iri, SVT.hasInvocation, invocation_iri))
-    g.add((result_iri, RDF.type, EARL.TestResult))
-    g.add((result_iri, EARL.outcome, URIRef(str(EARL) + outcome)))
-    g.add((result_iri, EARL.info, Literal(info)))
-    if actual is not None:
-        g.add((result_iri, SVT.actual, Literal(actual)))
-    g.add((invocation_iri, RDF.type, SVT.Invocation))
-    g.add((invocation_iri, SVT.command, Literal(command)))
-    g.add((invocation_iri, SVT.exitCode, Literal(exit_code, datatype=XSD.integer)))
-    g.add((invocation_iri, SVT.stdout, Literal(stdout)))
-    g.add((invocation_iri, SVT.stderr, Literal(stderr)))
-    g.add((invocation_iri, SVT.inputDigest, Literal(input_digest)))
-    g.add((invocation_iri, PROV.startedAtTime, ts))
+    if party_iri is not None:
+        g.add((run_iri, SVT.ranBy, party_iri))
+    _add_result(g, result_iri, outcome, info, actual)
+    _add_invocation(g, invocation_iri, command, exit_code, stdout, stderr, input_digest, ts)
 
     _gate_and_save(g, runs_ttl(implementation))
     typer.echo(f"{outcome}\t{run_iri}")

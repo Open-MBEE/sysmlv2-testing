@@ -16,6 +16,7 @@ from .namespaces import (
     FIXTURES_DIR,
     IMPLEMENTATIONS_TTL,
     LEDGER_DIR,
+    PARTIES_TTL,
     PREFIXES,
     RUNS_DIR,
     SHAPES_DIR,
@@ -57,7 +58,7 @@ def load_full_ledger() -> Graph:
     citations), implementations, test cases, and every implementation's
     recorded runs."""
     g = Graph()
-    for ttl in (SOURCES_TTL, IMPLEMENTATIONS_TTL, TESTCASES_TTL):
+    for ttl in (SOURCES_TTL, IMPLEMENTATIONS_TTL, PARTIES_TTL, TESTCASES_TTL):
         if ttl.exists():
             g.parse(ttl, format="turtle")
     if RUNS_DIR.exists():

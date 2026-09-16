@@ -1,0 +1,165 @@
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix svt: <https://w3id.org/sysmlv2-testing#> .
+@prefix earl: <http://www.w3.org/ns/earl#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# Re-running a test is not the same act as testing it. A svt:Reproduction
+# says a different Party got the same answer from the same input bytes;
+# the shapes below make that a checked fact rather than a claim, the same
+# way TestCaseGroundingRequiredShape and IntentMethodAlignmentShape do for
+# their own assertions.
+
+svt:PartyShape a sh:NodeShape ;
+    sh:targetClass svt:Party ;
+    sh:property svt:PartyLabelShape .
+
+svt:PartyLabelShape a sh:PropertyShape ;
+    sh:path rdfs:label ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+    sh:message "a Party must have exactly one rdfs:label -- an unlabelled machine identity tells a later reader nothing about what was independent" .
+
+svt:ReproductionShape a sh:NodeShape ;
+    sh:targetClass svt:Reproduction ;
+    sh:property svt:ReproductionConcernsRunShape, svt:ReproductionRanByShape,
+        svt:ReproductionStartedAtTimeShape, svt:ReproductionHasInvocationShape,
+        svt:ReproductionResultShape .
+
+svt:ReproductionConcernsRunShape a sh:PropertyShape ;
+    sh:path svt:concernsRun ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:nodeKind sh:IRI ;
+    sh:class svt:TestRun ;
+    sh:message "a Reproduction must concern exactly one svt:TestRun" .
+
+svt:ReproductionRanByShape a sh:PropertyShape ;
+    sh:path svt:ranBy ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:nodeKind sh:IRI ;
+    sh:class svt:Party ;
+    sh:message "a Reproduction must record exactly one svt:ranBy Party -- an unattributed re-run is the svt:reconfirmedAt case, not a reproduction" .
+
+svt:ReproductionStartedAtTimeShape a sh:PropertyShape ;
+    sh:path prov:startedAtTime ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:dateTime ;
+    sh:message "a Reproduction must record exactly one prov:startedAtTime" .
+
+svt:ReproductionHasInvocationShape a sh:PropertyShape ;
+    sh:path svt:hasInvocation ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:nodeKind sh:IRI ;
+    sh:class svt:Invocation ;
+    sh:message "a Reproduction must record exactly one svt:Invocation -- its own captured evidence, which is what makes it checkable rather than asserted" .
+
+svt:ReproductionResultShape a sh:PropertyShape ;
+    sh:path earl:result ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:nodeKind sh:IRI ;
+    sh:class earl:TestResult ;
+    sh:message "a Reproduction must record exactly one earl:TestResult -- the value it actually recomputed" .
+
+# The load-bearing one. A Reproduction that does not match the run it names
+# is not a reproduction; without this, "reproduced" would be a word anyone
+# could write next to any run.
+svt:ReproductionMatchesRunShape a sh:NodeShape ;
+    sh:targetClass svt:Reproduction ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "a Reproduction's earl:outcome, svt:actual and svt:inputDigest must each equal those of the svt:TestRun it concerns -- if any differs it is new evidence, and belongs in its own TestRun" ;
+        sh:select """
+            PREFIX svt: <https://w3id.org/sysmlv2-testing#>
+            PREFIX earl: <http://www.w3.org/ns/earl#>
+            SELECT $this
+            WHERE {
+                $this a svt:Reproduction ;
+                      svt:concernsRun ?run ;
+                      earl:result ?repResult ;
+                      svt:hasInvocation ?repInv .
+                ?run earl:result ?runResult ;
+                     svt:hasInvocation ?runInv .
+                ?repResult earl:outcome ?repOutcome .
+                ?runResult earl:outcome ?runOutcome .
+                ?repInv svt:inputDigest ?repDigest .
+                ?runInv svt:inputDigest ?runDigest .
+                OPTIONAL { ?repResult svt:actual ?repActual }
+                OPTIONAL { ?runResult svt:actual ?runActual }
+                FILTER (
+                       ?repOutcome != ?runOutcome
+                    || ?repDigest != ?runDigest
+                    || COALESCE(?repActual, "<unset>") != COALESCE(?runActual, "<unset>")
+                )
+            }
+        """ ;
+    ] .
+
+# Same party, same answer is svt:reconfirmedAt on the run itself. Recording
+# it as a Reproduction would overstate what happened: it would read as
+# independent confirmation when nothing was independent.
+svt:ReproductionDistinctPartyShape a sh:NodeShape ;
+    sh:targetClass svt:Reproduction ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "a Reproduction's svt:ranBy Party must differ from the concerned TestRun's -- the same party re-running its own test is svt:reconfirmedAt, not a reproduction" ;
+        sh:select """
+            PREFIX svt: <https://w3id.org/sysmlv2-testing#>
+            SELECT $this
+            WHERE {
+                $this a svt:Reproduction ;
+                      svt:concernsRun ?run ;
+                      svt:ranBy ?party .
+                ?run svt:ranBy ?runParty .
+                FILTER (?party = ?runParty)
+            }
+        """ ;
+    ] .
+
+# The structural guard. Two TestRuns of the same TestCase against the same
+# Version, agreeing on both outcome and svt:actual, are the redundant pair
+# this whole model exists to prevent -- one of them was removed from this
+# ledger by hand before this shape existed, and nothing stopped it
+# reappearing. A *differing* result stays legal: that is real evidence
+# (nondeterminism, or an undeclared environment dependence) and must be
+# recordable.
+svt:TestRunNoRedundantDuplicateShape a sh:NodeShape ;
+    sh:targetClass svt:TestRun ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "two TestRuns of the same TestCase against the same Version with the same earl:outcome and svt:actual are redundant -- a re-run that agrees is a svt:Reproduction (different party) or a svt:reconfirmedAt timestamp (same party)" ;
+        sh:select """
+            PREFIX svt: <https://w3id.org/sysmlv2-testing#>
+            PREFIX earl: <http://www.w3.org/ns/earl#>
+            SELECT $this
+            WHERE {
+                $this a svt:TestRun ;
+                      earl:test ?tc ;
+                      earl:subject ?version ;
+                      earl:result ?thisResult ;
+                      svt:hasInvocation ?thisInv .
+                ?other a svt:TestRun ;
+                       earl:test ?tc ;
+                       earl:subject ?version ;
+                       earl:result ?otherResult ;
+                       svt:hasInvocation ?otherInv .
+                FILTER (str($this) < str(?other))
+                # Same input bytes too: two runs over *different* fixtures
+                # are different evidence even when the verdict matches, so
+                # comparing outcome alone would forbid a legitimate record.
+                ?thisInv svt:inputDigest ?digest .
+                ?otherInv svt:inputDigest ?digest .
+                ?thisResult earl:outcome ?outcome .
+                ?otherResult earl:outcome ?outcome .
+                OPTIONAL { ?thisResult svt:actual ?thisActual }
+                OPTIONAL { ?otherResult svt:actual ?otherActual }
+                FILTER (COALESCE(?thisActual, "<unset>") = COALESCE(?otherActual, "<unset>"))
+            }
+        """ ;
+    ] .

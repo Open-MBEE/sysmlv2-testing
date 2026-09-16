@@ -1,0 +1,7 @@
+@prefix svt: <https://w3id.org/sysmlv2-testing#> .
+@prefix svtid: <https://w3id.org/sysmlv2-testing/id/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+
+svtid:party-broken a svt:Party, prov:SoftwareAgent .
+# no rdfs:label -- an unlabelled machine identity tells a later reader
+# nothing about what was independent. Violates svt:PartyLabelShape.

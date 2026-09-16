@@ -293,6 +293,67 @@ their exact `outcome` and `actual` under the updated TBox, and no new
 the intent work, so duplicating the records would have added noise, not
 evidence.
 
+## Duplication vs. reproduction: `svt run` stopped writing a TestRun every time
+
+Removing the redundant `state-machine-transitions-on-event`/opensysml pair
+left the obvious question unanswered: nothing stopped it happening again,
+and async multi-party work makes it the *default* outcome — two parties
+running the same test produce two TestRuns a reader must compare by hand
+to discover they say the same thing.
+
+But re-running is valuable. It is how a result stops being one machine's
+observation. What was missing was a way to record a successful
+reproduction without recording it as new evidence about the tool.
+
+`svt run` now decides between three records, mechanically, before minting
+anything. The comparison is on `svt:inputDigest` and the computed
+`(outcome, actual)` — deliberately **not** `svt:command`, which carries
+absolute local paths (`/Users/z/...`, `/var/folders/...`) and therefore
+can never match across machines, which is precisely the case this exists
+for.
+
+| same (testcase, version) | |
+|---|---|
+| same digest, same result, same party | a `svt:reconfirmedAt` timestamp on the existing run |
+| same digest, same result, different party | a `svt:Reproduction` |
+| same digest, different result | a new `TestRun`, with a warning naming what it contradicts |
+| different digest | a new `TestRun` — different inputs, different test |
+
+A `svt:Party` is **a machine or installation, not a person**. What a
+reproduction establishes is that a result is not an artifact of one
+toolchain; the person at the keyboard is beside the point. It also keeps
+`svt run` agent-runnable — that step is not human-gated, so recording who
+ran it must never require attributing anything to a `prov:Person`. Absence
+of a Party is itself a value ("unattributed"), which is why the runs
+recorded before this existed keep working and are not backfilled:
+asserting provenance that was never captured is a different thing from it
+being true.
+
+A `svt:Reproduction` carries its own `svt:Invocation` and `earl:result`
+rather than merely asserting agreement, so
+`ReproductionMatchesRunShape` can check that its outcome, `svt:actual` and
+input digest really do equal the run it names. "Reproduced" is a verified
+fact here, not a word someone wrote next to a run.
+`ReproductionDistinctPartyShape` enforces the same-party/different-party
+split, and `TestRunNoRedundantDuplicateShape` makes the state that was
+cleaned up by hand unrecordable — while still permitting a *differing*
+result, which must stay recordable because it is a real finding.
+
+Two things fell out of this that are worth noting:
+
+- **The same-second IRI collision is gone**, not merely narrowed.
+  `ids.mint` folded only `(testcase, implementation, version, ts)` with
+  `ts` at second resolution, so two runs inside one second minted
+  identical IRIs and silently merged their triples — documented as a
+  landmine and never fixed. Runs that agree no longer mint anything, and
+  runs that disagree now differ in the key because the digest and result
+  are folded in.
+- **A shape bug, caught by its own test.** The first
+  `TestRunNoRedundantDuplicateShape` compared only outcome and
+  `svt:actual`, so two runs over *different fixtures* that happened to
+  agree were flagged redundant. They are not: different inputs are
+  different evidence. The digest is part of the comparison now.
+
 ## Why `expected` can still be unset
 
 `svt:expected` is only ever set once it's actually grounded. A test case

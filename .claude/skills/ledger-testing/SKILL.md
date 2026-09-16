@@ -43,6 +43,25 @@ names (`ScalarValues`, `Parts::Part`, `Connections`) that the TestCase
 never meant to test, stop and check the environment before believing the
 verdict.
 
+## Re-running is safe: it will not duplicate
+
+`svt run` against an already-recorded (testcase, implementation, version)
+does **not** append a second TestRun. Depending on what it finds it
+records a `svt:reconfirmedAt` timestamp (same party, same answer), a
+`svt:Reproduction` (different party, same answer), or — only when the
+answer actually differs — a new TestRun, printing a warning that names
+the run it contradicts. The CLI says which of the three happened.
+
+So do not avoid re-running for fear of polluting the ledger, and do not
+hand-check for an existing run first; that is the CLI's job and it is
+mechanical. Pass `--as <party-id>` when you know which machine you are
+(register it with `svt party add`); omit it and the run is
+"unattributed", which counts as a party of its own.
+
+If you see the contradiction warning, **stop and check the environment
+before believing either result** — a missing standard library produces
+confident wrong verdicts, which is what the adapter guards exist for.
+
 ## Choosing `--method` when you construct a TestCase
 
 `--method` picks which fact about the state transition `x+ = f(x, u)`

@@ -81,7 +81,7 @@ package UsageTwo {
 | pilot-implementation | `692170b71867353b8f90341e61556f49a5beb0e5` | passed | UsageTwo::c::@0->Lib::Container::items; UsageTwo::c::@1->Lib::Container::items |
 | sysml-toolkit | `3a13c64adb93f1d069ce021c598318587126044a` | failed | UsageTwo::c::@0->UsageTwo::c::@2; UsageTwo::c::@1->UsageTwo::c::@1 |
 
-#### opensysml @ `2b6c1cf6c31266396899a90d3290cfbdf44019b9` (v0.4.0)
+#### opensysml @ `2b6c1cf6c31266396899a90d3290cfbdf44019b9` (v0.4.0) -- 2026-09-13T00:19:10+00:00
 
 - **outcome**: `inapplicable`
 - **info**: opensysml has no way to check reference-resolution facts for anonymous features: its Symbol/Query wire protocol's only identity field is the same colliding qualified-name string (confirmed via sysml_pb2.pyi), and its to_turtle() export's sysml:redefines predicate is a bare name string, not a link to the resolved target -- worth filing upstream
@@ -102,7 +102,7 @@ stderr:
 opensysml has no way to check reference-resolution facts for anonymous features: its Symbol/Query wire protocol's only identity field is the same colliding qualified-name string (confirmed via sysml_pb2.pyi), and its to_turtle() export's sysml:redefines predicate is a bare name string, not a link to the resolved target -- worth filing upstream
 ```
 
-#### pilot-implementation @ `692170b71867353b8f90341e61556f49a5beb0e5` (2026-08+)
+#### pilot-implementation @ `692170b71867353b8f90341e61556f49a5beb0e5` (2026-08+) -- 2026-09-13T00:19:23+00:00
 
 - **outcome**: `passed`
 - **actual**: `UsageTwo::c::@0->Lib::Container::items; UsageTwo::c::@1->Lib::Container::items`
@@ -129,7 +129,7 @@ log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more in
 
 ```
 
-#### sysml-toolkit @ `3a13c64adb93f1d069ce021c598318587126044a` (v0.6.0)
+#### sysml-toolkit @ `3a13c64adb93f1d069ce021c598318587126044a` (v0.6.0) -- 2026-09-13T00:19:09+00:00
 
 - **outcome**: `failed`
 - **actual**: `UsageTwo::c::@0->UsageTwo::c::@2; UsageTwo::c::@1->UsageTwo::c::@1`

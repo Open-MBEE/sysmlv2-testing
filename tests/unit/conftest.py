@@ -29,7 +29,7 @@ FAKE_TESTCASE = "fake-testcase"
 FAKE_INTENT = "fake-intent"
 
 
-def add_full_test_run(g: Graph, run_iri, tc_iri, version_iri, ts) -> None:
+def add_full_test_run(g: Graph, run_iri, tc_iri, version_iri, ts, outcome=None) -> None:
     """A SHACL-conformant TestRun (+ its Invocation/TestResult/agent) --
     every property TestRunShape/TestResultShape/InvocationShape require,
     so a test's real focus (an Annotation, IssueLink, or a view render)
@@ -49,7 +49,10 @@ def add_full_test_run(g: Graph, run_iri, tc_iri, version_iri, ts) -> None:
     g.add((run_iri, SVT.hasInvocation, invocation_iri))
     g.add((run_iri, PROV.startedAtTime, ts))
     g.add((result_iri, RDF.type, EARL.TestResult))
-    g.add((result_iri, EARL.outcome, EARL.passed))
+    # Parameterised because two TestRuns of one (testcase, version) are only
+    # a legal ledger state when their results differ -- agreeing re-runs are
+    # a Reproduction or a reconfirmedAt timestamp now, not a second run.
+    g.add((result_iri, EARL.outcome, outcome if outcome is not None else EARL.passed))
     g.add((invocation_iri, RDF.type, SVT.Invocation))
     g.add((invocation_iri, SVT.command, Literal("fake-tool check input.sysml")))
     g.add((invocation_iri, SVT.exitCode, Literal(0)))
@@ -78,6 +81,7 @@ def isolated_ledger(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     sources_ttl = tmp_path / "sources.ttl"
     implementations_ttl = ledger_dir / "implementations.ttl"
     testcases_ttl = ledger_dir / "testcases.ttl"
+    parties_ttl = ledger_dir / "parties.ttl"
 
     impl_iri = ids.slug_id("implementation", FAKE_IMPLEMENTATION)
     version_iri = ids.mint("version", f"{FAKE_IMPLEMENTATION}|{FAKE_COMMIT}")
@@ -119,6 +123,9 @@ def isolated_ledger(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
         monkeypatch.setattr(mod, "SOURCES_TTL", sources_ttl)
         monkeypatch.setattr(mod, "IMPLEMENTATIONS_TTL", implementations_ttl)
         monkeypatch.setattr(mod, "TESTCASES_TTL", testcases_ttl)
+        # Without this a test calling `svt party add` would write into the
+        # real ledger/parties.ttl -- the whole point of this fixture.
+        monkeypatch.setattr(mod, "PARTIES_TTL", parties_ttl)
         monkeypatch.setattr(mod, "RUNS_DIR", runs_dir)
     monkeypatch.setattr(cli_module, "runs_ttl", lambda slug: runs_dir / f"{slug}.ttl")
     # graph.py's fixtures_dir_for() reads its own module's FIXTURES_DIR at

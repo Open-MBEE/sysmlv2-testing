@@ -1,0 +1,53 @@
+@prefix svt: <https://w3id.org/sysmlv2-testing#> .
+@prefix svtid: <https://w3id.org/sysmlv2-testing/id/> .
+@prefix earl: <http://www.w3.org/ns/earl#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+svtid:intent-ok a svt:TestIntent ;
+    svt:question "Is this model accepted?" ;
+    svt:concerns "admissibility" .
+
+svtid:testcase-ok a svt:TestCase ;
+    svt:description "ok" ;
+    svt:realizesIntent svtid:intent-ok ;
+    svt:hasInputFile "input.sysml" ;
+    svt:method "structural-check" .
+
+svtid:implementation-ok a svt:Implementation ;
+    svt:name "ok" ; svt:repositoryURL "https://example.org/ok" ; svt:primaryLanguage "Go" .
+svtid:version-ok a svt:Version ;
+    svt:ofImplementation svtid:implementation-ok ; svt:commitHash "abc1234" .
+svtid:agent-ok a earl:Software .
+
+svtid:party-a a svt:Party, prov:SoftwareAgent ; rdfs:label "machine A" .
+svtid:party-b a svt:Party, prov:SoftwareAgent ; rdfs:label "machine B" .
+
+svtid:result-ok a earl:TestResult ; earl:outcome earl:passed ; svt:actual "clean" .
+svtid:invocation-ok a svt:Invocation ;
+    svt:command "tool check input.sysml" ; svt:exitCode 0 ;
+    svt:stdout "clean" ; svt:stderr "" ;
+    svt:inputDigest "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855" ;
+    prov:startedAtTime "2026-01-01T00:00:00"^^xsd:dateTime .
+
+svtid:run-ok a svt:TestRun ;
+    earl:test svtid:testcase-ok ; earl:subject svtid:version-ok ;
+    earl:assertedBy svtid:agent-ok ; earl:mode earl:automatic ;
+    earl:result svtid:result-ok ; svt:hasInvocation svtid:invocation-ok ;
+    svt:ranBy svtid:party-a ;
+    prov:startedAtTime "2026-01-01T00:00:00"^^xsd:dateTime .
+
+svtid:result-rep a earl:TestResult ; earl:outcome earl:passed ; svt:actual "clean" .
+svtid:invocation-rep a svt:Invocation ;
+    svt:command "tool check input.sysml" ; svt:exitCode 0 ;
+    svt:stdout "clean" ; svt:stderr "" ;
+    svt:inputDigest "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855" ;
+    prov:startedAtTime "2026-01-02T00:00:00"^^xsd:dateTime .
+
+svtid:reproduction-broken a svt:Reproduction ;
+    svt:concernsRun svtid:run-ok ; svt:ranBy svtid:party-a ;
+    earl:result svtid:result-rep ; svt:hasInvocation svtid:invocation-rep ;
+    prov:startedAtTime "2026-01-02T00:00:00"^^xsd:dateTime .
+# same party as the run it concerns -- nothing was independent, so this is
+# the svt:reconfirmedAt case. Violates svt:ReproductionDistinctPartyShape.

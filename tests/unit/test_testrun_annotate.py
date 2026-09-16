@@ -14,6 +14,7 @@ from typer.testing import CliRunner
 
 from sysmlv2_testing import cli as cli_module
 from sysmlv2_testing import ids
+from sysmlv2_testing.namespaces import EARL
 
 from conftest import FAKE_COMMIT, FAKE_IMPLEMENTATION, FAKE_TESTCASE, add_full_test_run
 
@@ -119,14 +120,19 @@ def test_link_issue_succeeds_and_appears_in_view(isolated_ledger):
 def test_ambiguous_multiple_runs_refuses_without_at(isolated_ledger):
     """A second real TestRun for the identical (testcase, implementation,
     version) triple, at a different timestamp, must force --at rather than
-    silently picking one (see the plan's design-review finding)."""
+    silently picking one (see the plan's design-review finding).
+
+    The second run records a *different* outcome deliberately: two runs of
+    one triple that agree are no longer a legal ledger state (they would be
+    a Reproduction or a reconfirmedAt timestamp), so divergence is now the
+    only way genuine --at ambiguity arises."""
     run_ts2 = Literal("2026-02-02T00:00:00+00:00", datatype=cli_module.XSD.dateTime)
     tc_iri = ids.slug_id("testcase", TESTCASE)
     version_iri = ids.mint("version", f"{IMPLEMENTATION}|{COMMIT}")
     run_iri2 = ids.mint("run", f"{TESTCASE}|{IMPLEMENTATION}|{COMMIT}|{run_ts2}")
     g = Graph()
     g.parse(isolated_ledger["runs_dir"] / f"{IMPLEMENTATION}.ttl", format="turtle")
-    add_full_test_run(g, run_iri2, tc_iri, version_iri, run_ts2)
+    add_full_test_run(g, run_iri2, tc_iri, version_iri, run_ts2, outcome=EARL.failed)
     (isolated_ledger["runs_dir"] / f"{IMPLEMENTATION}.ttl").write_text(
         g.serialize(format="turtle"), encoding="utf-8"
     )

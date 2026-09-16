@@ -8,7 +8,26 @@ svt:TestRunShape a sh:NodeShape ;
     sh:targetClass svt:TestRun ;
     sh:property svt:TestRunTestShape, svt:TestRunSubjectShape, svt:TestRunAssertedByShape,
         svt:TestRunModeShape, svt:TestRunResultShape, svt:TestRunStartedAtTimeShape,
-        svt:TestRunHasInvocationShape .
+        svt:TestRunHasInvocationShape, svt:TestRunRanByShape,
+        svt:TestRunReconfirmedAtShape .
+
+# Optional, unlike a Reproduction's: absence means "unattributed", which is
+# a real value, not a gap to fill in. The runs recorded before Party existed
+# are unattributed and stay that way -- backfilling them would assert
+# provenance that was never captured, which is a different thing from it
+# being true.
+svt:TestRunRanByShape a sh:PropertyShape ;
+    sh:path svt:ranBy ;
+    sh:maxCount 1 ;
+    sh:nodeKind sh:IRI ;
+    sh:class svt:Party ;
+    sh:message "svt:ranBy, when present, must be exactly one svt:Party" .
+
+# Multivalued on purpose -- one timestamp per same-party re-run that agreed.
+svt:TestRunReconfirmedAtShape a sh:PropertyShape ;
+    sh:path svt:reconfirmedAt ;
+    sh:datatype xsd:dateTime ;
+    sh:message "svt:reconfirmedAt values must be xsd:dateTime (multivalued -- one per same-party re-run that produced the identical result)" .
 
 svt:TestRunTestShape a sh:PropertyShape ;
     sh:path earl:test ;

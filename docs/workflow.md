@@ -95,6 +95,14 @@ its method can check is the specific failure this is looking for.
 uv run svt run --testcase <slug> --implementation <slug> --version <commit>
 ```
 
+Add `--as <party-id>` (registered with `svt party add`) to say which
+machine this is. Re-running an already-recorded test does **not** create a
+second TestRun: the same party getting the same answer from the same input
+bytes adds a `svt:reconfirmedAt` timestamp, a different party gets a
+`svt:Reproduction`, and only a *differing* answer is a new TestRun — with
+a warning naming the run it contradicts. So re-running is safe and
+worthwhile; it is how a result stops being one machine's observation.
+
 Set that implementation's environment first — see README's setup table,
 not an adapter's source. A missing standard library (`SYSML_LIBRARY_DIR`
 for the Pilot, `SYSMLV2_LIB_DIR` for sysml-toolkit) does not make these

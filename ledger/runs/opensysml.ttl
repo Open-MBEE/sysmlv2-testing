@@ -189,7 +189,8 @@ svtid:run-29d5c83c1e3dbdf2
     earl:subject svtid:version-f69111dc2adf2203 ;
     earl:test svtid:testcase-state-machine-transitions-on-event ;
     prov:startedAtTime "2026-09-13T02:10:38+00:00"^^xsd:dateTime ;
-    svt:hasInvocation svtid:invocation-29d5c83c1e3dbdf2 .
+    svt:hasInvocation svtid:invocation-29d5c83c1e3dbdf2 ;
+    svt:reconfirmedAt "2026-09-16T01:31:11+00:00"^^xsd:dateTime .
 
 svtid:run-59a9dc1ec284415e
     a svt:TestRun ;

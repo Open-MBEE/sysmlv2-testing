@@ -59,7 +59,7 @@ package Usage {
 | pilot-implementation | `692170b71867353b8f90341e61556f49a5beb0e5` | passed | violated |
 | sysml-toolkit | `3a13c64adb93f1d069ce021c598318587126044a` | passed | violated |
 
-#### opensysml @ `2b6c1cf6c31266396899a90d3290cfbdf44019b9` (v0.4.0)
+#### opensysml @ `2b6c1cf6c31266396899a90d3290cfbdf44019b9` (v0.4.0) -- 2026-09-13T02:35:13+00:00
 
 - **outcome**: `passed`
 - **actual**: `violated`
@@ -81,7 +81,7 @@ stderr:
 error <content>:6:14-6:25: unresolved reference: Lib::Widget
 ```
 
-#### pilot-implementation @ `692170b71867353b8f90341e61556f49a5beb0e5` (2026-08+)
+#### pilot-implementation @ `692170b71867353b8f90341e61556f49a5beb0e5` (2026-08+) -- 2026-09-13T02:01:05+00:00
 
 - **outcome**: `passed`
 - **actual**: `violated`
@@ -109,7 +109,7 @@ log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more in
 
 ```
 
-#### sysml-toolkit @ `3a13c64adb93f1d069ce021c598318587126044a` (v0.6.0)
+#### sysml-toolkit @ `3a13c64adb93f1d069ce021c598318587126044a` (v0.6.0) -- 2026-09-13T04:36:12+00:00
 
 - **outcome**: `passed`
 - **actual**: `violated`

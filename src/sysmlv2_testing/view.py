@@ -48,7 +48,17 @@ def _annotation_and_issue_lines(run_iri, ledger) -> list[str]:
     concerning = sorted(ledger.subjects(SVT.concernsRun, run_iri), key=str)
     annotations = [c for c in concerning if (c, RDF.type, SVT.Annotation) in ledger]
     issues = [c for c in concerning if (c, RDF.type, SVT.IssueLink) in ledger]
+    reproductions = [c for c in concerning if (c, RDF.type, SVT.Reproduction) in ledger]
     lines = []
+    # Confirmations first: whether a result has held elsewhere changes how
+    # much weight everything below it carries.
+    for ts in sorted(str(o) for o in ledger.objects(run_iri, SVT.reconfirmedAt)):
+        lines.append(f"- **reconfirmed** by the same party ({ts}) -- identical result, no new record")
+    for r in reproductions:
+        party = ledger.value(r, SVT.ranBy)
+        name = ledger.value(party, RDFS.label) if party is not None else None
+        when = ledger.value(r, PROV.startedAtTime)
+        lines.append(f"- **reproduced** by {name or party} ({when}) -- independently, same result")
     for a in annotations:
         person = ledger.value(a, PROV.wasAssociatedWith)
         name = ledger.value(person, RDFS.label) if person is not None else None
@@ -68,8 +78,11 @@ def _annotation_and_issue_lines(run_iri, ledger) -> list[str]:
 
 def _run_section(row, ledger) -> str:
     label = f" ({row.versionLabel})" if row.versionLabel is not None else ""
+    # The timestamp is part of the heading, not just a field further down:
+    # without it two runs of the same impl@commit render under identical
+    # headings and a reader cannot tell which section is which.
     lines = [
-        f"#### {row.implName} @ `{row.commitHash}`{label}",
+        f"#### {row.implName} @ `{row.commitHash}`{label} -- {row.startedAtTime}",
         "",
         f"- **outcome**: `{_outcome_local(row.outcome)}`",
     ]

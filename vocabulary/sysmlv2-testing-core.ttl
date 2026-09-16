@@ -273,7 +273,7 @@ svt:IssueLink a owl:Class ;
 svt:concernsRun a owl:ObjectProperty ;
     rdfs:range svt:TestRun ;
     rdfs:label "concerns run" ;
-    rdfs:comment "Which TestRun this Annotation or IssueLink is about. Shared by both classes -- one property doing the identical job, rather than two near-duplicate names." .
+    rdfs:comment "Which TestRun this Annotation, IssueLink or Reproduction is about. Shared by all three -- one property doing the identical job, rather than near-duplicate names per class." .
 
 svt:comment a owl:DatatypeProperty ;
     rdfs:domain svt:Annotation ;
@@ -370,10 +370,15 @@ svt:Invocation a owl:Class ;
     rdfs:comment "The exact command, exit code and environment of one adapter subprocess call, kept for reproducibility. Timestamped with prov:startedAtTime, for the same reason as TestRun." .
 
 svt:hasInvocation a owl:ObjectProperty ;
-    rdfs:domain svt:TestRun ;
     rdfs:range svt:Invocation ;
     rdfs:label "has invocation" ;
-    rdfs:comment "Links a TestRun to the Invocation that produced it. Deliberately not prov:wasGeneratedBy: that property's rdfs:domain is prov:Entity, and both a TestRun and an Invocation are prov:Activity -- a domain-specific object property is the correct fit, not a borrowed one that doesn't." .
+    rdfs:comment "Links a TestRun, or a svt:Reproduction, to the Invocation that produced it. Deliberately not prov:wasGeneratedBy: that property's rdfs:domain is prov:Entity, and both a TestRun and an Invocation are prov:Activity -- a domain-specific object property is the correct fit, not a borrowed one that doesn't. No rdfs:domain is declared, for the same reason svt:concernsRun declares none: one property doing the identical job for two classes beats two near-duplicate names." .
+
+svt:reconfirmedAt a owl:DatatypeProperty ;
+    rdfs:domain svt:TestRun ;
+    rdfs:range xsd:dateTime ;
+    rdfs:label "reconfirmed at" ;
+    rdfs:comment "Multivalued: each time this exact run was re-executed by the *same* party over the same svt:inputDigest and produced the same outcome and svt:actual. Re-running proves something (the result was not a one-off) but establishes nothing new about the tool, so it must not become a second TestRun -- that is duplication, and the ledger carried an instance of it until it was removed. A separate property, not a second prov:startedAtTime: that property means when *this activity* started, and one activity has one start. A different party's confirmation is a svt:Reproduction instead, since it establishes something stronger." .
 
 svt:command a owl:DatatypeProperty ;
     rdfs:domain svt:Invocation ;
@@ -402,6 +407,33 @@ svt:inputDigest a owl:DatatypeProperty ;
     rdfs:range xsd:string ;
     rdfs:label "input digest" ;
     rdfs:comment "sha256 over the exact bytes of the TestCase's input files (concatenated in sorted-filename order) as actually fed to the tool -- pins precisely which input bytes this Invocation ran against, independent of whatever state the fixture files are in later." .
+
+#################################################################
+# svt:Party, svt:Reproduction -- re-running a test is not the same act
+# as testing it.
+#
+# `svt run` used to write a new TestRun unconditionally, so re-running one
+# appended a record identical in every evidentiary respect but its
+# timestamp. Re-running is worth recording -- it is how a result stops
+# being one machine's observation -- but it is a confirmation, not a new
+# assertion, and conflating the two is what let a redundant pair of runs
+# into this ledger.
+#################################################################
+
+svt:Party a owl:Class ;
+    rdfs:subClassOf prov:SoftwareAgent ;
+    rdfs:label "Party" ;
+    rdfs:comment "One machine or installation that runs tests -- not a person. What a reproduction establishes is that a result is not an artifact of one toolchain, and the machine is what differs; the person at the keyboard is beside the point. Keeping Party a prov:SoftwareAgent also means `svt run` stays agent-runnable: it is not one of the human-gated steps, so recording who ran it must never require attributing anything to a prov:Person (see AGENTS.md). Absence of a Party on a TestRun is itself a value -- 'unattributed' -- and two unattributed runs count as the same party." .
+
+svt:ranBy a owl:ObjectProperty ;
+    rdfs:range svt:Party ;
+    rdfs:label "ran by" ;
+    rdfs:comment "Which Party executed this TestRun or Reproduction. Optional on a TestRun (absence means unattributed), required on a Reproduction -- a reproduction by nobody in particular is the same-party case, which is svt:reconfirmedAt instead. No rdfs:domain, same as svt:concernsRun and svt:hasInvocation." .
+
+svt:Reproduction a owl:Class ;
+    rdfs:subClassOf prov:Activity ;
+    rdfs:label "Reproduction" ;
+    rdfs:comment "A record that a *different* Party re-ran an existing TestRun over the same svt:inputDigest and got the same outcome and svt:actual. Append-only, like svt:Validation/svt:Annotation/svt:IssueLink, and attached by the same svt:concernsRun property. Deliberately NOT a subclass of svt:TestRun: that would make TestRunShape and every TestRun query pick it up, reintroducing the duplication this class exists to remove. It carries its own svt:hasInvocation and earl:result rather than merely asserting agreement -- so that 'this really is a reproduction' is checked by shapes/reproduction.shapes.ttl against the run it names, never taken on trust." .
 
 svt:actual a owl:DatatypeProperty ;
     rdfs:domain earl:TestResult ;
