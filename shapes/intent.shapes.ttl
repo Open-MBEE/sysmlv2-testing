@@ -1,0 +1,68 @@
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix svt: <https://w3id.org/sysmlv2-testing#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+svt:TestIntentShape a sh:NodeShape ;
+    sh:targetClass svt:TestIntent ;
+    sh:property svt:TestIntentQuestionShape, svt:TestIntentConcernsShape .
+
+# The trailing '?' is a real constraint, not formatting. svt:description's
+# "write the requirement, never narration of an outcome" rule (AGENTS.md)
+# is prose an author has to remember; requiring an interrogative here
+# enforces the same discipline mechanically, because a question has no
+# grammatical room to report what a run already found.
+svt:TestIntentQuestionShape a sh:PropertyShape ;
+    sh:path svt:question ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+    sh:pattern "\\?\\s*$" ;
+    sh:message "a TestIntent must have exactly one svt:question, stated as an actual question (ending in '?') -- not a statement of what a run found" .
+
+svt:TestIntentConcernsShape a sh:PropertyShape ;
+    sh:path svt:concerns ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:in ( "admissibility" "posterior-state" ) ;
+    sh:message "svt:concerns must be exactly one of: admissibility (is u in U_x), posterior-state (a fact about the actual x+)" .
+
+# The load-bearing shape, and the reason svt:TestIntent is a node rather
+# than a free-text field on TestCase.
+#
+# ledger/testcases.ttl held a TestCase whose svt:description asserted that
+# two anonymous ':>> items' redefinitions resolve to the inherited base
+# feature, under svt:method "structural-check" -- which compares an exit
+# code and structurally cannot check resolution. sysml-toolkit recorded
+# `passed` there while the sibling reference-resolution TestCase, over the
+# same fixture, recorded `failed`. Nothing was positioned to notice: the
+# claim and the mechanism were both individually well-formed, and no
+# element related them. See docs/design-notes.md.
+#
+# Stating the question once, with which half of the transition it concerns,
+# makes that relation checkable: an intent about x+ that no realizing
+# TestCase can establish is now refused at the gate, in the same
+# sh:sparql style as TestCaseGroundingRequiredShape.
+#
+# The EXISTS guard is deliberate -- an intent with no TestCases yet is a
+# legitimately recorded open question, not a violation. This fires only
+# once tests exist and none of them can settle the question.
+svt:IntentMethodAlignmentShape a sh:NodeShape ;
+    sh:targetClass svt:TestIntent ;
+    sh:sparql [
+        a sh:SPARQLConstraint ;
+        sh:message "a TestIntent concerning posterior-state must be realized by at least one TestCase whose svt:method can establish a fact about x+ (constraint-eval, state-execution, reference-resolution) -- structural-check alone only establishes that u was admissible" ;
+        sh:select """
+            PREFIX svt: <https://w3id.org/sysmlv2-testing#>
+            SELECT $this
+            WHERE {
+                $this a svt:TestIntent ;
+                      svt:concerns "posterior-state" .
+                FILTER EXISTS { ?any svt:realizesIntent $this }
+                FILTER NOT EXISTS {
+                    ?tc svt:realizesIntent $this ;
+                        svt:method ?m .
+                    FILTER (?m IN ("constraint-eval", "state-execution", "reference-resolution"))
+                }
+            }
+        """ ;
+    ] .

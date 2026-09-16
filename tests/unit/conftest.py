@@ -21,6 +21,12 @@ from sysmlv2_testing.namespaces import EARL, PROV, SVT
 FAKE_IMPLEMENTATION = "fake-impl"
 FAKE_COMMIT = "abc123def4567890abc123def4567890abc123d"
 FAKE_TESTCASE = "fake-testcase"
+# Every TestCase must realize a TestIntent, so the synthetic ledger needs
+# one too. "admissibility" deliberately, to match the fake TestCase's
+# structural-check method -- a posterior-state intent here would trip
+# IntentMethodAlignmentShape and make every test using this fixture fail
+# for a reason that has nothing to do with what it is testing.
+FAKE_INTENT = "fake-intent"
 
 
 def add_full_test_run(g: Graph, run_iri, tc_iri, version_iri, ts) -> None:
@@ -76,6 +82,7 @@ def isolated_ledger(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     impl_iri = ids.slug_id("implementation", FAKE_IMPLEMENTATION)
     version_iri = ids.mint("version", f"{FAKE_IMPLEMENTATION}|{FAKE_COMMIT}")
     tc_iri = ids.slug_id("testcase", FAKE_TESTCASE)
+    intent_iri = ids.slug_id("intent", FAKE_INTENT)
     run_ts = Literal("2026-01-01T00:00:00+00:00", datatype=cli_module.XSD.dateTime)
     run_iri = ids.mint("run", f"{FAKE_TESTCASE}|{FAKE_IMPLEMENTATION}|{FAKE_COMMIT}|{run_ts}")
 
@@ -92,8 +99,12 @@ def isolated_ledger(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
     implementations_ttl.write_text(impl_g.serialize(format="turtle"), encoding="utf-8")
 
     tc_g = Graph()
+    tc_g.add((intent_iri, RDF.type, SVT.TestIntent))
+    tc_g.add((intent_iri, SVT.question, Literal("Is a fake model accepted as well-formed?")))
+    tc_g.add((intent_iri, SVT.concerns, Literal("admissibility")))
     tc_g.add((tc_iri, RDF.type, SVT.TestCase))
     tc_g.add((tc_iri, SVT.description, Literal("a fake testcase for isolated testing")))
+    tc_g.add((tc_iri, SVT.realizesIntent, intent_iri))
     tc_g.add((tc_iri, SVT.hasInputFile, Literal("input.sysml")))
     tc_g.add((tc_iri, SVT.method, Literal("structural-check")))
     testcases_ttl.write_text(tc_g.serialize(format="turtle"), encoding="utf-8")
@@ -122,6 +133,7 @@ def isolated_ledger(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
         "runs_dir": runs_dir,
         "fixtures_dir": fixtures_dir,
         "testcase": FAKE_TESTCASE,
+        "intent": FAKE_INTENT,
         "implementation": FAKE_IMPLEMENTATION,
         "version": FAKE_COMMIT,
     }

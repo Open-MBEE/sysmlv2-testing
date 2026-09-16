@@ -5,6 +5,36 @@
 @prefix svtid: <https://w3id.org/sysmlv2-testing/id/> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
+svtid:intent-anonymous-sibling-redefinition-target
+    a svt:TestIntent ;
+    svt:concerns "posterior-state" ;
+    svt:question "Do several anonymous ':>> items' redefinitions of the same multi-valued reference feature each resolve to the inherited base feature, regardless of how many siblings there are?" .
+
+svtid:intent-anonymous-sibling-redefinition-well-formed
+    a svt:TestIntent ;
+    svt:concerns "admissibility" ;
+    svt:question "Must a model in which a multi-valued reference feature is redefined by several anonymous ':>> items' memberships be accepted as well-formed?" .
+
+svtid:intent-constraint-evaluates-against-usage-bindings
+    a svt:TestIntent ;
+    svt:concerns "posterior-state" ;
+    svt:question "Does an assert constraint evaluate against a usage's actual bound feature values rather than its declaration-site defaults?" .
+
+svtid:intent-end-feature-redefinition-requires-end-keyword
+    a svt:TestIntent ;
+    svt:concerns "admissibility" ;
+    svt:question "Does a connection-end redefinition have to carry the literal 'end' keyword to be accepted as well-formed?" .
+
+svtid:intent-private-membership-not-visible-outside-namespace
+    a svt:TestIntent ;
+    svt:concerns "admissibility" ;
+    svt:question "Must a model that references a private member from outside its owning namespace be rejected?" .
+
+svtid:intent-state-machine-initial-and-transition-semantics
+    a svt:TestIntent ;
+    svt:concerns "posterior-state" ;
+    svt:question "Which states does an exhibited state machine occupy, given its entry transition and a sequence of accepted events?" .
+
 svtid:person-zargham
     a prov:Person ;
     rdfs:label "Zargham" .
@@ -43,7 +73,8 @@ svtid:testcase-constraint-eval-declaration-site
     svt:groundedIn svtid:citation-assert-constraint-per-usage-evaluation ;
     svt:hasInputFile "lib.sysml",
         "usage.sysml" ;
-    svt:method "constraint-eval" .
+    svt:method "constraint-eval" ;
+    svt:realizesIntent svtid:intent-constraint-evaluates-against-usage-bindings .
 
 svtid:testcase-end-feature-redefinition-bare
     a svt:TestCase ;
@@ -53,7 +84,8 @@ svtid:testcase-end-feature-redefinition-bare
         svtid:citation-end-usage-prefix-grammar ;
     svt:hasInputFile "lib.sysml",
         "usage-bare-noncompliant.sysml" ;
-    svt:method "structural-check" .
+    svt:method "structural-check" ;
+    svt:realizesIntent svtid:intent-end-feature-redefinition-requires-end-keyword .
 
 svtid:testcase-end-feature-redefinition-explicit
     a svt:TestCase ;
@@ -63,7 +95,8 @@ svtid:testcase-end-feature-redefinition-explicit
         svtid:citation-end-usage-prefix-grammar ;
     svt:hasInputFile "lib.sysml",
         "usage-end-portable.sysml" ;
-    svt:method "structural-check" .
+    svt:method "structural-check" ;
+    svt:realizesIntent svtid:intent-end-feature-redefinition-requires-end-keyword .
 
 svtid:testcase-membership-visibility-private-rejected
     a svt:TestCase ;
@@ -71,16 +104,18 @@ svtid:testcase-membership-visibility-private-rejected
     svt:expected "violated" ;
     svt:groundedIn svtid:citation-membership-visibility-private ;
     svt:hasInputFile "private-visibility.sysml" ;
-    svt:method "structural-check" .
+    svt:method "structural-check" ;
+    svt:realizesIntent svtid:intent-private-membership-not-visible-outside-namespace .
 
 svtid:testcase-redefinition-ambiguity-2
     a svt:TestCase ;
-    svt:description "Two anonymous ':>> items' redefinitions of a multi-valued reference feature should both resolve to the inherited base feature Container::items." ;
+    svt:description "A model in which a multi-valued reference feature is redefined by two anonymous ':>> items' memberships must be accepted as well-formed." ;
     svt:expected "clean" ;
     svt:groundedIn svtid:citation-remove-redefined-features ;
     svt:hasInputFile "lib.sysml",
         "usage-two-ok.sysml" ;
-    svt:method "structural-check" .
+    svt:method "structural-check" ;
+    svt:realizesIntent svtid:intent-anonymous-sibling-redefinition-well-formed .
 
 svtid:testcase-redefinition-ambiguity-2-resolution
     a svt:TestCase ;
@@ -90,16 +125,18 @@ svtid:testcase-redefinition-ambiguity-2-resolution
     svt:groundedIn svtid:citation-remove-redefined-features ;
     svt:hasInputFile "lib.sysml",
         "usage-two-ok.sysml" ;
-    svt:method "reference-resolution" .
+    svt:method "reference-resolution" ;
+    svt:realizesIntent svtid:intent-anonymous-sibling-redefinition-target .
 
 svtid:testcase-redefinition-ambiguity-3plus
     a svt:TestCase ;
-    svt:description "Three anonymous ':>> items' redefinitions of a multi-valued reference feature must all resolve to the inherited base feature Container::items, regardless of sibling count." ;
+    svt:description "A model in which a multi-valued reference feature is redefined by three anonymous ':>> items' memberships must be accepted as well-formed, regardless of sibling count." ;
     svt:expected "clean" ;
     svt:groundedIn svtid:citation-remove-redefined-features ;
     svt:hasInputFile "lib.sysml",
         "usage-three-ambiguous.sysml" ;
-    svt:method "structural-check" .
+    svt:method "structural-check" ;
+    svt:realizesIntent svtid:intent-anonymous-sibling-redefinition-well-formed .
 
 svtid:testcase-redefinition-ambiguity-3plus-resolution
     a svt:TestCase ;
@@ -110,7 +147,8 @@ svtid:testcase-redefinition-ambiguity-3plus-resolution
     svt:groundedIn svtid:citation-remove-redefined-features ;
     svt:hasInputFile "lib.sysml",
         "usage-three-ambiguous.sysml" ;
-    svt:method "reference-resolution" .
+    svt:method "reference-resolution" ;
+    svt:realizesIntent svtid:intent-anonymous-sibling-redefinition-target .
 
 svtid:testcase-state-machine-settles-without-events
     a svt:TestCase ;
@@ -119,7 +157,8 @@ svtid:testcase-state-machine-settles-without-events
     svt:expected "dormant" ;
     svt:groundedIn svtid:citation-state-initial-via-entry-succession ;
     svt:hasInputFile "surface.sysml" ;
-    svt:method "state-execution" .
+    svt:method "state-execution" ;
+    svt:realizesIntent svtid:intent-state-machine-initial-and-transition-semantics .
 
 svtid:testcase-state-machine-transitions-on-event
     a svt:TestCase ;
@@ -129,7 +168,15 @@ svtid:testcase-state-machine-transitions-on-event
     svt:expected "dormant,active" ;
     svt:groundedIn svtid:citation-state-initial-via-entry-succession ;
     svt:hasInputFile "surface.sysml" ;
-    svt:method "state-execution" .
+    svt:method "state-execution" ;
+    svt:realizesIntent svtid:intent-state-machine-initial-and-transition-semantics .
+
+svtid:validation-0bdb490ced4ca474
+    a svt:Validation ;
+    prov:startedAtTime "2026-09-16T00:28:33+00:00"^^xsd:dateTime ;
+    prov:wasAssociatedWith svtid:person-zargham ;
+    svt:note "re-validated after svt:realizesIntent added; intent split from the structural-check cases" ;
+    svt:validates svtid:testcase-redefinition-ambiguity-2-resolution .
 
 svtid:validation-4402332ac9d82d9e
     a svt:Validation ;
@@ -137,14 +184,70 @@ svtid:validation-4402332ac9d82d9e
     prov:wasAssociatedWith svtid:person-zargham ;
     svt:validates svtid:testcase-membership-visibility-private-rejected .
 
+svtid:validation-5509608b95e1eda0
+    a svt:Validation ;
+    prov:startedAtTime "2026-09-16T00:28:14+00:00"^^xsd:dateTime ;
+    prov:wasAssociatedWith svtid:person-zargham ;
+    svt:validates svtid:testcase-constraint-eval-declaration-site .
+
 svtid:validation-5df9d17405b10dce
     a svt:Validation ;
     prov:startedAtTime "2026-09-13T02:10:24+00:00"^^xsd:dateTime ;
     prov:wasAssociatedWith svtid:person-zargham ;
     svt:validates svtid:testcase-state-machine-transitions-on-event .
 
+svtid:validation-77040dc491209fa8
+    a svt:Validation ;
+    prov:startedAtTime "2026-09-16T00:28:21+00:00"^^xsd:dateTime ;
+    prov:wasAssociatedWith svtid:person-zargham ;
+    svt:validates svtid:testcase-end-feature-redefinition-explicit .
+
+svtid:validation-a1c5514a5719b243
+    a svt:Validation ;
+    prov:startedAtTime "2026-09-16T00:28:26+00:00"^^xsd:dateTime ;
+    prov:wasAssociatedWith svtid:person-zargham ;
+    svt:validates svtid:testcase-redefinition-ambiguity-3plus .
+
 svtid:validation-ba4d619d960026bd
     a svt:Validation ;
     prov:startedAtTime "2026-09-13T02:49:00+00:00"^^xsd:dateTime ;
     prov:wasAssociatedWith svtid:person-zargham ;
     svt:validates svtid:testcase-redefinition-ambiguity-2-resolution .
+
+svtid:validation-d2d8224a40199f14
+    a svt:Validation ;
+    prov:startedAtTime "2026-09-16T00:28:32+00:00"^^xsd:dateTime ;
+    prov:wasAssociatedWith svtid:person-zargham ;
+    svt:note "re-validated after svt:realizesIntent added; question reworded to an admissibility claim" ;
+    svt:validates svtid:testcase-membership-visibility-private-rejected .
+
+svtid:validation-d7d8f70ead34982f
+    a svt:Validation ;
+    prov:startedAtTime "2026-09-16T00:28:15+00:00"^^xsd:dateTime ;
+    prov:wasAssociatedWith svtid:person-zargham ;
+    svt:validates svtid:testcase-state-machine-settles-without-events .
+
+svtid:validation-d85b9abffc010770
+    a svt:Validation ;
+    prov:startedAtTime "2026-09-16T00:28:27+00:00"^^xsd:dateTime ;
+    prov:wasAssociatedWith svtid:person-zargham ;
+    svt:validates svtid:testcase-redefinition-ambiguity-3plus-resolution .
+
+svtid:validation-f9d239c463231d6f
+    a svt:Validation ;
+    prov:startedAtTime "2026-09-16T00:28:25+00:00"^^xsd:dateTime ;
+    prov:wasAssociatedWith svtid:person-zargham ;
+    svt:validates svtid:testcase-redefinition-ambiguity-2 .
+
+svtid:validation-fd1cca7af3a99d51
+    a svt:Validation ;
+    prov:startedAtTime "2026-09-16T00:28:21+00:00"^^xsd:dateTime ;
+    prov:wasAssociatedWith svtid:person-zargham ;
+    svt:validates svtid:testcase-end-feature-redefinition-bare .
+
+svtid:validation-ff357b185095421c
+    a svt:Validation ;
+    prov:startedAtTime "2026-09-16T00:28:32+00:00"^^xsd:dateTime ;
+    prov:wasAssociatedWith svtid:person-zargham ;
+    svt:note "re-validated after svt:realizesIntent added" ;
+    svt:validates svtid:testcase-state-machine-transitions-on-event .

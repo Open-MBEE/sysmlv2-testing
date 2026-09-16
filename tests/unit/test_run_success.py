@@ -78,6 +78,8 @@ def test_run_writes_a_real_passed_testrun_via_a_stub_adapter(isolated_ledger, tm
             testcase,
             "--description",
             "a fake requirement for testing the run success path",
+            "--intent",
+            isolated_ledger["intent"],
             "--input-file",
             str(src),
             "--method",

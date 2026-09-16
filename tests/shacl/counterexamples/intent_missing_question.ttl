@@ -1,0 +1,7 @@
+@prefix svt: <https://w3id.org/sysmlv2-testing#> .
+@prefix svtid: <https://w3id.org/sysmlv2-testing/id/> .
+
+svtid:intent-broken a svt:TestIntent ;
+    svt:concerns "admissibility" .
+# no svt:question -- an intent that states no question states nothing,
+# violates svt:TestIntentQuestionShape

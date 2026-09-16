@@ -4,10 +4,15 @@
 @prefix prov: <http://www.w3.org/ns/prov#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
+svtid:intent-ok a svt:TestIntent ;
+    svt:question "Is this model accepted?" ;
+    svt:concerns "admissibility" .
+
 svtid:testcase-ok a svt:TestCase ;
     svt:description "ok" ;
     svt:hasInputFile "input.sysml" ;
-    svt:method "structural-check" .
+    svt:method "structural-check" ;
+    svt:realizesIntent svtid:intent-ok .
 
 svtid:implementation-ok a svt:Implementation ;
     svt:name "ok" ;

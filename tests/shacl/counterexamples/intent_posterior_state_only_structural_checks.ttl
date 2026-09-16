@@ -1,0 +1,28 @@
+@prefix svt: <https://w3id.org/sysmlv2-testing#> .
+@prefix svtid: <https://w3id.org/sysmlv2-testing/id/> .
+
+# ledger/testcases.ttl's redefinition-ambiguity family as it actually stood
+# before this shape existed, minus the -resolution siblings: a question
+# about the posterior state x+, asked only by test cases that check an exit
+# code. Every node here is individually well-formed; the defect is only
+# visible in the relation between them, which is the whole reason
+# svt:TestIntent is a node and not a free-text field.
+
+svtid:intent-broken a svt:TestIntent ;
+    svt:question "Do two anonymous ':>> items' redefinitions each resolve to the inherited base feature?" ;
+    svt:concerns "posterior-state" .
+
+svtid:testcase-two a svt:TestCase ;
+    svt:description "A model with two anonymous ':>> items' redefinitions must be accepted." ;
+    svt:hasInputFile "usage-two-ok.sysml" ;
+    svt:method "structural-check" ;
+    svt:realizesIntent svtid:intent-broken .
+
+svtid:testcase-three a svt:TestCase ;
+    svt:description "A model with three anonymous ':>> items' redefinitions must be accepted." ;
+    svt:hasInputFile "usage-three-ambiguous.sysml" ;
+    svt:method "structural-check" ;
+    svt:realizesIntent svtid:intent-broken .
+# No realizing TestCase uses a method that can establish a fact about x+ --
+# a `passed` from either of these says only that the input was admissible.
+# Violates svt:IntentMethodAlignmentShape.

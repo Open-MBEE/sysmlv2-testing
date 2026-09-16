@@ -1,0 +1,9 @@
+@prefix svt: <https://w3id.org/sysmlv2-testing#> .
+@prefix svtid: <https://w3id.org/sysmlv2-testing/id/> .
+
+svtid:intent-broken a svt:TestIntent ;
+    svt:question "sysml-toolkit cross-wires the two redefinitions to each other." ;
+    svt:concerns "posterior-state" .
+# svt:question doesn't end in '?' -- and this is exactly why the pattern
+# exists: the text is narration of a bug already found, not a prospective
+# question the spec raises. Violates svt:TestIntentQuestionShape.

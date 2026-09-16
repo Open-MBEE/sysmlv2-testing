@@ -14,7 +14,7 @@ from rdflib.namespace import RDFS
 
 from . import ids
 from .graph import fixtures_dir_for, load_full_ledger
-from .namespaces import PROV, ROOT, SVT
+from .namespaces import POSTERIOR_STATE_METHODS, PROV, ROOT, SVT
 
 QUERY_PATH = ROOT / "queries" / "testcase_view.rq"
 
@@ -136,6 +136,48 @@ def _resolution_check_lines(tc_iri: URIRef, ledger) -> list[str]:
     return lines
 
 
+def _intent_lines(tc_iri: URIRef, method: str, ledger) -> list[str]:
+    """The question this TestCase bears on, and -- the part that makes a
+    verdict readable -- whether this TestCase's method can actually settle
+    it. A structural-check under a posterior-state intent contributes real
+    evidence (the input was admissible) but cannot establish the intent, so
+    its `passed` must not be read as confirming the question. Saying so
+    here, next to the method, is what stops a reader doing exactly that.
+
+    Derived entirely from svt:concerns + svt:method + svt:realizesIntent --
+    no per-method prose is stored anywhere; POSTERIOR_STATE_METHODS is the
+    same partition shapes/intent.shapes.ttl enforces.
+    """
+    intent = ledger.value(tc_iri, SVT.realizesIntent)
+    if intent is None:
+        return ["- **intent**: _none recorded_"]
+
+    question = ledger.value(intent, SVT.question)
+    concerns = str(ledger.value(intent, SVT.concerns))
+    lines = [f"- **intent**: {question} (`{_local_slug(intent)}`, concerns: {concerns})"]
+
+    establishes = concerns == "admissibility" or method in POSTERIOR_STATE_METHODS
+    if establishes:
+        lines.append(f"  - this method establishes the intent's `{concerns}` question directly.")
+    else:
+        lines.append(
+            "  - **this method establishes admissibility only** -- a verdict here says the "
+            "input was accepted, not that the intent's question about `x+` is settled."
+        )
+
+    siblings = sorted(
+        (s for s in ledger.subjects(SVT.realizesIntent, intent) if s != tc_iri), key=str
+    )
+    if siblings:
+        names = ", ".join(f"`{_local_slug(s)}`" for s in siblings)
+        lines.append(f"  - also realized by: {names}")
+    elif not establishes:
+        lines.append(
+            "  - no other test case realizes this intent, so nothing here settles it yet."
+        )
+    return lines
+
+
 def _validation_line(tc_iri: URIRef, ledger) -> str:
     """Being SHACL-valid RDF is not the same thing as a human having
     confirmed this claim against the spec -- this is precisely the fact a
@@ -165,8 +207,9 @@ def _testcase_section(tc_iri: URIRef, rows: list, ledger) -> str:
         "",
         str(first.description),
         "",
-        f"- **method**: `{first.method}`",
     ]
+    lines += _intent_lines(tc_iri, str(first.method), ledger)
+    lines.append(f"- **method**: `{first.method}`")
     prior_state = ledger.value(tc_iri, SVT.priorState)
     if prior_state is not None:
         lines.append(f"- **prior state (x)**: {prior_state}")
@@ -207,15 +250,24 @@ def _testcase_section(tc_iri: URIRef, rows: list, ledger) -> str:
     return "\n".join(lines)
 
 
-def render_report(testcase_id: str | None = None, implementation_slug: str | None = None) -> str:
+def render_report(
+    testcase_id: str | None = None,
+    implementation_slug: str | None = None,
+    intent_id: str | None = None,
+) -> str:
     """The whole compiled Markdown report, as a string. Deterministic:
     same ledger state + same fixtures -> byte-identical output, every time.
 
-    Two independent, orthogonal filters give the two report kinds
-    docs/workflow.md documents: ``testcase_id`` alone (or neither filter)
-    is kind 2, a cross-implementation comparison of one TestCase (or the
-    whole ledger); both filters together is kind 1, one TestCase against
-    exactly one Implementation.
+    Three independent, orthogonal filters. ``testcase_id`` alone (or no
+    filter at all) is kind 2, a cross-implementation comparison of one
+    TestCase (or the whole ledger); with ``implementation_slug`` too it is
+    kind 1, one TestCase against exactly one Implementation.
+
+    ``intent_id`` is the third: every TestCase bearing on one question,
+    together. That grouping is the point of a shared svt:TestIntent -- a
+    weak structural-check `passed` and the reference-resolution `failed`
+    that actually settles the same question are misleading read apart and
+    correct read together.
     """
     ledger = load_full_ledger()
     query_text = QUERY_PATH.read_text(encoding="utf-8")
@@ -231,10 +283,18 @@ def render_report(testcase_id: str | None = None, implementation_slug: str | Non
         init_bindings["implementation"] = ids.slug_id("implementation", implementation_slug)
     results = ledger.query(query_text, initBindings=init_bindings)
 
+    # An intent selects a *set* of test cases, so it can't be pre-bound the
+    # way ?testcase and ?implementation are -- filter the rows instead.
+    keep: set[URIRef] | None = None
+    if intent_id is not None:
+        keep = set(ledger.subjects(SVT.realizesIntent, ids.slug_id("intent", intent_id)))
+
     by_testcase: dict[URIRef, list] = {}
     order: list[URIRef] = []
     for row in results:
         tc = row.testcase
+        if keep is not None and tc not in keep:
+            continue
         if tc not in by_testcase:
             by_testcase[tc] = []
             order.append(tc)
@@ -245,13 +305,21 @@ def render_report(testcase_id: str | None = None, implementation_slug: str | Non
         "Compiled by `svt view` from the ledger + fixtures. Ephemeral --\n"
         "regenerate any time with the same command; never committed.\n\n"
     )
-    if testcase_id is not None or implementation_slug is not None:
+    if testcase_id is not None or implementation_slug is not None or intent_id is not None:
         scope_parts = []
+        if intent_id is not None:
+            scope_parts.append(f"intent `{intent_id}`")
         if testcase_id is not None:
             scope_parts.append(f"testcase `{testcase_id}`")
         if implementation_slug is not None:
             scope_parts.append(f"implementation `{implementation_slug}`")
         header += f"_Scope: {', '.join(scope_parts)} only._\n\n"
+    if intent_id is not None:
+        intent_iri = ids.slug_id("intent", intent_id)
+        question = ledger.value(intent_iri, SVT.question)
+        concerns = ledger.value(intent_iri, SVT.concerns)
+        if question is not None:
+            header += f"**Question:** {question}\n\n_Concerns: {concerns}._\n\n"
     sections = [_testcase_section(tc, by_testcase[tc], ledger) for tc in order]
     if not sections:
         return header + "_no matching test case found_\n"

@@ -24,8 +24,10 @@ from rdflib.namespace import RDFS, XSD
 from . import ids
 from .graph import fixtures_dir_for, load_full_ledger, load_graph, load_shapes, save_graph
 from .namespaces import (
+    CONCERNS,
     EARL,
     IMPLEMENTATIONS_TTL,
+    METHODS,
     PROV,
     RUNS_DIR,
     SOURCES_TTL,
@@ -42,6 +44,9 @@ sys.path.insert(0, str(ROOT))  # adapters/ lives at repo root, not under src/
 app = typer.Typer(help="svt — the sysmlv2-testing ledger CLI. The CLI is the only writer.")
 implementation_app = typer.Typer(help="Register implementations and their versions.")
 version_app = typer.Typer(help="Register versions and stability designations.")
+intent_app = typer.Typer(
+    help="Register test intents -- the question one or more test cases exist to answer."
+)
 testcase_app = typer.Typer(help="Register test cases.")
 document_app = typer.Typer(help="Register spec documents (sources/sources.ttl).")
 citation_app = typer.Typer(help="Register spec citations grounding a TestCase's expected value.")
@@ -52,13 +57,13 @@ testrun_app = typer.Typer(
 )
 app.add_typer(implementation_app, name="implementation")
 app.add_typer(version_app, name="version")
+app.add_typer(intent_app, name="intent")
 app.add_typer(testcase_app, name="testcase")
 app.add_typer(document_app, name="document")
 app.add_typer(citation_app, name="citation")
 app.add_typer(testrun_app, name="testrun")
 
 AGENT_IRI = URIRef(f"{SVTID}agent-svt-cli")
-METHODS = ("structural-check", "constraint-eval", "state-execution", "reference-resolution")
 ADAPTER_MODULES = {
     "opensysml": "adapters.opensysml",
     "sysml-toolkit": "adapters.sysml_toolkit",
@@ -246,6 +251,30 @@ def citation_set_quote(
     typer.echo(str(iri))
 
 
+@citation_app.command("set-rationale")
+def citation_set_rationale(
+    id_: str = typer.Option(..., "--id"),
+    rationale: str = typer.Option(
+        ..., "--rationale", help="connecting reasoning from the quote to the claim"
+    ),
+) -> None:
+    """Correct a SpecCitation's svt:rationale in place.
+
+    Rationale's job is connecting the quote to the TestCase's expected
+    value, and it may legitimately name a tool's observed behavior. What it
+    must not do is assert a settled verdict on an implementation's
+    conformance with the same confidence as the grounding itself -- that
+    is a finding a TestRun produces, not something a citation establishes.
+    This command exists so such wording can be narrowed without a
+    hand-edit (`set-quote`/`set-page` already existed; this one did not)."""
+    g = load_graph(SOURCES_TTL)
+    iri = _existing_citation_iri(g, id_)
+    g.remove((iri, SVT.rationale, None))
+    g.add((iri, SVT.rationale, Literal(rationale)))
+    _gate_and_save(g, SOURCES_TTL)
+    typer.echo(str(iri))
+
+
 @citation_app.command("set-page")
 def citation_set_page(
     id_: str = typer.Option(..., "--id"),
@@ -282,10 +311,79 @@ def _resolved_citation_iris(grounds: List[str]) -> List[URIRef]:
     return iris
 
 
+@intent_app.command("add")
+def intent_add(
+    id_: str = typer.Option(..., "--id"),
+    question: str = typer.Option(
+        ..., "--question", help="the question, as an actual question -- must end in '?'"
+    ),
+    concerns: str = typer.Option(
+        ..., "--concerns", help=f"one of: {', '.join(CONCERNS)}"
+    ),
+) -> None:
+    """Register the question one or more TestCases exist to answer.
+
+    Write --question as a question about what the spec requires, not as the
+    answer a run produced. The trailing '?' is SHACL-enforced, which is the
+    point: an interrogative has no room to narrate an outcome, so the
+    failure mode svt:description's prose discipline guards against is
+    structurally unavailable here (see AGENTS.md).
+
+    --concerns says which half of the transition the question is about, and
+    is what the realizing TestCases' --method is checked against: a
+    posterior-state question cannot be settled by structural-check, which
+    only asks whether u was admissible."""
+    if concerns not in CONCERNS:
+        typer.echo(f"error: --concerns must be one of {', '.join(CONCERNS)}", err=True)
+        raise typer.Exit(2)
+    g = load_graph(TESTCASES_TTL)
+    iri = ids.slug_id("intent", id_)
+    g.add((iri, RDF.type, SVT.TestIntent))
+    g.add((iri, SVT.question, Literal(question)))
+    g.add((iri, SVT.concerns, Literal(concerns)))
+    _gate_and_save(g, TESTCASES_TTL)
+    typer.echo(str(iri))
+
+
+@intent_app.command("set-question")
+def intent_set_question(
+    id_: str = typer.Option(..., "--id"),
+    question: str = typer.Option(..., "--question"),
+) -> None:
+    """Correct a TestIntent's svt:question in place, for the same reason
+    `testcase set-description` exists: a claim needs a correction path that
+    isn't a hand-edit. svt:concerns is deliberately not settable here --
+    changing it changes which methods can establish the intent, i.e. it
+    makes a different question, so register that as a new intent instead."""
+    g = load_graph(TESTCASES_TTL)
+    iri = _resolved_intent_iri(g, id_)
+    g.remove((iri, SVT.question, None))
+    g.add((iri, SVT.question, Literal(question)))
+    _gate_and_save(g, TESTCASES_TTL)
+    typer.echo(str(iri))
+
+
+def _resolved_intent_iri(g: Graph, intent_id: str) -> URIRef:
+    """Every --intent id must already exist as a svt:TestIntent -- same
+    rule as _resolved_citation_iris, for the same reason: a dangling
+    reference is worse than no reference at all."""
+    iri = ids.slug_id("intent", intent_id)
+    if (iri, RDF.type, SVT.TestIntent) not in g:
+        typer.echo(
+            f"error: unknown intent {intent_id!r} (register it first with `svt intent add`)",
+            err=True,
+        )
+        raise typer.Exit(2)
+    return iri
+
+
 @testcase_app.command("add")
 def testcase_add(
     id_: str = typer.Option(..., "--id"),
     description: str = typer.Option(..., "--description"),
+    intent: str = typer.Option(
+        ..., "--intent", help="the svt:TestIntent --id this test case bears on"
+    ),
     input_file: List[Path] = typer.Option(..., "--input-file"),
     method: str = typer.Option(..., "--method"),
     expected: Optional[str] = typer.Option(None, "--expected"),
@@ -311,9 +409,11 @@ def testcase_add(
         raise typer.Exit(2)
     citation_iris = _resolved_citation_iris(grounds)
     g = load_graph(TESTCASES_TTL)
+    intent_iri = _resolved_intent_iri(g, intent)
     iri = ids.slug_id("testcase", id_)
     g.add((iri, RDF.type, SVT.TestCase))
     g.add((iri, SVT.description, Literal(description)))
+    g.add((iri, SVT.realizesIntent, intent_iri))
     g.add((iri, SVT.method, Literal(method)))
     if prior_state is not None:
         g.add((iri, SVT.priorState, Literal(prior_state)))
@@ -389,6 +489,28 @@ def testcase_set_description(
         raise typer.Exit(2)
     g.remove((iri, SVT.description, None))
     g.add((iri, SVT.description, Literal(description)))
+    _gate_and_save(g, TESTCASES_TTL)
+    typer.echo(str(iri))
+
+
+@testcase_app.command("set-intent")
+def testcase_set_intent(
+    id_: str = typer.Option(..., "--id"),
+    intent: str = typer.Option(..., "--intent"),
+) -> None:
+    """Point a TestCase at the question it bears on (remove-then-add: a
+    TestCase realizes exactly one intent). Re-pointing is a real change of
+    claim, not a relabel -- it changes which method is adequate for this
+    test case, so the SHACL alignment check re-runs over both the old and
+    the new intent before anything is written."""
+    g = load_graph(TESTCASES_TTL)
+    iri = ids.slug_id("testcase", id_)
+    if (iri, RDF.type, SVT.TestCase) not in g:
+        typer.echo(f"error: unknown testcase {id_!r}", err=True)
+        raise typer.Exit(2)
+    intent_iri = _resolved_intent_iri(g, intent)
+    g.remove((iri, SVT.realizesIntent, None))
+    g.add((iri, SVT.realizesIntent, intent_iri))
     _gate_and_save(g, TESTCASES_TTL)
     typer.echo(str(iri))
 
@@ -861,6 +983,13 @@ def view_cmd(
         "report kind 1); --testcase alone (or neither filter) is the "
         "cross-implementation comparison (report kind 2).",
     ),
+    intent: Optional[str] = typer.Option(
+        None,
+        "--intent",
+        help="Report every test case bearing on this svt:TestIntent, under its question -- "
+        "the grouping that makes a weak structural-check verdict and the method that "
+        "actually settles the same question readable together rather than apart.",
+    ),
 ) -> None:
     """Compile a deterministic Markdown report (one SPARQL query + the
     fixture files) so a human can actually read the ledger's precise
@@ -868,10 +997,12 @@ def view_cmd(
     fully reproducible from the ledger + fixtures at any time."""
     from .view import render_report  # noqa: PLC0415
 
-    content = render_report(testcase, implementation)
+    content = render_report(testcase, implementation, intent)
     reports_dir = ROOT / "reports"
     reports_dir.mkdir(parents=True, exist_ok=True)
     name_parts = []
+    if intent is not None:
+        name_parts.append(f"intent-{intent}")
     if testcase is not None:
         name_parts.append(f"testcase-{testcase}")
     if implementation is not None:

@@ -106,13 +106,47 @@ svt:forImplementation a owl:ObjectProperty ;
     rdfs:label "for implementation" .
 
 #################################################################
+# svt:TestIntent -- the question, above the test cases that answer it.
+#
+# svt:description says what the spec requires; svt:method says which
+# comparator runs. Neither records *what question the test case exists to
+# answer*, so nothing was positioned to notice when the two came apart --
+# a TestCase whose description asserted a fact about x+ while its method
+# only checked admissibility recorded a passed verdict that read as
+# confirming a claim the run never adjudicated. See docs/design-notes.md.
+#################################################################
+
+svt:TestIntent a owl:Class ;
+    rdfs:subClassOf earl:TestRequirement ;
+    rdfs:label "Test intent" ;
+    rdfs:comment "The question one or more TestCases exist to answer, stated once and shared by all of them. EARL's own TestRequirement is exactly this relation -- a higher-level requirement established by one or more sub-tests -- so this subclasses it rather than inventing a parallel notion. svt:concerns says which half of the x+ = f(x, u) transition the question is about, and that is what makes the intent checkable against a realizing TestCase's svt:method: a question about x+ cannot be settled by structural-check, which only asks whether u was admissible. Enforced, not merely documented -- see shapes/intent.shapes.ttl's IntentMethodAlignmentShape." .
+
+svt:question a owl:DatatypeProperty ;
+    rdfs:domain svt:TestIntent ;
+    rdfs:range xsd:string ;
+    rdfs:label "question" ;
+    rdfs:comment "The intent stated as an actual interrogative -- required to end in '?' (shapes/intent.shapes.ttl). Not a formatting preference: a question has no grammatical room to narrate an outcome, so the 'LLM describing what it just found' failure mode svt:description's prose discipline guards against (see AGENTS.md) is structurally unavailable here. Write the question the spec text raises, not the answer a run produced." .
+
+svt:concerns a owl:DatatypeProperty ;
+    rdfs:domain svt:TestIntent ;
+    rdfs:range xsd:string ;
+    rdfs:label "concerns" ;
+    rdfs:comment "Which fact about the transition this question is about: admissibility (is u in U_x at all) | posterior-state (a fact about the actual x+ once u is admitted). Closed set -- see shapes/intent.shapes.ttl. This is the field svt:method is checked against; an intent concerning posterior-state that no realizing TestCase can establish is a SHACL violation, not a judgment call." .
+
+svt:realizesIntent a owl:ObjectProperty ;
+    rdfs:domain svt:TestCase ;
+    rdfs:range svt:TestIntent ;
+    rdfs:label "realizes intent" ;
+    rdfs:comment "Which question this TestCase bears on. Exactly one per TestCase; several TestCases may realize one intent, and that is the point -- a weak structural-check case and the reference-resolution case that actually settles the same question belong under one intent, so a reader of the weak verdict is pointed at the strong one instead of being left to read it alone." .
+
+#################################################################
 # svt:TestCase
 #################################################################
 
 svt:TestCase a owl:Class ;
     rdfs:subClassOf earl:TestCriterion ;
     rdfs:label "Test case" ;
-    rdfs:comment "A state-transition claim: each Implementation under test is a candidate realization of a transition function f; given prior state x (svt:priorState, default: nothing but the standard library loaded) and command u (svt:hasInputFile, and for some methods svt:events/svt:evalExpression/svt:evalSubject), the correct posterior state is x+ = f_spec(x, u). svt:method selects which fact about that transition this TestCase checks: structural-check asks whether u is even admissible (u in U_x -- see AGENTS.md); constraint-eval, state-execution, and reference-resolution each assert a specific fact about the actual x+ once u is admitted. Grounded in real spec citations (svt:groundedIn), not bare assertions." .
+    rdfs:comment "A state-transition claim: each Implementation under test is a candidate realization of a transition function f; given prior state x (svt:priorState, default: nothing but the standard library loaded) and command u (svt:hasInputFile, and for some methods svt:events/svt:evalExpression/svt:evalSubject), the correct posterior state is x+ = f_spec(x, u). svt:method selects which fact about that transition this TestCase checks: structural-check asks whether u is even admissible (u in U_x -- see AGENTS.md); constraint-eval, state-execution, and reference-resolution each assert a specific fact about the actual x+ once u is admitted. Grounded in real spec citations (svt:groundedIn), not bare assertions, and answerable to a stated question (svt:realizesIntent) whose svt:concerns the chosen method must actually be able to establish." .
 
 svt:description a owl:DatatypeProperty ;
     rdfs:domain svt:TestCase ;

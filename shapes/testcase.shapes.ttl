@@ -8,7 +8,8 @@ svt:TestCaseShape a sh:NodeShape ;
         svt:TestCaseMethodShape, svt:TestCaseExpectedShape,
         svt:TestCaseEvalExpressionShape, svt:TestCaseEvalSubjectShape,
         svt:TestCaseGroundedInShape, svt:TestCasePriorStateShape,
-        svt:TestCaseEventsShape, svt:TestCaseChecksResolutionShape .
+        svt:TestCaseEventsShape, svt:TestCaseChecksResolutionShape,
+        svt:TestCaseRealizesIntentShape .
 
 svt:TestCaseDescriptionShape a sh:PropertyShape ;
     sh:path svt:description ;
@@ -61,6 +62,18 @@ svt:TestCaseEventsShape a sh:PropertyShape ;
     sh:path svt:events ;
     sh:maxCount 1 ;
     sh:datatype xsd:string .
+
+# Exactly one -- a TestCase bears on one question. Several TestCases may
+# share an intent (and should, when a weak method and a strong one ask the
+# same thing), but a TestCase that answers to two questions at once is the
+# ambiguity this element exists to remove.
+svt:TestCaseRealizesIntentShape a sh:PropertyShape ;
+    sh:path svt:realizesIntent ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:nodeKind sh:IRI ;
+    sh:class svt:TestIntent ;
+    sh:message "a TestCase must realize exactly one svt:TestIntent -- the question it exists to answer (register one with `svt intent add`)" .
 
 svt:TestCaseChecksResolutionShape a sh:PropertyShape ;
     sh:path svt:checksResolution ;

@@ -1,0 +1,10 @@
+@prefix svt: <https://w3id.org/sysmlv2-testing#> .
+@prefix svtid: <https://w3id.org/sysmlv2-testing/id/> .
+
+svtid:testcase-broken a svt:TestCase ;
+    svt:description "a test case that answers to no stated question" ;
+    svt:hasInputFile "input.sysml" ;
+    svt:method "structural-check" .
+# no svt:realizesIntent -- nothing records what this test case is asking,
+# so nothing can check the method against it.
+# Violates svt:TestCaseRealizesIntentShape.

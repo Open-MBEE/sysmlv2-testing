@@ -11,6 +11,19 @@ SVTID = Namespace("https://w3id.org/sysmlv2-testing/id/")
 EARL = Namespace("http://www.w3.org/ns/earl#")
 PROV = Namespace("http://www.w3.org/ns/prov#")
 
+# Closed vocabularies that must read identically in the SHACL shapes and in
+# the code that writes them -- kept here for the same reason the namespaces
+# are: one place, so nothing drifts.
+METHODS = ("structural-check", "constraint-eval", "state-execution", "reference-resolution")
+CONCERNS = ("admissibility", "posterior-state")
+
+# The methods that establish a fact about the posterior state x+, as opposed
+# to merely whether the command u was admissible. This split is what makes a
+# svt:TestIntent's svt:concerns checkable against a realizing TestCase's
+# svt:method -- see shapes/intent.shapes.ttl's IntentMethodAlignmentShape,
+# which encodes the same partition in SPARQL. Change one, change both.
+POSTERIOR_STATE_METHODS = ("constraint-eval", "state-execution", "reference-resolution")
+
 PREFIXES: dict[str, str] = {
     "svt": str(SVT),
     "svtid": str(SVTID),

@@ -1,0 +1,7 @@
+@prefix svt: <https://w3id.org/sysmlv2-testing#> .
+@prefix svtid: <https://w3id.org/sysmlv2-testing/id/> .
+
+svtid:intent-broken a svt:TestIntent ;
+    svt:question "Does the tool accept this model?" ;
+    svt:concerns "whatever-the-tool-does" .
+# svt:concerns isn't in the closed set -- violates svt:TestIntentConcernsShape

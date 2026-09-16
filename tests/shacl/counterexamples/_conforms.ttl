@@ -34,6 +34,10 @@ svtid:resolutioncheck-ok a svt:ResolutionCheck ;
     svt:subjectFeature "UsageTwo::c::@0" ;
     svt:expectedTarget "Lib::Container::items" .
 
+svtid:intent-ok a svt:TestIntent ;
+    svt:question "Is this model accepted?" ;
+    svt:concerns "admissibility" .
+
 svtid:testcase-ok a svt:TestCase ;
     svt:description "ok" ;
     svt:hasInputFile "input.sysml" ;
@@ -42,7 +46,8 @@ svtid:testcase-ok a svt:TestCase ;
     svt:priorState "fresh" ;
     svt:events "SomeEvent" ;
     svt:checksResolution svtid:resolutioncheck-ok ;
-    svt:groundedIn svtid:citation-ok .
+    svt:groundedIn svtid:citation-ok ;
+    svt:realizesIntent svtid:intent-ok .
 
 svtid:person-ok a prov:Person ;
     rdfs:label "Ok Human" .

@@ -1,75 +1,82 @@
 """svt run must refuse an unvalidated TestCase outright -- being SHACL-valid
 RDF is not the same thing as a human having confirmed the claim against the
 spec (see AGENTS.md's "Construction vs. validation"). This is the literal
-enforcement of that gate: as long as at least one seeded TestCase in this
-ledger remains unvalidated (an agent must never validate one itself, so
-there will always be some -- see docs/design-notes.md/docs/walkthrough.md
-for which ones have been validated by Z so far, a count that only grows
-over time), a real run against it must be refused, not just documented as
-a rule.
+enforcement of that gate, not just documentation of the rule.
+
+This used to find an unvalidated TestCase by scanning the real ledger,
+which worked only while some seeded TestCase remained unvalidated. Every
+one is now validated, so that approach fails -- as the old helper's own
+assertion message predicted it would ("if every TestCase now has a
+Validation record, this test needs a dedicated unvalidated fixture
+instead"). It builds its own unvalidated TestCase in an isolated ledger
+now: the gate is a property of the code, and a test of it should not go
+red because a human did the validating work the gate exists to require.
 """
 
 from typer.testing import CliRunner
 
 from sysmlv2_testing.cli import app
-from sysmlv2_testing.graph import load_full_ledger
-from sysmlv2_testing.namespaces import SVT
+
+from conftest import FAKE_COMMIT, FAKE_IMPLEMENTATION, FAKE_TESTCASE
 
 runner = CliRunner()
 
 
-def _an_unvalidated_testcase_id() -> str:
-    """This test only needs *one* real unvalidated TestCase to exist, not
-    all of them -- picks one live rather than hard-coding an id, since
-    which specific TestCases are still unvalidated changes over time as
-    Z validates more (see docs/walkthrough.md)."""
-    ledger = load_full_ledger()
-    from rdflib import RDF  # noqa: PLC0415
-
-    for tc_iri in ledger.subjects(RDF.type, SVT.TestCase):
-        if not any(ledger.subjects(SVT.validates, tc_iri)):
-            # ids are minted as .../id/testcase-<slug>; slug may itself
-            # contain hyphens, so split on the first one instead
-            slug = str(tc_iri).rsplit("/", 1)[-1]
-            return slug.split("-", 1)[1]
-    raise AssertionError(
-        "expected at least one unvalidated TestCase in the ledger for this "
-        "test to mean anything -- if every TestCase now has a Validation "
-        "record, this test needs a dedicated unvalidated fixture instead"
-    )
-
-
-def _a_registered_version() -> tuple[str, str]:
-    """(implementation slug, commit hash) for any real registered Version --
-    the gate fires before adapter dispatch, so this need not be runnable."""
-    ledger = load_full_ledger()
-    from rdflib import RDF  # noqa: PLC0415
-
-    for v_iri in ledger.subjects(RDF.type, SVT.Version):
-        impl_iri = ledger.value(v_iri, SVT.ofImplementation)
-        commit = ledger.value(v_iri, SVT.commitHash)
-        impl_slug = str(impl_iri).rsplit("/", 1)[-1].split("-", 1)[1]
-        return impl_slug, str(commit)
-    raise AssertionError("expected at least one registered Version")
-
-
-def test_run_refuses_an_unvalidated_testcase():
-    testcase_id = _an_unvalidated_testcase_id()
-    impl_slug, commit = _a_registered_version()
+def test_run_refuses_an_unvalidated_testcase(isolated_ledger):
+    """The isolated ledger's TestCase deliberately has no svt:Validation."""
     result = runner.invoke(
         app,
-        ["run", "--testcase", testcase_id, "--implementation", impl_slug, "--version", commit],
+        ["run", "--testcase", FAKE_TESTCASE,
+         "--implementation", FAKE_IMPLEMENTATION, "--version", FAKE_COMMIT],
     )
     assert result.exit_code == 2, result.output
     assert "no svt:Validation record" in result.output
-    assert f"svt testcase validate --id {testcase_id}" in result.output
+    assert f"svt testcase validate --id {FAKE_TESTCASE}" in result.output
 
 
-def test_validate_refuses_llm_flavored_by_names():
+def test_the_gate_fires_before_adapter_dispatch(isolated_ledger):
+    """FAKE_IMPLEMENTATION has no registered adapter, so if the validation
+    gate ever moved below adapter lookup this would still exit 2 -- but
+    with a different message. Pins the ordering, not just the exit code."""
+    result = runner.invoke(
+        app,
+        ["run", "--testcase", FAKE_TESTCASE,
+         "--implementation", FAKE_IMPLEMENTATION, "--version", FAKE_COMMIT],
+    )
+    assert "no svt:Validation record" in result.output
+    assert "no adapter registered" not in result.output
+
+
+def test_run_proceeds_past_the_gate_once_a_validation_exists(isolated_ledger):
+    """The complement: the gate must not be unconditional. After a real
+    `testcase validate`, `svt run` gets far enough to fail on the *next*
+    thing (no adapter for the fake implementation) instead of on the gate."""
+    assert runner.invoke(
+        app,
+        ["testcase", "validate", "--id", FAKE_TESTCASE, "--by", "Test Human"],
+    ).exit_code == 0
+
+    # run_cmd checks fixture files before adapter dispatch, so without this
+    # the run would stop at "missing fixture files" and never reach the
+    # lookup this test is about.
+    fixture = isolated_ledger["fixtures_dir"] / FAKE_TESTCASE / "input.sysml"
+    fixture.parent.mkdir(parents=True, exist_ok=True)
+    fixture.write_text("package Example { part def Thing; }\n", encoding="utf-8")
+
+    result = runner.invoke(
+        app,
+        ["run", "--testcase", FAKE_TESTCASE,
+         "--implementation", FAKE_IMPLEMENTATION, "--version", FAKE_COMMIT],
+    )
+    assert "no svt:Validation record" not in result.output
+    assert "no adapter registered" in result.output
+
+
+def test_validate_refuses_llm_flavored_by_names(isolated_ledger):
     for bad_name in ("claude", "AI", "llm", "Agent"):
         result = runner.invoke(
             app,
-            ["testcase", "validate", "--id", "does-not-matter", "--by", bad_name],
+            ["testcase", "validate", "--id", FAKE_TESTCASE, "--by", bad_name],
         )
         assert result.exit_code == 2, (bad_name, result.output)
         assert "not a human" in result.output
