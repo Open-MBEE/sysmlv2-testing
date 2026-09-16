@@ -7,7 +7,8 @@
 
 svtid:implementation-opensysml
     a svt:Implementation ;
-    svt:hasVersion svtid:version-f69111dc2adf2203 ;
+    svt:hasVersion svtid:version-43b25328b26cade7,
+        svtid:version-f69111dc2adf2203 ;
     svt:name "opensysml" ;
     svt:primaryLanguage "Go" ;
     svt:repositoryURL "https://github.com/Open-MBEE/OpenSysML"^^xsd:anyURI .
@@ -50,6 +51,14 @@ svtid:version-26283fd33076c9d6
     svt:ofImplementation svtid:implementation-pilot-implementation ;
     svt:sourceURL "https://github.com/Systems-Modeling/SysML-v2-Pilot-Implementation/commit/692170b71867353b8f90341e61556f49a5beb0e5"^^xsd:anyURI ;
     svt:versionLabel "2026-08+" .
+
+svtid:version-43b25328b26cade7
+    a svt:Version ;
+    svt:artifactDigest "229d129b0051e008aab3bd077fd3087b82f322f15ad91135effdd3f65aae197c" ;
+    svt:commitHash "238aed650b2cd102191039a88c29a67b09d82271" ;
+    svt:ofImplementation svtid:implementation-opensysml ;
+    svt:sourceURL "https://github.com/Open-MBEE/OpenSysML/releases/tag/v0.8.0"^^xsd:anyURI ;
+    svt:versionLabel "v0.8.0" .
 
 svtid:version-cdc8cdb3385265b0
     a svt:Version ;
