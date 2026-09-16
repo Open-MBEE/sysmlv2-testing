@@ -23,6 +23,9 @@ _Scope: testcase `redefinition-ambiguity-2-resolution` only._
 
 Each anonymous ':>> items' redefinition under part c must resolve, by real object identity, to the inherited base feature Container::items.
 
+- **intent**: Do several anonymous ':>> items' redefinitions of the same multi-valued reference feature each resolve to the inherited base feature, regardless of how many siblings there are? (`anonymous-sibling-redefinition-target`, concerns: posterior-state)
+  - this method establishes the intent's `posterior-state` question directly.
+  - also realized by: `redefinition-ambiguity-3plus-resolution`
 - **method**: `reference-resolution`
 - **expected posterior state** (resolution facts):
   - `UsageTwo::c::@0` must resolve to `Lib::Container::items`
@@ -34,7 +37,7 @@ Each anonymous ':>> items' redefinition under part c must resolve, by real objec
 
 > removeRedefinedFeatures(memberships : Membership [0..*]) : Membership [0..*] -- Return a subset of memberships, removing those Memberships whose memberElements are Features and for which either of the following two conditions holds: 1. The memberElement of the Membership is included in redefined Features of another Membership in memberships. 2. One of the redefined Features of the Membership is a directly redefinedFeature of an ownedFeature of this Type. [...] body: let reducedMemberships : Sequence(Membership) = memberships->reject(mem1 | memberships->excluding(mem1)-> exists(mem2 | allRedefinedFeaturesOf(mem2)-> includes(mem1.memberElement))) in let redefinedFeatures : Set(Feature) = ownedFeature.redefinition.redefinedFeature->asSet() in reducedMemberships->reject(mem | allRedefinedFeaturesOf(mem)-> exists(feature | redefinedFeatures->includes(feature)))
 
-*This is a general set operation over the whole memberships collection (existential quantification, not a pairwise fold) -- it is defined the same way regardless of how many redefining memberships exist. Nothing in this algorithm conditions correctness on sibling count, so 2 vs 3+ anonymous redefinitions of the same base feature should resolve identically. This directly supports expected=clean for both redefinition-ambiguity-2 and redefinition-ambiguity-3plus, and independently corroborates BrandFootprintML's own root-cause hypothesis that sysml-toolkit's drop_redefined_hits (a suspected pairwise fold) diverges from this normative set-based algorithm. Version caveat: this is KerML v1.1 Beta 2 (Release 2026-07), not the v1.0 release the SysML v2.0 Language Specification (formal/2026-03-02, March 2026) cross-references as '[KerML, ...]' -- used as the best locally-held proxy; this is a foundational, long-stable KerML mechanism unlikely to have changed in a way that would flip this conclusion, but the version mismatch is real and noted rather than glossed over.*
+*This is a general set operation over the whole memberships collection (existential quantification, not a pairwise fold) -- it is defined the same way regardless of how many redefining memberships exist. Nothing in this algorithm conditions correctness on sibling count, so 2 vs 3+ anonymous redefinitions of the same base feature should resolve identically. This grounds expected=clean for redefinition-ambiguity-2/-3plus and the expected resolution targets for their -resolution counterparts. Version caveat: this is KerML v1.1 Beta 2 (Release 2026-07), not the v1.0 release the SysML v2.0 Language Specification (formal/2026-03-02, March 2026) cross-references as '[KerML, ...]' -- used as the best locally-held proxy; this is a foundational, long-stable KerML mechanism unlikely to have changed in a way that would flip this conclusion, but the version mismatch is real and noted rather than glossed over.*
 
 ### Input
 

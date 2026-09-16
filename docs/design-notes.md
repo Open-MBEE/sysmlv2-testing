@@ -137,6 +137,161 @@ in §7.18.2's entry-transition-succession text, which also explains
 `BrandFootprintML`'s own `ISSUES-PROPOSED.md` #6 finding (a state machine
 with no explicit entry transition has no well-defined initial state).
 
+## The same conflation, still sitting in the ledger: `svt:TestIntent`
+
+The `reference-resolution` method above fixed the *mechanism* gap — the rig
+gained a way to check facts about `x+`. It did not fix the *recording* gap,
+and a review prompted by a colleague's observation (that the TBox should
+capture a test case's intent explicitly) found the residue still in place:
+
+`redefinition-ambiguity-2` kept the description it was seeded with —
+"Two anonymous ':>> items' redefinitions ... should both resolve to the
+inherited base feature `Container::items`" — under `method:
+structural-check`, `expected: clean`. That description asserts a
+resolution fact. `structural-check` compares an exit code and cannot
+check it. sysml-toolkit's recorded verdict there is `passed`, while
+`redefinition-ambiguity-2-resolution`, over the *same fixture*, records
+`failed`. Read alone, the first verdict says a tool got right what it in
+fact gets wrong. `redefinition-ambiguity-3plus` had the identical defect.
+Both survived four audit passes, because each element was individually
+well-formed and nothing in the model related the claim to the mechanism.
+
+The generalization: `svt:description` says what the spec requires and
+`svt:method` says what gets checked, but nothing said *what question the
+test case exists to answer*, so no gate — and no reader — was positioned
+to notice when the two came apart.
+
+A free-text `intent` field was considered and rejected. Every description
+in this repo was authored by Claude in one session; an `intent` string
+written by the same author in the same pass would have restated the
+description and agreed with it. It would not have caught this.
+
+`svt:TestIntent` (a subclass of `earl:TestRequirement`, EARL's own "a
+requirement established by one or more sub-tests") is instead a shared
+node: one `svt:question`, and a `svt:concerns` drawn from a closed set —
+`admissibility` (is `u` in `U_x`) or `posterior-state` (a fact about the
+actual `x+`). TestCases point at it with `svt:realizesIntent`. Two
+consequences, both mechanical:
+
+- **`IntentMethodAlignmentShape`** (`shapes/intent.shapes.ttl`) refuses a
+  `posterior-state` intent that no realizing TestCase can establish —
+  i.e. exactly the `redefinition-ambiguity-2` family as it would have
+  stood had the `-resolution` siblings never been written. Same
+  `sh:sparql` style as `TestCaseGroundingRequiredShape`; the
+  counterexample proving it is
+  `tests/shacl/counterexamples/intent_posterior_state_only_structural_checks.ttl`.
+  The shape constrains the *intent*, not each TestCase, so a
+  `structural-check` case coexisting with a `reference-resolution` one
+  under the same question is permitted — it would contribute real evidence
+  without being asked to carry the whole claim. Z's call was not to use
+  that latitude here (see below).
+- **`svt view` states what a verdict does and does not establish**, under
+  every test case, derived from `concerns` + `method` (no per-method prose
+  is stored), plus the sibling TestCases realizing the same intent.
+  `svt view --intent <slug>` renders a whole family under its question.
+
+**Two intents, not one, for the redefinition family.** The first cut put
+all four redefinition TestCases under one `posterior-state` intent, so the
+weak `structural-check` pair would render as "establishes admissibility
+only" next to the `reference-resolution` pair that actually settles the
+question — putting sysml-toolkit's `passed` and its `failed` on one page.
+Z split them instead: `anonymous-sibling-redefinition-well-formed`
+(`admissibility`) for the two `structural-check` cases,
+`anonymous-sibling-redefinition-target` (`posterior-state`) for the two
+`-resolution` cases. Every intent in the ledger is now established by
+every TestCase realizing it.
+
+The trade is deliberate and worth stating plainly. What it buys: each
+intent asks exactly one question and every method under it can answer it,
+so there is no "this verdict doesn't settle the question" caveat to read
+past. What it costs: nothing in the ledger now links
+`redefinition-ambiguity-2`'s `passed` to
+`redefinition-ambiguity-2-resolution`'s `failed` over the same fixture; a
+reader of the weak verdict is no longer pointed at the strong one.
+
+That cost is smaller than it first looks, because the cross-reference was
+the *aid*, not the fix. The actual defect was a description asserting a
+resolution fact under a method that checks an exit code; rewording it
+("must be accepted as well-formed") is what makes the weak `passed`
+honest on its own terms. The grouping only ever made it additionally
+legible. A future `svt:TestIntent`-to-`svt:TestIntent` relation could
+restore the link without collapsing the questions again — deliberately not
+added now, since nothing needs it yet.
+
+One consequence to keep in view: no TestCase in the ledger currently
+exercises the "establishes admissibility only" rendering path. It is still
+enforced by `IntentMethodAlignmentShape` and covered by
+`tests/shacl/counterexamples/intent_posterior_state_only_structural_checks.ttl`,
+but it no longer has live data behind it.
+
+`svt:question` must end in `?`, SHACL-enforced. Not a formatting rule: an
+interrogative has no grammatical room to narrate an outcome, so the tell
+that `svt:Validation` was introduced for ("...not to each other") is
+structurally unavailable in this field.
+
+The two descriptions were corrected via `svt testcase set-description` to
+claim only admissibility, which is all their method adjudicates; the
+resolution claim already lived on the `-resolution` siblings. Neither had
+a `Validation` record, so no human's confirmation was invalidated.
+
+**Flag for Z, not resolved here:** the three TestCases validated before
+this change (`membership-visibility-private-rejected`,
+`state-machine-transitions-on-event`,
+`redefinition-ambiguity-2-resolution`) now carry an
+`svt:realizesIntent` assertion their `Validation` predates and does not
+cover. Attaching an intent is ordinary construction, the same as
+`svt:description` always was — but re-running `svt testcase validate` on
+those three, once the intents have been read, is the thing that would
+make the record whole, and that is Z's to run, not an agent's.
+
+## Re-running the worked examples found a third bug — in the harness, not the tools
+
+Re-executing every recorded `TestRun` after the `svt:TestIntent` change
+(to confirm the TBox work had not disturbed any recorded evidence) turned
+up a defect in this repo's own rig, of exactly the kind it exists to catch.
+
+With `SYSML_LIBRARY_DIR` unset, the Pilot Implementation loads **no
+standard library** — and does not fail. It reports `Couldn't resolve
+reference to Namespace 'ScalarValues'` and a cascade of consequent errors,
+then returns a verdict anyway. Four of the seven Pilot rows flipped
+(`clean` → `violated`, resolved targets → `UNRESOLVED:not-found`), which
+is loud enough to notice. The dangerous three were the ones that still
+said **`passed`**: `membership-visibility-private-rejected` expects
+`violated`, and a model that resolves nothing is trivially `violated`, so
+it passed for entirely the wrong reason — one error in the recorded run,
+three in the broken one, same verdict. A verdict that is right by accident
+is indistinguishable, in the ledger, from one that is right on purpose.
+
+`README`'s setup table documented the variable all along. That did not
+help, because the environment was reconstructed from the adapter's code
+rather than the README — which is exactly what an agent in a fresh clone
+will do. Documentation was never the missing piece; enforcement was.
+
+`adapters/sysml_toolkit.py`'s `_lib_dir()` already had the right shape (a
+hard `RuntimeError` when `SYSMLV2_LIB_DIR` is unset — a config error must
+crash, not become ledger evidence). The Pilot adapter simply never grew
+the equivalent. Both now validate, and both now also reject a path that is
+set but is not a directory, since a typo fails exactly as silently as an
+omission. The error is deliberately **not** `UnsupportedMethod`: `svt run`
+catches that and records `earl:inapplicable`, which would turn a broken
+machine into a permanent, honest-looking ledger fact.
+`tests/unit/test_adapter_env_guards.py` pins all of this, including that
+the guard is not an `UnsupportedMethod` — the regression that would
+quietly undo it.
+
+Also corrected here: `docs/workflow.md` claimed **two** of the seven steps
+were human-gated (3 and 7) and that "an agent may perform every other
+step," contradicting its own step 6 eleven lines later, AGENTS.md, and the
+`NOT_A_HUMAN` denylist the code actually applies to `svt testrun annotate`.
+As written it told an agent it could run a command the CLI refuses.
+
+The re-run itself came back clean: all 27 recorded `TestRun`s reproduce
+their exact `outcome` and `actual` under the updated TBox, and no new
+`TestRun` was appended — nothing the comparator reads (`svt:method`,
+`svt:expected`, `svt:checksResolution`, the fixture bytes) was touched by
+the intent work, so duplicating the records would have added noise, not
+evidence.
+
 ## Why `expected` can still be unset
 
 `svt:expected` is only ever set once it's actually grounded. A test case

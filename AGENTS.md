@@ -70,6 +70,23 @@ just there:
   either on its own behalf. See `docs/walkthrough.md` for a worked
   example of exactly that boundary being tested and held.
 
+**`svt:intent` is the question; `svt:description` is the requirement.**
+Every `TestCase` names exactly one `svt:TestIntent` (`--intent`), whose
+`svt:question` must be an actual question — the trailing `?` is
+SHACL-enforced, because an interrogative has no grammatical room to
+narrate an outcome. Its `svt:concerns` (`admissibility` |
+`posterior-state`) is what makes the question checkable against the
+chosen `svt:method`: a `posterior-state` intent realized only by
+`structural-check` test cases is refused at the gate, since nothing in
+that family could answer it. Test cases share one intent when they
+genuinely ask the same question — the zero-event and one-event halves of
+a state-machine question, say — and get separate intents when the
+questions differ, even over the same fixture: "is this model accepted"
+and "does this reference resolve correctly" are two questions, not one
+asked two ways. `svt view --intent <slug>` renders each family under its
+question. This existed as prose in this file and nowhere in the data
+until a real defect showed up in the ledger; see `docs/design-notes.md`.
+
 **`svt:description` is a requirement statement, not commentary.** Write
 it the way the spec states the requirement — it should read identically
 whether written before or after anything has ever been run against it.

@@ -6,10 +6,12 @@ TestCase) — for a real, worked example following these exact steps, see
 `docs/walkthrough.md`. For *why* each governance boundary exists, see
 `AGENTS.md`; this document is the *how*.
 
-Two of the seven steps are governance-gated to a human, never an agent
-(step 3 and step 7) — see AGENTS.md's "Construction vs. validation: the
-LLM's role is bounded." An
-agent may perform every other step.
+Three of the seven steps are governance-gated to a human, never an agent
+(steps 3, 6 and 7) — see AGENTS.md's "Construction vs. validation: the
+LLM's role is bounded." All three are enforced by the same `NOT_A_HUMAN`
+denylist on `--by`; step 6 (`svt testrun annotate`) is gated exactly as
+steps 3 and 7 are, as this document's own step 6 says below. An agent may
+perform every other step.
 
 ## 1. Construct
 
@@ -24,7 +26,11 @@ uv run svt document add --id <doc-slug> --doc-number "..." --title "..." \
 uv run svt citation add --id <slug> --document <doc-slug> \
   --section "..." --page "..." --quote "..." [--rationale "..."]
 
+uv run svt intent add --id <intent-slug> --question "...?" \
+  --concerns <admissibility|posterior-state>   # reuse an existing one when it fits
+
 uv run svt testcase add --id <slug> --description "..." \
+  --intent <intent-slug> \
   --input-file <path>... --method <method> --expected <value> \
   --grounds <citation-id>
 ```
@@ -33,6 +39,16 @@ Write `--description` as the requirement the spec states, in the same
 tense/voice whether written before or after anything has run — never as
 commentary on an outcome (see AGENTS.md). `--expected`/`--resolves` with
 no `--grounds` is SHACL-rejected outright.
+
+`--intent` names the question this test case bears on, stated once and
+shared by every test case that bears on it — so reuse an existing intent
+rather than minting a near-duplicate. `--question` must be an actual
+question (the trailing `?` is SHACL-enforced), and `--concerns` says which
+half of the transition it asks about: `admissibility` (is `u` in `U_x`) or
+`posterior-state` (a fact about the actual `x+`). A `posterior-state`
+intent whose test cases are all `structural-check` is SHACL-rejected —
+that combination is a question nothing in the ledger can answer, and it is
+the exact defect this element was added to make unrecordable.
 
 Before this ever touches the ledger, check the claim ad hoc against at
 least one real implementation (outside the ledger — a subprocess/Python
@@ -65,11 +81,27 @@ other than the actual human directing the work, even when explicitly
 asked to (see AGENTS.md, and `docs/walkthrough.md` for how that
 exchange actually went).
 
+Validating covers the whole claim, which now includes the question:
+read `svt view --testcase <slug>` and check the `intent` line against
+the `description` and `method` below it. The shapes guarantee only that
+*some* test case under that intent could answer it — whether *this*
+one's description is really an answer to *that* question is the
+judgment no gate can make for you. A description that says more than
+its method can check is the specific failure this is looking for.
+
 ## 4. Trigger the run
 
 ```bash
 uv run svt run --testcase <slug> --implementation <slug> --version <commit>
 ```
+
+Set that implementation's environment first — see README's setup table,
+not an adapter's source. A missing standard library (`SYSML_LIBRARY_DIR`
+for the Pilot, `SYSMLV2_LIB_DIR` for sysml-toolkit) does not make these
+tools fail loudly; they resolve nothing and still return a verdict, which
+can coincidentally match `expected` and be recorded as `passed` for the
+wrong reason. Both adapters now raise rather than let that happen — treat
+such an error as a real stop, not an obstacle to route around.
 
 Pipes the TestCase's fixture files into that implementation's own tool,
 captures raw stdout/stderr/exit code verbatim, compares against

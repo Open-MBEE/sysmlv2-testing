@@ -23,6 +23,9 @@ _Scope: testcase `redefinition-ambiguity-2-resolution`, implementation `sysml-to
 
 Each anonymous ':>> items' redefinition under part c must resolve, by real object identity, to the inherited base feature Container::items.
 
+- **intent**: Do several anonymous ':>> items' redefinitions of the same multi-valued reference feature each resolve to the inherited base feature, regardless of how many siblings there are? (`anonymous-sibling-redefinition-target`, concerns: posterior-state)
+  - this method establishes the intent's `posterior-state` question directly.
+  - also realized by: `redefinition-ambiguity-2`, `redefinition-ambiguity-3plus`, `redefinition-ambiguity-3plus-resolution`
 - **method**: `reference-resolution`
 - **expected posterior state** (resolution facts):
   - `UsageTwo::c::@0` must resolve to `Lib::Container::items`

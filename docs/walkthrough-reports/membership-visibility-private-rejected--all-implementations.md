@@ -23,6 +23,8 @@ _Scope: testcase `membership-visibility-private-rejected` only._
 
 A part usage typed by a private part definition, referenced by qualified name from outside the definition's owning package, must be rejected -- the private member is not visible outside its owning namespace.
 
+- **intent**: Must a model that references a private member from outside its owning namespace be rejected? (`private-membership-not-visible-outside-namespace`, concerns: admissibility)
+  - this method establishes the intent's `admissibility` question directly.
 - **method**: `structural-check`
 - **expected**: `violated`
 
