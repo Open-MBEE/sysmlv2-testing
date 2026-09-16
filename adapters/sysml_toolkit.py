@@ -29,6 +29,12 @@ def _lib_dir() -> str:
             "library directory (e.g. a SysML-v2-Release checkout's "
             "sysml.library/)"
         )
+    if not os.path.isdir(lib_dir):
+        raise RuntimeError(
+            f"SYSMLV2_LIB_DIR={lib_dir!r} is not a directory -- a wrong path "
+            "is as dangerous as an unset one: the tool resolves no standard "
+            "library and still returns a verdict"
+        )
     return lib_dir
 
 

@@ -31,6 +31,40 @@ def _classpath() -> str:
     return classpath
 
 
+def _library_dir() -> str:
+    """SYSML_LIBRARY_DIR, validated before any glue process is started.
+
+    Without it the Pilot silently loads no standard library and still
+    returns a verdict: every input importing ScalarValues/Parts/etc fails
+    to resolve, so a model that should check clean reports `violated`, and
+    -- worse -- a model that *should* be rejected still reports `violated`,
+    for entirely the wrong reason. That is a plausible-looking but false
+    verdict entering the ledger as evidence, which is the one thing this
+    repo exists to prevent.
+
+    RuntimeError, deliberately, not UnsupportedMethod: `svt run` catches
+    UnsupportedMethod and records earl:inapplicable, and a misconfigured
+    environment must never become a ledger fact. Same reasoning, and same
+    shape, as sysml_toolkit._lib_dir().
+    """
+    lib_dir = os.environ.get("SYSML_LIBRARY_DIR")
+    if not lib_dir:
+        raise RuntimeError(
+            "SYSML_LIBRARY_DIR must be set to a sysml.library directory (the "
+            "Pilot repo's own sysml.library/, or an equivalent OMG standard "
+            "library checkout) -- without it the Pilot resolves no standard "
+            "library and produces confident, wrong verdicts. See README's "
+            "setup table."
+        )
+    if not os.path.isdir(lib_dir):
+        raise RuntimeError(
+            f"SYSML_LIBRARY_DIR={lib_dir!r} is not a directory -- a wrong path "
+            "fails exactly as silently as an unset one (the Pilot logs and "
+            "carries on with no standard library loaded)"
+        )
+    return lib_dir
+
+
 class PilotAdapter(Adapter):
     slug = "pilot-implementation"
 
@@ -47,6 +81,7 @@ class PilotAdapter(Adapter):
         )
 
     def _structural_check(self, spec: TestCaseSpec) -> RawResult:
+        _library_dir()  # fail before the subprocess, not after a false verdict
         cmd = ["java", "-cp", _classpath(), "svt.Main", *[str(p) for p in spec.input_files]]
         proc = subprocess.run(cmd, capture_output=True, text=True)
         return RawResult(
@@ -60,6 +95,7 @@ class PilotAdapter(Adapter):
         subject locators ("Container::@i") by their container and issue
         one glue invocation per distinct container."""
         classpath = _classpath()
+        _library_dir()  # fail before the subprocess, not after a false verdict
         containers = sorted({c.subject_feature.rsplit("::@", 1)[0] for c in spec.resolution_checks})
         facts: dict[str, str] = {}
         command = ""
