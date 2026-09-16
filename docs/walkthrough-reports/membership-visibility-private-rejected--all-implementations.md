@@ -19,7 +19,7 @@ _Scope: testcase `membership-visibility-private-rejected` only._
 
 ## membership-visibility-private-rejected
 
-**VALIDATION: confirmed by** Zargham (2026-09-13T02:00:39+00:00)
+**VALIDATION: confirmed by** Zargham (2026-09-13T02:00:39+00:00); Zargham (2026-09-16T00:28:32+00:00)
 
 A part usage typed by a private part definition, referenced by qualified name from outside the definition's owning package, must be rejected -- the private member is not visible outside its owning namespace.
 

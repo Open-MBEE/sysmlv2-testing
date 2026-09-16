@@ -22,15 +22,6 @@ error <content>:22:9-22:16: Redefining feature must be an end feature
 warning <content>:22:9-22:15: Duplicate of inherited member name 'target' from BinaryConnection""" ;
     svt:stdout "" .
 
-svtid:invocation-0b1e2a6e11a706ea
-    a svt:Invocation ;
-    prov:startedAtTime "2026-09-13T00:20:59+00:00"^^xsd:dateTime ;
-    svt:command "Model.execute_state('StateDemo::Surface::condition', events=['EngagementEvent'])" ;
-    svt:exitCode "0"^^xsd:integer ;
-    svt:inputDigest "a42791bd6ee2f43cb1ef27ea1dd8197ff401212039cde225961d6167bd0e4d0a" ;
-    svt:stderr "" ;
-    svt:stdout "dormant,active" .
-
 svtid:invocation-124b82f1c1237e0b
     a svt:Invocation ;
     prov:startedAtTime "2026-09-13T00:20:59+00:00"^^xsd:dateTime ;
@@ -118,12 +109,6 @@ svtid:result-028809c427cb28e0
     earl:outcome earl:passed ;
     svt:actual "violated" .
 
-svtid:result-0b1e2a6e11a706ea
-    a earl:TestResult ;
-    earl:info "expected='dormant,active' actual='dormant,active'" ;
-    earl:outcome earl:passed ;
-    svt:actual "dormant,active" .
-
 svtid:result-124b82f1c1237e0b
     a earl:TestResult ;
     earl:info "expected='dormant' actual='dormant'" ;
@@ -185,16 +170,6 @@ svtid:run-028809c427cb28e0
     earl:test svtid:testcase-end-feature-redefinition-bare ;
     prov:startedAtTime "2026-09-12T21:18:41+00:00"^^xsd:dateTime ;
     svt:hasInvocation svtid:invocation-028809c427cb28e0 .
-
-svtid:run-0b1e2a6e11a706ea
-    a svt:TestRun ;
-    earl:assertedBy svtid:agent-svt-cli ;
-    earl:mode earl:automatic ;
-    earl:result svtid:result-0b1e2a6e11a706ea ;
-    earl:subject svtid:version-f69111dc2adf2203 ;
-    earl:test svtid:testcase-state-machine-transitions-on-event ;
-    prov:startedAtTime "2026-09-13T00:20:59+00:00"^^xsd:dateTime ;
-    svt:hasInvocation svtid:invocation-0b1e2a6e11a706ea .
 
 svtid:run-124b82f1c1237e0b
     a svt:TestRun ;

@@ -19,7 +19,7 @@ _Scope: testcase `redefinition-ambiguity-2-resolution` only._
 
 ## redefinition-ambiguity-2-resolution
 
-**VALIDATION: confirmed by** Zargham (2026-09-13T02:49:00+00:00)
+**VALIDATION: confirmed by** Zargham (2026-09-16T00:28:33+00:00); Zargham (2026-09-13T02:49:00+00:00)
 
 Each anonymous ':>> items' redefinition under part c must resolve, by real object identity, to the inherited base feature Container::items.
 
