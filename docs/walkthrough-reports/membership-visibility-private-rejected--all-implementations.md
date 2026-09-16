@@ -68,6 +68,7 @@ package Usage {
 - **command**: `Connection.load_from_content(<input files>, strict=False)`
 - **exit code**: `1`
 - **input digest**: `sha256:de9f631acd37024ea472b26f505839b98e889c27830b7dd738cb60aa56c5e4b2`
+- **tool**: _not recorded — this run predates tool fingerprinting_
 - **started at**: 2026-09-13T02:35:13+00:00
 
 stdout:
@@ -90,6 +91,7 @@ error <content>:6:14-6:25: unresolved reference: Lib::Widget
 - **command**: `java -cp .cache/pilot/692170b71867353b8f90341e61556f49a5beb0e5/interactive-all.jar:.cache/pilot/692170b71867353b8f90341e61556f49a5beb0e5/classes svt.Main /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/membership-visibility-private-rejected/private-visibility.sysml`
 - **exit code**: `1`
 - **input digest**: `sha256:de9f631acd37024ea472b26f505839b98e889c27830b7dd738cb60aa56c5e4b2`
+- **tool**: _not recorded — this run predates tool fingerprinting_
 - **started at**: 2026-09-13T02:01:05+00:00
 
 stdout:
@@ -119,6 +121,7 @@ log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more in
 - **command**: `/Users/z/Documents/GitHub/sysml-toolkit/target/release/sysmlv2 check --lib /Users/z/Documents/GitHub/sysml-toolkit/spec-refs/SysML-v2-Release/sysml.library --strict /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/membership-visibility-private-rejected/private-visibility.sysml`
 - **exit code**: `1`
 - **input digest**: `sha256:de9f631acd37024ea472b26f505839b98e889c27830b7dd738cb60aa56c5e4b2`
+- **tool**: _not recorded — this run predates tool fingerprinting_
 - **started at**: 2026-09-13T04:36:12+00:00
 
 stdout:
@@ -148,6 +151,8 @@ warning: unresolved reference `Lib::Widget`
 - **command**: `/Users/z/Documents/GitHub/sysmlv2-testing/.cache/sysml-toolkit/v0.6.0/sysmlv2-0.6.0-aarch64-apple-darwin/sysmlv2 check --lib /Users/z/Documents/GitHub/sysml-toolkit/spec-refs/SysML-v2-Release/sysml.library --strict /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/membership-visibility-private-rejected/private-visibility.sysml`
 - **exit code**: `1`
 - **input digest**: `sha256:de9f631acd37024ea472b26f505839b98e889c27830b7dd738cb60aa56c5e4b2`
+- **tool version**: `sysmlv2 0.6.0`
+- **tool digest**: `sha256:32dcc65375614975fde29b86f12745015d2b691768a00f14f22987ad4ff768b4`
 - **started at**: 2026-09-16T03:56:46+00:00
 
 stdout:

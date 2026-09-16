@@ -7,12 +7,17 @@
 
 # sysmlv2-testing core vocabulary.
 #
-# Four classes, every one a subclass of a W3C EARL or PROV-O class — this
+# Every class here is a subclass of a W3C EARL or PROV-O class — this
 # vocabulary never redefines what EARL/PROV-O already mean, it only adds the
-# SysML-v2-testing-specific properties those classes carry. See AGENTS.md
-# for the pipeline these four classes support: run a pinned tool against a
-# TestCase's input, capture raw output, compare it to an expected literal
-# with a scripted comparator, log the result as a TestRun.
+# SysML-v2-testing-specific properties those classes carry. That rule is
+# enforced by tests/unit/test_prov_consistency.py, not just stated: it was
+# stated here for a long time while svt:ResolutionCheck quietly had no
+# superclass at all. (No count is given deliberately — this file has grown
+# from four classes to several times that, and a number in a comment only
+# ever goes stale.) See AGENTS.md for the pipeline they support: run a
+# pinned tool against a TestCase's input, capture raw output, compare it to
+# an expected literal with a scripted comparator, log the result as a
+# TestRun.
 
 <https://w3id.org/sysmlv2-testing#> a owl:Ontology ;
     rdfs:label "sysmlv2-testing core vocabulary" ;
@@ -202,6 +207,7 @@ svt:checksResolution a owl:ObjectProperty ;
     rdfs:comment "For method=reference-resolution: the set of resolution facts x+ must satisfy (multivalued -- a test case may need to check several redefinitions at once)." .
 
 svt:ResolutionCheck a owl:Class ;
+    rdfs:subClassOf prov:Entity ;
     rdfs:label "Resolution check" ;
     rdfs:comment "One fact about x+: the feature named svt:subjectFeature must resolve (via redefinition/specialization) to the feature named svt:expectedTarget. Checked by real per-implementation object identity, never by diagnostics alone -- see AGENTS.md." .
 

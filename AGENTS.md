@@ -85,7 +85,7 @@ TestRuns of one TestCase against one Version that agree on outcome,
 `svt:actual` and input bytes are a SHACL violation; the ledger carried
 such a pair until it was removed by hand, and nothing had stopped it.
 
-**`svt:intent` is the question; `svt:description` is the requirement.**
+**`svt:TestIntent` is the question; `svt:description` is the requirement.**
 Every `TestCase` names exactly one `svt:TestIntent` (`--intent`), whose
 `svt:question` must be an actual question — the trailing `?` is
 SHACL-enforced, because an interrogative has no grammatical room to
@@ -118,9 +118,9 @@ tool's behavior the citation settles — that is rationale's actual job.
 | Tier | Paths | Rule |
 |---|---|---|
 | Vocabulary | `vocabulary/`, `shapes/` | Hand-edited. Every class must be `rdfs:subClassOf` an EARL or PROV-O class — extend by subclassing, never redefine. Adding a property is fine; changing what an existing one means is not (it's load-bearing for every past `TestRun`). |
-| Ledger | `ledger/*.ttl`, `ledger/runs/*.ttl` | **Never hand-edit.** Written only by `svt` commands. If a file doesn't match what `svt` would produce from its own triples, something is wrong — regenerate, don't patch. |
+| Ledger | `ledger/*.ttl` (`implementations.ttl`, `parties.ttl`, `testcases.ttl`), `ledger/runs/*.ttl` | **Never hand-edit.** Written only by `svt` commands — `parties.ttl` by `svt party add`, the rest as the workflow describes. If a file doesn't match what `svt` would produce from its own triples, something is wrong — regenerate, don't patch. |
 | Fixtures | `ledger/fixtures/<testcase-id>/` | Written by `svt testcase add` (it copies the files you pass it). Don't edit a fixture after a `TestRun` cites it — add a new `TestCase` instead; a `TestRun`'s evidentiary value depends on the input it actually saw. |
-| Sources | `sources/sources.ttl` (committed), `sources/local/` (gitignored) | The two OMG spec PDFs are copyrighted and held locally only. `sources.ttl`'s sha256 entries are how anyone confirms their own copy is the same edition — keep them in sync if a PDF is replaced. |
+| Sources | `sources/sources.ttl` (committed), `sources/local/` (gitignored) | The OMG spec PDFs are copyrighted and held locally only. `sources.ttl`'s sha256 entries are how anyone confirms their own copy is the same edition — keep them in sync if a PDF is replaced. |
 | Adapters/toolchain | `adapters/`, `toolchain/` | Plain code. A new implementation gets a new adapter module implementing `adapters.base.Adapter`; it should raise `UnsupportedMethod` honestly rather than fake a result for a method it can't perform. |
 
 ## Adding a test case

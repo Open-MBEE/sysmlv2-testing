@@ -9,9 +9,10 @@ from pathlib import Path
 
 from owlrl import OWLRL_Semantics, DeductiveClosure
 from rdflib import RDF, Graph
-from rdflib.namespace import OWL
+from rdflib.namespace import OWL, RDFS
 
 from sysmlv2_testing.graph import load_full_ledger, load_vocabulary
+from sysmlv2_testing.namespaces import EARL, PROV
 
 VENDOR_DIR = Path(__file__).parent.parent / "vendor"
 
@@ -24,6 +25,29 @@ def _closed_graph() -> Graph:
     g += load_full_ledger()
     DeductiveClosure(OWLRL_Semantics).expand(g)
     return g
+
+
+def test_every_svt_class_subclasses_an_earl_or_prov_class():
+    """AGENTS.md's Vocabulary tier: "Every class must be rdfs:subClassOf an
+    EARL or PROV-O class — extend by subclassing, never redefine."
+
+    This file's own docstring asserted that rule for a long time while
+    nothing checked it, and svt:ResolutionCheck sat with no superclass at
+    all from the day reference-resolution was added. Stating a rule in a
+    docstring is not enforcing it.
+    """
+    vocab = load_vocabulary()
+    orphans = [
+        str(c).rsplit("#", 1)[-1]
+        for c in sorted(vocab.subjects(RDF.type, OWL.Class), key=str)
+        if not any(
+            str(p).startswith((str(PROV), str(EARL)))
+            for p in vocab.objects(c, RDFS.subClassOf)
+        )
+    ]
+    assert not orphans, (
+        "svt class(es) with no EARL/PROV-O superclass: " + ", ".join(orphans)
+    )
 
 
 def test_no_instance_is_asserted_into_two_disjoint_prov_classes():

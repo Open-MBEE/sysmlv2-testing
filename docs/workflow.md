@@ -40,6 +40,13 @@ tense/voice whether written before or after anything has run — never as
 commentary on an outcome (see AGENTS.md). `--expected`/`--resolves` with
 no `--grounds` is SHACL-rejected outright.
 
+Every one of these has a correction path, so a mistake is never a reason
+to hand-edit or re-add: `svt testcase set-description` / `set-expected` /
+`set-intent` / `ground`, `svt intent set-question`, `svt citation
+set-quote` / `set-page` / `set-rationale`, `svt version
+add-artifact-digest` / `set-stable`. If you need one that doesn't exist,
+add it rather than work around it.
+
 `--intent` names the question this test case bears on, stated once and
 shared by every test case that bears on it — so reuse an existing intent
 rather than minting a near-duplicate. `--question` must be an actual
@@ -110,7 +117,9 @@ machine this is. Re-running an already-recorded test does **not** create a
 second TestRun: the same party getting the same answer from the same input
 bytes adds a `svt:reconfirmedAt` timestamp, a different party gets a
 `svt:Reproduction`, and only a *differing* answer is a new TestRun — with
-a warning naming the run it contradicts. So re-running is safe and
+a warning naming the run it contradicts. An *unattributed* re-run that
+would land in the reproduction case is refused: independent confirmation
+has to say whose, so register a party and pass `--as`. So re-running is safe and
 worthwhile; it is how a result stops being one machine's observation.
 
 Set that implementation's environment first — see README's setup table,
@@ -124,11 +133,12 @@ such an error as a real stop, not an obstacle to route around.
 Pipes the TestCase's fixture files into that implementation's own tool,
 captures raw stdout/stderr/exit code verbatim, compares against
 `expected` with a scripted comparator (`adapters/compare.py`), and logs
-a `TestRun`. No LLM anywhere in this path. Repeat for every
+the result — as a `TestRun`, a `svt:Reproduction`, or a
+`svt:reconfirmedAt` timestamp, per the three cases above. No LLM anywhere in this path. Repeat for every
 `(testcase, implementation, version)` combination you care about — that
 is the whole point of a differential ledger.
 
-## 5. Report — two kinds
+## 5. Report — by test case, implementation, or intent
 
 `svt view` compiles a deterministic Markdown report (one SPARQL query +
 the fixture files) under `reports/` (gitignored, ephemeral — fully
@@ -159,10 +169,13 @@ snapshot. `--implementation <slug>` alone, without `--testcase`, is a
 third combination `svt view` accepts: every TestCase's runs, filtered
 to just that one implementation — useful for "what has this
 implementation actually been tried against so far," across the whole
-ledger rather than one TestCase at a time.)
+ledger rather than one TestCase at a time. `--intent <slug>` is a
+fourth: every TestCase bearing on one question, rendered under it, which
+is how a weak verdict and the method that actually settles the same
+question are read together rather than apart.)
 
 A third, coarser command, `svt report [--implementation <slug>]
-[--stable-only]`, is neither of these two kinds — it's a quick tally
+[--stable-only]`, is none of these — it's a quick tally
 (counts of `passed`/`failed`/`cantTell`/`inapplicable`/`untested` across
 the whole ledger), useful as a dashboard-free sanity check, not a
 substitute for reading an actual `svt view` report before trusting a

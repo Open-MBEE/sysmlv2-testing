@@ -160,3 +160,43 @@ def test_report_kind_1_is_deterministic():
     once = render_report("redefinition-ambiguity-3plus", "sysml-toolkit")
     twice = render_report("redefinition-ambiguity-3plus", "sysml-toolkit")
     assert once == twice
+
+
+def test_report_shows_the_intent_not_just_the_description():
+    """The question a test case bears on, and whether its method can settle
+    it -- the whole point of svt:TestIntent is that a reader of a verdict
+    can see what was being asked."""
+    report = render_report("redefinition-ambiguity-2")
+    assert "- **intent**:" in report
+    assert "concerns: admissibility" in report
+    # and the sibling test cases under the same question
+    assert "also realized by" in report
+
+
+def test_report_shows_which_tool_actually_ran():
+    """Recording svt:toolDigest and never rendering it would be half a
+    feature: the ledger would hold the provenance and no human could see
+    it. The input digest says what went in, not what ran."""
+    report = render_report("membership-visibility-private-rejected")
+    assert "- **tool version**: `sysmlv2 0.6.0`" in report
+    assert "- **tool digest**: `sha256:32dcc653" in report
+    # runs predating fingerprinting say so rather than silently omitting it
+    assert "predates tool fingerprinting" in report
+
+
+def test_report_shows_reproductions_and_reconfirmations():
+    """A verdict that has held on another machine carries more weight than
+    one that has not, so confirmations render above the raw evidence."""
+    report = render_report("state-machine-transitions-on-event")
+    assert "**reproduced** by" in report
+    assert "independently, same result" in report
+    assert "**reconfirmed** by the same party" in report
+
+
+def test_intent_filter_renders_the_family_under_its_question():
+    report = render_report(intent_id="anonymous-sibling-redefinition-target")
+    assert "**Question:**" in report
+    # both -resolution cases, and not the admissibility-intent siblings
+    assert "redefinition-ambiguity-2-resolution" in report
+    assert "redefinition-ambiguity-3plus-resolution" in report
+    assert "## redefinition-ambiguity-2\n" not in report

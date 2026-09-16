@@ -336,7 +336,8 @@ input digest really do equal the run it names. "Reproduced" is a verified
 fact here, not a word someone wrote next to a run.
 `ReproductionDistinctPartyShape` enforces the same-party/different-party
 split, and `TestRunNoRedundantDuplicateShape` makes the state that was
-cleaned up by hand unrecordable — while still permitting a *differing*
+cleaned up by hand unrecordable (all three in
+`shapes/reproduction.shapes.ttl`) — while still permitting a *differing*
 result, which must stay recordable because it is a real finding.
 
 Two things fell out of this that are worth noting:
@@ -390,19 +391,21 @@ refuse to record a contradiction. Every `svt:Invocation` now carries
 `svt:toolVersion` and `svt:toolDigest` — what the tool said it was, and the
 sha256 of the binary that actually answered. When the target Version pins an
 `svt:artifactDigest` and the running tool's digest differs, `svt run`
-refuses and writes nothing. Where no digest is pinned it records what ran
-and prints the `svt version add-artifact-digest` command, so nothing
-existing breaks.
+refuses and writes nothing. It also refuses when no digest is pinned at
+all and the artifact is determinable — see "the harness no longer lets this
+happen again" below, which tightened this from the merely-warn behaviour
+this paragraph originally described.
 
 **The digest is the load-bearing half, and this is not theoretical.**
-sysml-toolkit's release asset (`32dcc653…`) and the local dev build every
-recorded run actually used (`87da32db…`) are built from byte-identical
+sysml-toolkit's release asset (`32dcc653…`) and the local dev build that
+every sysml-toolkit run recorded up to this point had used (`87da32db…`)
+are built from byte-identical
 source — `git diff 3a13c64a HEAD` is empty — and *both report `sysmlv2
 0.6.0`*. The self-reported version cannot tell them apart. Only the digest
 can, and it does: pointing `SYSMLV2_BIN` at the dev build now fails with
 both hashes printed.
 
-All four Versions are pinned. sysml-toolkit is pinned to the **release
+Every Version is pinned. sysml-toolkit is pinned to the **release
 asset**, not the dev build, because a digest nobody else can obtain pins
 nothing — verified first that the release asset reproduces every recorded
 sysml-toolkit outcome, so this is a build-provenance change and not a

@@ -25,7 +25,9 @@ setup table is the source of truth**; read it rather than inferring the
 list from an adapter's code, which is how this was got wrong once already.
 As of now: `SYSMLV2_BIN`/`SYSMLV2_LIB_DIR` (sysml-toolkit),
 `PILOT_GLUE_CLASSPATH`/`SYSML_LIBRARY_DIR` plus a JDK 21 on `PATH`
-(Pilot), `OPENSYSML_VERSION` (OpenSysML, optional).
+(Pilot), `OPENSYSML_VERSION` or `OPENSYSML_GRPC_VERSION` (OpenSysML,
+optional — the second is the client's own variable, honoured as a
+fallback).
 
 Why this matters more than ordinary setup friction: a missing standard
 library does **not** make these tools fail loudly. The Pilot with no
@@ -153,5 +155,6 @@ records exactly that exchange happening once, for real.
   claims; only a human `Validation` record makes the latter one.
 
 A ledger explorer/browser is out of scope for now — `svt view` (see
-`docs/workflow.md` for its two report kinds) is the read path; prefer it
+`docs/workflow.md` for its filters: by test case, implementation, or
+intent) is the read path; prefer it
 over reading the `.ttl` files directly.

@@ -91,10 +91,24 @@ def _run_section(row, ledger) -> str:
     if row.info is not None:
         lines.append(f"- **info**: {row.info}")
     lines += _annotation_and_issue_lines(row.run, ledger)
+    # Which tool actually answered. Read off the Invocation rather than
+    # joined into the query, like the other per-record reads here. Without
+    # this the ledger records the provenance and no reader can see it --
+    # and the input digest alone tells you what went in, not what ran.
+    tool_version = ledger.value(row.invocation, SVT.toolVersion)
+    tool_digest = ledger.value(row.invocation, SVT.toolDigest)
     lines += [
         f"- **command**: `{row.command}`",
         f"- **exit code**: `{row.exitCode}`",
         f"- **input digest**: `sha256:{row.inputDigest}`",
+    ]
+    if tool_version is not None:
+        lines.append(f"- **tool version**: `{tool_version}`")
+    if tool_digest is not None:
+        lines.append(f"- **tool digest**: `sha256:{tool_digest}`")
+    elif tool_version is None:
+        lines.append("- **tool**: _not recorded — this run predates tool fingerprinting_")
+    lines += [
         f"- **started at**: {row.startedAtTime}",
         "",
         "stdout:",

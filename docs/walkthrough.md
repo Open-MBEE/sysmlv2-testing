@@ -89,6 +89,10 @@ uv run svt testcase add --id membership-visibility-private-rejected \
   --grounds membership-visibility-private
 ```
 
+> Transcript, not a template: this predates `svt:TestIntent`, and a
+> `testcase add` without `--intent <intent-slug>` is refused today. See
+> `docs/workflow.md` step 1 for the current form.
+
 Before committing this to the ledger, the claim was checked ad hoc --
 outside the ledger, a plain subprocess call, not `svt run` (see
 `docs/workflow.md`'s step 1) -- against the Pilot Implementation
@@ -325,7 +329,17 @@ https://w3id.org/sysmlv2-testing/id/validation-ba4d619d960026bd
 |---|---|---|---|
 | pilot-implementation | `692170b7...` | passed | resolves correctly to `Lib::Container::items` |
 | opensysml | `2b6c1cf6...` | inapplicable | honestly can't check this (confirmed two independent ways, not a client-wrapping gap -- see `docs/design-notes.md`) |
-| sysml-toolkit | `3a13c64a...` (**v0.6.0**) | **failed** | cross-wired: `@0`→`@2`, `@1`→`@1`, instead of the base feature |
+| sysml-toolkit | `29d57f43...` (**v0.6.0 source, local build**) | **failed** | cross-wired: `@0`→`@2`, `@1`→`@1`, instead of the base feature |
+| sysml-toolkit | `3a13c64a...` (**v0.6.0 release asset**) | **failed** | identical: the release build cross-wires the same way |
+
+> The sysml-toolkit rows read `3a13c64a` (the v0.6.0 release tag) when this
+> walkthrough was written, because that is the `--version` the run was
+> recorded against. It was not what actually executed: every sysml-toolkit
+> run up to that point used a *local* build, and commit `69f8d2f` moved
+> those runs onto a Version for the build that made them and re-ran the
+> suite against the real release asset. The second row is that re-run. See
+> `docs/design-notes.md`; this is the mislabelling that `svt:toolDigest`
+> now makes unrecordable.
 
 ### Step 5 — Report, both kinds *(done)*
 
@@ -350,6 +364,11 @@ $ uv run svt testrun link-issue \
     --label "sysml-toolkit v0.6.0 (3a13c64a): cross-wires anonymous :>> items redefinitions to each other instead of the base feature"
 https://w3id.org/sysmlv2-testing/id/issuelink-b36078b05596c5c6
 ```
+
+That IssueLink still exists, but the run it concerns now sits under
+`29d57f43...` (see the note in step 4), so re-typing this command verbatim
+would no longer reach it — a transcript of what was typed, not a command to
+copy.
 
 **Why the version is in the label, not just the ledger's structure:**
 every `TestRun` is already pinned to an exact `commitHash` -- that part
@@ -413,10 +432,13 @@ the complete list; not re-duplicated here.
    `ids.mint("run", f"{testcase}|{implementation}|{version}|{ts}")`
    truncates `ts` to the second, so two runs of the identical triple
    within the same second mint the identical IRI and the second write
-   fails the SHACL gate outright. Not fixed (documented only) -- a
-   genuine rerun just needs to be at least a second apart. (`testrun
-   annotate`/`link-issue`'s own mint keys were widened this pass to fold
-   in the comment/URL, narrowing but not eliminating the same class of
+   fails the SHACL gate outright. **Resolved since** (see
+   `docs/design-notes.md`): the mint key now folds in the input digest and
+   the result, and two runs that *agree* no longer mint anything at all —
+   they become a `svt:reconfirmedAt` timestamp or a `svt:Reproduction` — so
+   the collision is gone rather than merely narrowed. (`testrun
+   annotate`/`link-issue`'s own mint keys were widened during this pass to
+   fold in the comment/URL, narrowing but not eliminating the same class of
    collision for *those* two commands.)
 4. **`svt run` (top-level) vs. `svt testrun ...` (sub-app) naming
    asymmetry.** Accepted deliberately -- renaming the existing top-level

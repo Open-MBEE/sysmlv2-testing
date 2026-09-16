@@ -89,6 +89,7 @@ package UsageTwo {
 - **command**: `(unsupported)`
 - **exit code**: `-1`
 - **input digest**: `sha256:dd8e5e69f050f6548c2e6e2e7cb21b17e84b79019c80fd3ffacb29d95c05e35a`
+- **tool**: _not recorded — this run predates tool fingerprinting_
 - **started at**: 2026-09-13T00:19:10+00:00
 
 stdout:
@@ -111,6 +112,7 @@ opensysml has no way to check reference-resolution facts for anonymous features:
 - **command**: `java -cp /Users/z/Documents/GitHub/sysmlv2-testing/.cache/pilot/692170b71867353b8f90341e61556f49a5beb0e5/interactive-all.jar:/Users/z/Documents/GitHub/sysmlv2-testing/.cache/pilot/692170b71867353b8f90341e61556f49a5beb0e5/classes svt.Main --redef UsageTwo::c /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/redefinition-ambiguity-2-resolution/lib.sysml /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/redefinition-ambiguity-2-resolution/usage-two-ok.sysml`
 - **exit code**: `0`
 - **input digest**: `sha256:dd8e5e69f050f6548c2e6e2e7cb21b17e84b79019c80fd3ffacb29d95c05e35a`
+- **tool**: _not recorded — this run predates tool fingerprinting_
 - **started at**: 2026-09-13T00:19:23+00:00
 
 stdout:
@@ -139,6 +141,7 @@ log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more in
 - **command**: `/Users/z/Documents/GitHub/sysml-toolkit/target/release/sysmlv2 convert --lib /Users/z/Documents/GitHub/sysml-toolkit/spec-refs/SysML-v2-Release/sysml.library --to compact-json /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/redefinition-ambiguity-2-resolution/lib.sysml /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/redefinition-ambiguity-2-resolution/usage-two-ok.sysml -o /var/folders/_z/k9fkf53x4q7dm02s4lr__qq00000gn/T/tmpgae1xsfd/model.json`
 - **exit code**: `0`
 - **input digest**: `sha256:dd8e5e69f050f6548c2e6e2e7cb21b17e84b79019c80fd3ffacb29d95c05e35a`
+- **tool**: _not recorded — this run predates tool fingerprinting_
 - **started at**: 2026-09-13T00:19:09+00:00
 
 stdout:
@@ -163,6 +166,8 @@ stderr:
 - **command**: `/Users/z/Documents/GitHub/sysmlv2-testing/.cache/sysml-toolkit/v0.6.0/sysmlv2-0.6.0-aarch64-apple-darwin/sysmlv2 convert --lib /Users/z/Documents/GitHub/sysml-toolkit/spec-refs/SysML-v2-Release/sysml.library --to compact-json /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/redefinition-ambiguity-2-resolution/lib.sysml /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/redefinition-ambiguity-2-resolution/usage-two-ok.sysml -o /var/folders/_z/k9fkf53x4q7dm02s4lr__qq00000gn/T/tmpurq8_cy9/model.json`
 - **exit code**: `0`
 - **input digest**: `sha256:dd8e5e69f050f6548c2e6e2e7cb21b17e84b79019c80fd3ffacb29d95c05e35a`
+- **tool version**: `sysmlv2 0.6.0`
+- **tool digest**: `sha256:32dcc65375614975fde29b86f12745015d2b691768a00f14f22987ad4ff768b4`
 - **started at**: 2026-09-16T03:56:48+00:00
 
 stdout:

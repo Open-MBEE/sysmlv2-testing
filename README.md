@@ -94,7 +94,8 @@ vocabulary/   the T-box: subclasses of EARL/PROV-O only, never redefines them
 shapes/       SHACL shapes gating every write (named, never anonymous)
 sources/      spec document + citation register (sources.ttl); PDFs held in sources/local/, gitignored
 queries/      the SPARQL query behind `svt view`
-ledger/       the data: implementations, test cases, fixtures, runs
+ledger/       the data: implementations + versions, parties (machines that run
+              tests), test cases + the intents they answer, fixtures, runs
 adapters/     one module per implementation + the scripted comparators
 toolchain/    pinned-binary/build scripts for implementations under test
 src/          the svt CLI
