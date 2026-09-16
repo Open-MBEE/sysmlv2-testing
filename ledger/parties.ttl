@@ -1,0 +1,11 @@
+@prefix earl: <http://www.w3.org/ns/earl#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix svt: <https://w3id.org/sysmlv2-testing#> .
+@prefix svtid: <https://w3id.org/sysmlv2-testing/id/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+svtid:party-devin-linux-x86-64
+    a prov:SoftwareAgent,
+        svt:Party ;
+    rdfs:label "Ubuntu 22.04.5 LTS, x86_64 (Devin cloud VM)" .
