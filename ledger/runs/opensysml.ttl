@@ -85,6 +85,15 @@ svtid:invocation-75c5822601fb66db
     svt:stderr "" ;
     svt:stdout "clean" .
 
+svtid:invocation-b04ed708ad449ab5
+    a svt:Invocation ;
+    prov:startedAtTime "2026-09-16T02:40:36+00:00"^^xsd:dateTime ;
+    svt:command "Model.execute_state('StateDemo::Surface::condition', events=['EngagementEvent'])" ;
+    svt:exitCode "0"^^xsd:integer ;
+    svt:inputDigest "a42791bd6ee2f43cb1ef27ea1dd8197ff401212039cde225961d6167bd0e4d0a" ;
+    svt:stderr "" ;
+    svt:stdout "dormant,active" .
+
 svtid:invocation-b7b02e6efabedc87
     a svt:Invocation ;
     prov:startedAtTime "2026-09-12T21:18:41+00:00"^^xsd:dateTime ;
@@ -102,6 +111,14 @@ svtid:invocation-d7466e9771590b36
     svt:inputDigest "dd8e5e69f050f6548c2e6e2e7cb21b17e84b79019c80fd3ffacb29d95c05e35a" ;
     svt:stderr "" ;
     svt:stdout "clean" .
+
+svtid:reproduction-b04ed708ad449ab5
+    a svt:Reproduction ;
+    earl:result svtid:result-b04ed708ad449ab5 ;
+    prov:startedAtTime "2026-09-16T02:40:36+00:00"^^xsd:dateTime ;
+    svt:concernsRun svtid:run-29d5c83c1e3dbdf2 ;
+    svt:hasInvocation svtid:invocation-b04ed708ad449ab5 ;
+    svt:ranBy svtid:party-devin-linux-x86-64 .
 
 svtid:result-028809c427cb28e0
     a earl:TestResult ;
@@ -148,6 +165,12 @@ svtid:result-75c5822601fb66db
     earl:info "expected='clean' actual='clean'" ;
     earl:outcome earl:passed ;
     svt:actual "clean" .
+
+svtid:result-b04ed708ad449ab5
+    a earl:TestResult ;
+    earl:info "expected='dormant,active' actual='dormant,active'" ;
+    earl:outcome earl:passed ;
+    svt:actual "dormant,active" .
 
 svtid:result-b7b02e6efabedc87
     a earl:TestResult ;
