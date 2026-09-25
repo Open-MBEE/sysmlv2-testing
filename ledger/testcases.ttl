@@ -98,6 +98,17 @@ svtid:testcase-end-feature-redefinition-explicit
     svt:method "structural-check" ;
     svt:realizesIntent svtid:intent-end-feature-redefinition-requires-end-keyword .
 
+svtid:testcase-end-feature-redefinition-explicit-reference-binding
+    a svt:TestCase ;
+    svt:description "A connection-end redefinition written with the explicit 'end' keyword and bound to its related element by reference ('end :>> source ::> a'/'end :>> target ::> b'), in a connection whose definition declares its end features without an additional explicit type, must be accepted." ;
+    svt:expected "clean" ;
+    svt:groundedIn svtid:citation-check-feature-end-redefinition,
+        svtid:citation-end-usage-prefix-grammar ;
+    svt:hasInputFile "lib.sysml",
+        "usage-end-reference.sysml" ;
+    svt:method "structural-check" ;
+    svt:realizesIntent svtid:intent-end-feature-redefinition-requires-end-keyword .
+
 svtid:testcase-membership-visibility-private-rejected
     a svt:TestCase ;
     svt:description "A part usage typed by a private part definition, referenced by qualified name from outside the definition's owning package, must be rejected -- the private member is not visible outside its owning namespace." ;
