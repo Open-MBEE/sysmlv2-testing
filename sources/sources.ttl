@@ -21,6 +21,30 @@ svtid:citation-check-feature-end-redefinition
     svt:rationale "Combined with the isEnd grammar rule (citation-end-usage-prefix-grammar): a feature written as bare ':>> source = a;' (no 'end' keyword) has isEnd = false, so it cannot satisfy checkFeatureEndRedefinition when redefining an end Feature such as BinaryLinkObject::source. This grounds rejecting the bare form (expected=violated) and accepting only the explicit 'end :>> source = a;' form (expected=clean)." ;
     svt:section "8.4.9.2 Connection Usages" .
 
+svtid:citation-connection-usage-related-elements-via-reference-subsetting
+    a svt:SpecCitation ;
+    svt:citesDocument svtid:spec-formal-2026-03-02 ;
+    svt:page "68" ;
+    svt:quote "For a connection usage, its related elements are the features associated to each of its end features via reference subsetting relationships, whose textual notation is the keyword references or the equivalent symbol ::>." ;
+    svt:rationale "States in prose what KerML's deriveConnectorRelatedFeature states formally: a connection usage is related to exactly the features its ends reach through reference subsetting (::>). The section's own example binds ends with 'end part hub ::> mainSwitch[1];'; no example binds a connection end by feature value ('= a')." ;
+    svt:section "7.13.2 Connection Definitions and Usages" .
+
+svtid:citation-connector-related-features-derivation
+    a svt:SpecCitation ;
+    svt:citesDocument svtid:spec-kerml-1-1-beta2 ;
+    svt:page "190" ;
+    svt:quote "The relatedFeatures of a Connector are the referenced Features of its connectorEnds." ;
+    svt:rationale "The accompanying OCL is 'relatedFeature = connectorEnd.ownedReferenceSubsetting->select(s | s <> null).subsettedFeature': a connector end contributes a related feature only through an owned ReferenceSubsetting. A redefining end that carries a feature value ('end :>> source = a') has no owned ReferenceSubsetting, so it contributes none. This is an inference from this constraint together with citation-feature-value-binding-connector, not a sentence the spec states directly; whether a redefining end inherits the referenced feature of the end it redefines is not settled by this text (the derivation reads 'owned')." ;
+    svt:section "8.3.4.5.3 Connector (deriveConnectorRelatedFeature)" .
+
+svtid:citation-connector-related-features-minimum
+    a svt:SpecCitation ;
+    svt:citesDocument svtid:spec-kerml-1-1-beta2 ;
+    svt:page "191" ;
+    svt:quote "If a Connector is concrete (not abstract), then it must have at least two relatedFeatures." ;
+    svt:rationale "The constraint the Pilot and OpenSysML report as 'Must have at least two related elements'. A concrete ConnectionUsage (a kind of Connector, per the SysML 8.4.9.2 citation already in the ledger) whose ends contribute fewer than two relatedFeatures violates it. OCL: not isAbstract implies relatedFeature->size() >= 2." ;
+    svt:section "8.3.4.5.3 Connector (validateConnectorRelatedFeatures)" .
+
 svtid:citation-end-usage-prefix-grammar
     a svt:SpecCitation ;
     svt:citesDocument svtid:spec-formal-2026-03-02 ;
@@ -28,6 +52,14 @@ svtid:citation-end-usage-prefix-grammar
     svt:quote "EndUsagePrefix : Usage = isEnd ?= 'end' ( ownedRelationship += OwnedCrossFeatureMember )?" ;
     svt:rationale "isEnd is set true only when the literal 'end' keyword is parsed. A feature written without 'end' therefore has isEnd = false." ;
     svt:section "8.2.2.6.2 Usages (Textual Notation)" .
+
+svtid:citation-feature-value-binding-connector
+    a svt:SpecCitation ;
+    svt:citesDocument svtid:spec-kerml-1-1-beta2 ;
+    svt:page "227" ;
+    svt:quote "If isDefault = false, then the featureWithValue must have an ownedMember that is a BindingConnector whose relatedElements are the featureWithValue and a feature chain consisting of the value Expression and its result." ;
+    svt:rationale "A feature value ('= a') is realized as a BindingConnector owned by the end feature, not as a ReferenceSubsetting on it. So binding a connection end by value does not add a relatedFeature to the enclosing connection under deriveConnectorRelatedFeature. The constraint's text runs onto p. 228." ;
+    svt:section "8.3.4.10.2 FeatureValue (checkFeatureValueBindingConnector)" .
 
 svtid:citation-membership-visibility-private
     a svt:SpecCitation ;
