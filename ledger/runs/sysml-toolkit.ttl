@@ -64,6 +64,15 @@ UsageTwo::c::@1	UsageTwo::c::@1
     svt:toolDigest "32dcc65375614975fde29b86f12745015d2b691768a00f14f22987ad4ff768b4" ;
     svt:toolVersion "sysmlv2 0.6.0" .
 
+svtid:invocation-59dd15ab63751471
+    a svt:Invocation ;
+    prov:startedAtTime "2026-09-25T13:09:59+00:00"^^xsd:dateTime ;
+    svt:command "(unsupported)" ;
+    svt:exitCode "-1"^^xsd:integer ;
+    svt:inputDigest "a42791bd6ee2f43cb1ef27ea1dd8197ff401212039cde225961d6167bd0e4d0a" ;
+    svt:stderr "sysml-toolkit has no working state-execution mechanism (see ISSUES-PROPOSED.md #1: verify/query evaluate a constraint's declaration-site defaults, not a usage's actual bindings)" ;
+    svt:stdout "" .
+
 svtid:invocation-5d14dd0422bc1113
     a svt:Invocation ;
     prov:startedAtTime "2026-09-16T03:56:44+00:00"^^xsd:dateTime ;
@@ -75,6 +84,15 @@ svtid:invocation-5d14dd0422bc1113
     svt:toolDigest "32dcc65375614975fde29b86f12745015d2b691768a00f14f22987ad4ff768b4" ;
     svt:toolVersion "sysmlv2 0.6.0" .
 
+svtid:invocation-60f1a538e4748cec
+    a svt:Invocation ;
+    prov:startedAtTime "2026-09-25T13:09:56+00:00"^^xsd:dateTime ;
+    svt:command "(unsupported)" ;
+    svt:exitCode "-1"^^xsd:integer ;
+    svt:inputDigest "a42791bd6ee2f43cb1ef27ea1dd8197ff401212039cde225961d6167bd0e4d0a" ;
+    svt:stderr "sysml-toolkit has no working state-execution mechanism (see ISSUES-PROPOSED.md #1: verify/query evaluate a constraint's declaration-site defaults, not a usage's actual bindings)" ;
+    svt:stdout "" .
+
 svtid:invocation-8420ab5a5dab4e2e
     a svt:Invocation ;
     prov:startedAtTime "2026-09-16T03:56:45+00:00"^^xsd:dateTime ;
@@ -85,6 +103,17 @@ svtid:invocation-8420ab5a5dab4e2e
     svt:stdout "" ;
     svt:toolDigest "32dcc65375614975fde29b86f12745015d2b691768a00f14f22987ad4ff768b4" ;
     svt:toolVersion "sysmlv2 0.6.0" .
+
+svtid:invocation-8cf2b2e037b5ca30
+    a svt:Invocation ;
+    prov:startedAtTime "2026-09-25T13:09:45+00:00"^^xsd:dateTime ;
+    svt:command "/Users/z/Documents/GitHub/sysmlv2-testing/.cache/sysml-toolkit/v0.9.1/sysmlv2-0.9.1-aarch64-apple-darwin/sysmlv2 check --lib /Users/z/Documents/GitHub/sysml-toolkit/spec-refs/SysML-v2-Release/sysml.library --strict /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/redefinition-ambiguity-2/lib.sysml /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/redefinition-ambiguity-2/usage-two-ok.sysml" ;
+    svt:exitCode "0"^^xsd:integer ;
+    svt:inputDigest "dd8e5e69f050f6548c2e6e2e7cb21b17e84b79019c80fd3ffacb29d95c05e35a" ;
+    svt:stderr "" ;
+    svt:stdout "" ;
+    svt:toolDigest "af1c32f5108c3a671df0a38afd1b6264ca5ad0a8a215c36cc1d374d530957b4f" ;
+    svt:toolVersion "sysmlv2 0.9.1" .
 
 svtid:invocation-9639d2a67ba372c1
     a svt:Invocation ;
@@ -117,6 +146,17 @@ svtid:invocation-9a23a41cc8de8d13
     svt:inputDigest "a42791bd6ee2f43cb1ef27ea1dd8197ff401212039cde225961d6167bd0e4d0a" ;
     svt:stderr "sysml-toolkit has no working state-execution mechanism (see ISSUES-PROPOSED.md #1: verify/query evaluate a constraint's declaration-site defaults, not a usage's actual bindings)" ;
     svt:stdout "" .
+
+svtid:invocation-a1003d56634a61f0
+    a svt:Invocation ;
+    prov:startedAtTime "2026-09-25T13:09:51+00:00"^^xsd:dateTime ;
+    svt:command "/Users/z/Documents/GitHub/sysmlv2-testing/.cache/sysml-toolkit/v0.9.1/sysmlv2-0.9.1-aarch64-apple-darwin/sysmlv2 check --lib /Users/z/Documents/GitHub/sysml-toolkit/spec-refs/SysML-v2-Release/sysml.library --strict /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/redefinition-ambiguity-3plus/lib.sysml /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/redefinition-ambiguity-3plus/usage-three-ambiguous.sysml" ;
+    svt:exitCode "0"^^xsd:integer ;
+    svt:inputDigest "918e05e1bc6e884e0ccd7463547e4d4fe50086c280ee5e28f5b37c0b614711ca" ;
+    svt:stderr "" ;
+    svt:stdout "" ;
+    svt:toolDigest "af1c32f5108c3a671df0a38afd1b6264ca5ad0a8a215c36cc1d374d530957b4f" ;
+    svt:toolVersion "sysmlv2 0.9.1" .
 
 svtid:invocation-a12af5ad367fb4b0
     a svt:Invocation ;
@@ -181,6 +221,52 @@ svtid:invocation-be1705645196f44d
     svt:stderr "sysml-toolkit has no working constraint-eval mechanism (see ISSUES-PROPOSED.md #1: verify/query evaluate a constraint's declaration-site defaults, not a usage's actual bindings)" ;
     svt:stdout "" .
 
+svtid:invocation-c55a6d1fbc1208c5
+    a svt:Invocation ;
+    prov:startedAtTime "2026-09-25T13:09:53+00:00"^^xsd:dateTime ;
+    svt:command "/Users/z/Documents/GitHub/sysmlv2-testing/.cache/sysml-toolkit/v0.9.1/sysmlv2-0.9.1-aarch64-apple-darwin/sysmlv2 convert --lib /Users/z/Documents/GitHub/sysml-toolkit/spec-refs/SysML-v2-Release/sysml.library --to compact-json /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/redefinition-ambiguity-3plus-resolution/lib.sysml /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/redefinition-ambiguity-3plus-resolution/usage-three-ambiguous.sysml -o /var/folders/_z/k9fkf53x4q7dm02s4lr__qq00000gn/T/tmpwg0mfp10/model.json" ;
+    svt:exitCode "0"^^xsd:integer ;
+    svt:inputDigest "918e05e1bc6e884e0ccd7463547e4d4fe50086c280ee5e28f5b37c0b614711ca" ;
+    svt:stderr "" ;
+    svt:stdout """UsageThree::d::@2	Lib::Container::items
+UsageThree::d::@1	Lib::Container::items
+UsageThree::d::@0	Lib::Container::items
+""" ;
+    svt:toolDigest "af1c32f5108c3a671df0a38afd1b6264ca5ad0a8a215c36cc1d374d530957b4f" ;
+    svt:toolVersion "sysmlv2 0.9.1" .
+
+svtid:invocation-c9c6f4bb2018cadc
+    a svt:Invocation ;
+    prov:startedAtTime "2026-09-25T13:09:39+00:00"^^xsd:dateTime ;
+    svt:command "/Users/z/Documents/GitHub/sysmlv2-testing/.cache/sysml-toolkit/v0.9.1/sysmlv2-0.9.1-aarch64-apple-darwin/sysmlv2 check --lib /Users/z/Documents/GitHub/sysml-toolkit/spec-refs/SysML-v2-Release/sysml.library --strict /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/end-feature-redefinition-bare/lib.sysml /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/end-feature-redefinition-bare/usage-bare-noncompliant.sysml" ;
+    svt:exitCode "1"^^xsd:integer ;
+    svt:inputDigest "dbe9caa07da73db2bb98c4e975eff68668bc8f26da33146eb367cb38f3a77fae" ;
+    svt:stderr """error: An association end must have exactly one non-redundant type [validateAssociationEndTypes]
+  --> /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/end-feature-redefinition-bare/lib.sysml:9:9
+   |
+   |     end source : Foo :>> BinaryLinkObject::source;
+
+error: An association end must have exactly one non-redundant type [validateAssociationEndTypes]
+  --> /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/end-feature-redefinition-bare/lib.sysml:10:9
+   |
+   |     end target : Foo :>> BinaryLinkObject::target;
+
+error: A feature redefining an end must itself be an end [validateRedefinitionEndConformance]
+  --> /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/end-feature-redefinition-bare/usage-bare-noncompliant.sysml:8:9
+   |
+   |     :>> source = a;
+
+error: A feature redefining an end must itself be an end [validateRedefinitionEndConformance]
+  --> /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/end-feature-redefinition-bare/usage-bare-noncompliant.sysml:9:9
+   |
+   |     :>> target = b;
+
+4 error(s)
+""" ;
+    svt:stdout "" ;
+    svt:toolDigest "af1c32f5108c3a671df0a38afd1b6264ca5ad0a8a215c36cc1d374d530957b4f" ;
+    svt:toolVersion "sysmlv2 0.9.1" .
+
 svtid:invocation-cd11eb3b7858dbc3
     a svt:Invocation ;
     prov:startedAtTime "2026-09-13T04:36:12+00:00"^^xsd:dateTime ;
@@ -196,6 +282,50 @@ svtid:invocation-cd11eb3b7858dbc3
 --strict: warnings are failures
 """ ;
     svt:stdout "" .
+
+svtid:invocation-d31791bcb8dd6447
+    a svt:Invocation ;
+    prov:startedAtTime "2026-09-25T13:09:42+00:00"^^xsd:dateTime ;
+    svt:command "/Users/z/Documents/GitHub/sysmlv2-testing/.cache/sysml-toolkit/v0.9.1/sysmlv2-0.9.1-aarch64-apple-darwin/sysmlv2 check --lib /Users/z/Documents/GitHub/sysml-toolkit/spec-refs/SysML-v2-Release/sysml.library --strict /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/end-feature-redefinition-explicit/lib.sysml /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/end-feature-redefinition-explicit/usage-end-portable.sysml" ;
+    svt:exitCode "1"^^xsd:integer ;
+    svt:inputDigest "9e0a09962391872bdfc341fc7f17a4e3cfed1a5c736d3b50a1318d49072f405c" ;
+    svt:stderr """error: An association end must have exactly one non-redundant type [validateAssociationEndTypes]
+  --> /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/end-feature-redefinition-explicit/lib.sysml:9:9
+   |
+   |     end source : Foo :>> BinaryLinkObject::source;
+
+error: An association end must have exactly one non-redundant type [validateAssociationEndTypes]
+  --> /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/end-feature-redefinition-explicit/lib.sysml:10:9
+   |
+   |     end target : Foo :>> BinaryLinkObject::target;
+
+2 error(s)
+""" ;
+    svt:stdout "" ;
+    svt:toolDigest "af1c32f5108c3a671df0a38afd1b6264ca5ad0a8a215c36cc1d374d530957b4f" ;
+    svt:toolVersion "sysmlv2 0.9.1" .
+
+svtid:invocation-d7a19f6430f2650c
+    a svt:Invocation ;
+    prov:startedAtTime "2026-09-25T13:09:37+00:00"^^xsd:dateTime ;
+    svt:command "(unsupported)" ;
+    svt:exitCode "-1"^^xsd:integer ;
+    svt:inputDigest "bba86b0291f9536718ccec38a52c692089862f2cfb5a24dd31ec4dc5adce9903" ;
+    svt:stderr "sysml-toolkit has no working constraint-eval mechanism (see ISSUES-PROPOSED.md #1: verify/query evaluate a constraint's declaration-site defaults, not a usage's actual bindings)" ;
+    svt:stdout "" .
+
+svtid:invocation-d92704faccc24dc2
+    a svt:Invocation ;
+    prov:startedAtTime "2026-09-25T13:09:48+00:00"^^xsd:dateTime ;
+    svt:command "/Users/z/Documents/GitHub/sysmlv2-testing/.cache/sysml-toolkit/v0.9.1/sysmlv2-0.9.1-aarch64-apple-darwin/sysmlv2 convert --lib /Users/z/Documents/GitHub/sysml-toolkit/spec-refs/SysML-v2-Release/sysml.library --to compact-json /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/redefinition-ambiguity-2-resolution/lib.sysml /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/redefinition-ambiguity-2-resolution/usage-two-ok.sysml -o /var/folders/_z/k9fkf53x4q7dm02s4lr__qq00000gn/T/tmphugkjyuq/model.json" ;
+    svt:exitCode "0"^^xsd:integer ;
+    svt:inputDigest "dd8e5e69f050f6548c2e6e2e7cb21b17e84b79019c80fd3ffacb29d95c05e35a" ;
+    svt:stderr "" ;
+    svt:stdout """UsageTwo::c::@0	Lib::Container::items
+UsageTwo::c::@1	Lib::Container::items
+""" ;
+    svt:toolDigest "af1c32f5108c3a671df0a38afd1b6264ca5ad0a8a215c36cc1d374d530957b4f" ;
+    svt:toolVersion "sysmlv2 0.9.1" .
 
 svtid:invocation-ef17eab2e438270f
     a svt:Invocation ;
@@ -214,6 +344,24 @@ svtid:invocation-f19dbd0d109d687e
     svt:inputDigest "dbe9caa07da73db2bb98c4e975eff68668bc8f26da33146eb367cb38f3a77fae" ;
     svt:stderr "" ;
     svt:stdout "" .
+
+svtid:invocation-fee04b11f4e49cd0
+    a svt:Invocation ;
+    prov:startedAtTime "2026-09-25T13:09:43+00:00"^^xsd:dateTime ;
+    svt:command "/Users/z/Documents/GitHub/sysmlv2-testing/.cache/sysml-toolkit/v0.9.1/sysmlv2-0.9.1-aarch64-apple-darwin/sysmlv2 check --lib /Users/z/Documents/GitHub/sysml-toolkit/spec-refs/SysML-v2-Release/sysml.library --strict /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/membership-visibility-private-rejected/private-visibility.sysml" ;
+    svt:exitCode "1"^^xsd:integer ;
+    svt:inputDigest "de9f631acd37024ea472b26f505839b98e889c27830b7dd738cb60aa56c5e4b2" ;
+    svt:stderr """warning: unresolved reference `Lib::Widget` — `Lib::Widget` exists but is private
+  --> /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/membership-visibility-private-rejected/private-visibility.sysml:6:14
+   |
+   |     part w : Lib::Widget;
+
+1 warning(s)
+--strict: warnings are failures
+""" ;
+    svt:stdout "" ;
+    svt:toolDigest "af1c32f5108c3a671df0a38afd1b6264ca5ad0a8a215c36cc1d374d530957b4f" ;
+    svt:toolVersion "sysmlv2 0.9.1" .
 
 svtid:invocation-ff4d7b60f4e835e1
     a svt:Invocation ;
@@ -282,13 +430,29 @@ svtid:result-590d840275874c6f
     earl:outcome earl:failed ;
     svt:actual "UsageTwo::c::@0->UsageTwo::c::@2; UsageTwo::c::@1->UsageTwo::c::@1" .
 
+svtid:result-59dd15ab63751471
+    a earl:TestResult ;
+    earl:info "sysml-toolkit has no working state-execution mechanism (see ISSUES-PROPOSED.md #1: verify/query evaluate a constraint's declaration-site defaults, not a usage's actual bindings)" ;
+    earl:outcome earl:inapplicable .
+
 svtid:result-5d14dd0422bc1113
     a earl:TestResult ;
     earl:info "expected='violated' actual='clean'" ;
     earl:outcome earl:failed ;
     svt:actual "clean" .
 
+svtid:result-60f1a538e4748cec
+    a earl:TestResult ;
+    earl:info "sysml-toolkit has no working state-execution mechanism (see ISSUES-PROPOSED.md #1: verify/query evaluate a constraint's declaration-site defaults, not a usage's actual bindings)" ;
+    earl:outcome earl:inapplicable .
+
 svtid:result-8420ab5a5dab4e2e
+    a earl:TestResult ;
+    earl:info "expected='clean' actual='clean'" ;
+    earl:outcome earl:passed ;
+    svt:actual "clean" .
+
+svtid:result-8cf2b2e037b5ca30
     a earl:TestResult ;
     earl:info "expected='clean' actual='clean'" ;
     earl:outcome earl:passed ;
@@ -310,6 +474,12 @@ svtid:result-9a23a41cc8de8d13
     a earl:TestResult ;
     earl:info "sysml-toolkit has no working state-execution mechanism (see ISSUES-PROPOSED.md #1: verify/query evaluate a constraint's declaration-site defaults, not a usage's actual bindings)" ;
     earl:outcome earl:inapplicable .
+
+svtid:result-a1003d56634a61f0
+    a earl:TestResult ;
+    earl:info "expected='clean' actual='clean'" ;
+    earl:outcome earl:passed ;
+    svt:actual "clean" .
 
 svtid:result-a12af5ad367fb4b0
     a earl:TestResult ;
@@ -334,11 +504,40 @@ svtid:result-be1705645196f44d
     earl:info "sysml-toolkit has no working constraint-eval mechanism (see ISSUES-PROPOSED.md #1: verify/query evaluate a constraint's declaration-site defaults, not a usage's actual bindings)" ;
     earl:outcome earl:inapplicable .
 
+svtid:result-c55a6d1fbc1208c5
+    a earl:TestResult ;
+    earl:info "3 resolution check(s), all_match=True" ;
+    earl:outcome earl:passed ;
+    svt:actual "UsageThree::d::@2->Lib::Container::items; UsageThree::d::@1->Lib::Container::items; UsageThree::d::@0->Lib::Container::items" .
+
+svtid:result-c9c6f4bb2018cadc
+    a earl:TestResult ;
+    earl:info "expected='violated' actual='violated'" ;
+    earl:outcome earl:passed ;
+    svt:actual "violated" .
+
 svtid:result-cd11eb3b7858dbc3
     a earl:TestResult ;
     earl:info "expected='violated' actual='violated'" ;
     earl:outcome earl:passed ;
     svt:actual "violated" .
+
+svtid:result-d31791bcb8dd6447
+    a earl:TestResult ;
+    earl:info "expected='clean' actual='violated'" ;
+    earl:outcome earl:failed ;
+    svt:actual "violated" .
+
+svtid:result-d7a19f6430f2650c
+    a earl:TestResult ;
+    earl:info "sysml-toolkit has no working constraint-eval mechanism (see ISSUES-PROPOSED.md #1: verify/query evaluate a constraint's declaration-site defaults, not a usage's actual bindings)" ;
+    earl:outcome earl:inapplicable .
+
+svtid:result-d92704faccc24dc2
+    a earl:TestResult ;
+    earl:info "2 resolution check(s), all_match=True" ;
+    earl:outcome earl:passed ;
+    svt:actual "UsageTwo::c::@0->Lib::Container::items; UsageTwo::c::@1->Lib::Container::items" .
 
 svtid:result-ef17eab2e438270f
     a earl:TestResult ;
@@ -351,6 +550,12 @@ svtid:result-f19dbd0d109d687e
     earl:info "expected='violated' actual='clean'" ;
     earl:outcome earl:failed ;
     svt:actual "clean" .
+
+svtid:result-fee04b11f4e49cd0
+    a earl:TestResult ;
+    earl:info "expected='violated' actual='violated'" ;
+    earl:outcome earl:passed ;
+    svt:actual "violated" .
 
 svtid:result-ff4d7b60f4e835e1
     a earl:TestResult ;
@@ -411,6 +616,17 @@ svtid:run-590d840275874c6f
     svt:hasInvocation svtid:invocation-590d840275874c6f ;
     svt:ranBy svtid:party-zargham-macbook .
 
+svtid:run-59dd15ab63751471
+    a svt:TestRun ;
+    earl:assertedBy svtid:agent-svt-cli ;
+    earl:mode earl:automatic ;
+    earl:result svtid:result-59dd15ab63751471 ;
+    earl:subject svtid:version-ebc29af982364131 ;
+    earl:test svtid:testcase-state-machine-transitions-on-event ;
+    prov:startedAtTime "2026-09-25T13:09:59+00:00"^^xsd:dateTime ;
+    svt:hasInvocation svtid:invocation-59dd15ab63751471 ;
+    svt:ranBy svtid:party-zargham-macbook .
+
 svtid:run-5d14dd0422bc1113
     a svt:TestRun ;
     earl:assertedBy svtid:agent-svt-cli ;
@@ -422,6 +638,17 @@ svtid:run-5d14dd0422bc1113
     svt:hasInvocation svtid:invocation-5d14dd0422bc1113 ;
     svt:ranBy svtid:party-zargham-macbook .
 
+svtid:run-60f1a538e4748cec
+    a svt:TestRun ;
+    earl:assertedBy svtid:agent-svt-cli ;
+    earl:mode earl:automatic ;
+    earl:result svtid:result-60f1a538e4748cec ;
+    earl:subject svtid:version-ebc29af982364131 ;
+    earl:test svtid:testcase-state-machine-settles-without-events ;
+    prov:startedAtTime "2026-09-25T13:09:56+00:00"^^xsd:dateTime ;
+    svt:hasInvocation svtid:invocation-60f1a538e4748cec ;
+    svt:ranBy svtid:party-zargham-macbook .
+
 svtid:run-8420ab5a5dab4e2e
     a svt:TestRun ;
     earl:assertedBy svtid:agent-svt-cli ;
@@ -431,6 +658,17 @@ svtid:run-8420ab5a5dab4e2e
     earl:test svtid:testcase-end-feature-redefinition-explicit ;
     prov:startedAtTime "2026-09-16T03:56:45+00:00"^^xsd:dateTime ;
     svt:hasInvocation svtid:invocation-8420ab5a5dab4e2e ;
+    svt:ranBy svtid:party-zargham-macbook .
+
+svtid:run-8cf2b2e037b5ca30
+    a svt:TestRun ;
+    earl:assertedBy svtid:agent-svt-cli ;
+    earl:mode earl:automatic ;
+    earl:result svtid:result-8cf2b2e037b5ca30 ;
+    earl:subject svtid:version-ebc29af982364131 ;
+    earl:test svtid:testcase-redefinition-ambiguity-2 ;
+    prov:startedAtTime "2026-09-25T13:09:45+00:00"^^xsd:dateTime ;
+    svt:hasInvocation svtid:invocation-8cf2b2e037b5ca30 ;
     svt:ranBy svtid:party-zargham-macbook .
 
 svtid:run-9639d2a67ba372c1
@@ -463,6 +701,17 @@ svtid:run-9a23a41cc8de8d13
     earl:test svtid:testcase-state-machine-settles-without-events ;
     prov:startedAtTime "2026-09-13T00:21:11+00:00"^^xsd:dateTime ;
     svt:hasInvocation svtid:invocation-9a23a41cc8de8d13 .
+
+svtid:run-a1003d56634a61f0
+    a svt:TestRun ;
+    earl:assertedBy svtid:agent-svt-cli ;
+    earl:mode earl:automatic ;
+    earl:result svtid:result-a1003d56634a61f0 ;
+    earl:subject svtid:version-ebc29af982364131 ;
+    earl:test svtid:testcase-redefinition-ambiguity-3plus ;
+    prov:startedAtTime "2026-09-25T13:09:51+00:00"^^xsd:dateTime ;
+    svt:hasInvocation svtid:invocation-a1003d56634a61f0 ;
+    svt:ranBy svtid:party-zargham-macbook .
 
 svtid:run-a12af5ad367fb4b0
     a svt:TestRun ;
@@ -506,6 +755,28 @@ svtid:run-be1705645196f44d
     svt:hasInvocation svtid:invocation-be1705645196f44d ;
     svt:ranBy svtid:party-zargham-macbook .
 
+svtid:run-c55a6d1fbc1208c5
+    a svt:TestRun ;
+    earl:assertedBy svtid:agent-svt-cli ;
+    earl:mode earl:automatic ;
+    earl:result svtid:result-c55a6d1fbc1208c5 ;
+    earl:subject svtid:version-ebc29af982364131 ;
+    earl:test svtid:testcase-redefinition-ambiguity-3plus-resolution ;
+    prov:startedAtTime "2026-09-25T13:09:53+00:00"^^xsd:dateTime ;
+    svt:hasInvocation svtid:invocation-c55a6d1fbc1208c5 ;
+    svt:ranBy svtid:party-zargham-macbook .
+
+svtid:run-c9c6f4bb2018cadc
+    a svt:TestRun ;
+    earl:assertedBy svtid:agent-svt-cli ;
+    earl:mode earl:automatic ;
+    earl:result svtid:result-c9c6f4bb2018cadc ;
+    earl:subject svtid:version-ebc29af982364131 ;
+    earl:test svtid:testcase-end-feature-redefinition-bare ;
+    prov:startedAtTime "2026-09-25T13:09:39+00:00"^^xsd:dateTime ;
+    svt:hasInvocation svtid:invocation-c9c6f4bb2018cadc ;
+    svt:ranBy svtid:party-zargham-macbook .
+
 svtid:run-cd11eb3b7858dbc3
     a svt:TestRun ;
     earl:assertedBy svtid:agent-svt-cli ;
@@ -516,6 +787,39 @@ svtid:run-cd11eb3b7858dbc3
     prov:startedAtTime "2026-09-13T04:36:12+00:00"^^xsd:dateTime ;
     svt:hasInvocation svtid:invocation-cd11eb3b7858dbc3 ;
     svt:reconfirmedAt "2026-09-16T03:37:22+00:00"^^xsd:dateTime .
+
+svtid:run-d31791bcb8dd6447
+    a svt:TestRun ;
+    earl:assertedBy svtid:agent-svt-cli ;
+    earl:mode earl:automatic ;
+    earl:result svtid:result-d31791bcb8dd6447 ;
+    earl:subject svtid:version-ebc29af982364131 ;
+    earl:test svtid:testcase-end-feature-redefinition-explicit ;
+    prov:startedAtTime "2026-09-25T13:09:42+00:00"^^xsd:dateTime ;
+    svt:hasInvocation svtid:invocation-d31791bcb8dd6447 ;
+    svt:ranBy svtid:party-zargham-macbook .
+
+svtid:run-d7a19f6430f2650c
+    a svt:TestRun ;
+    earl:assertedBy svtid:agent-svt-cli ;
+    earl:mode earl:automatic ;
+    earl:result svtid:result-d7a19f6430f2650c ;
+    earl:subject svtid:version-ebc29af982364131 ;
+    earl:test svtid:testcase-constraint-eval-declaration-site ;
+    prov:startedAtTime "2026-09-25T13:09:37+00:00"^^xsd:dateTime ;
+    svt:hasInvocation svtid:invocation-d7a19f6430f2650c ;
+    svt:ranBy svtid:party-zargham-macbook .
+
+svtid:run-d92704faccc24dc2
+    a svt:TestRun ;
+    earl:assertedBy svtid:agent-svt-cli ;
+    earl:mode earl:automatic ;
+    earl:result svtid:result-d92704faccc24dc2 ;
+    earl:subject svtid:version-ebc29af982364131 ;
+    earl:test svtid:testcase-redefinition-ambiguity-2-resolution ;
+    prov:startedAtTime "2026-09-25T13:09:48+00:00"^^xsd:dateTime ;
+    svt:hasInvocation svtid:invocation-d92704faccc24dc2 ;
+    svt:ranBy svtid:party-zargham-macbook .
 
 svtid:run-ef17eab2e438270f
     a svt:TestRun ;
@@ -536,6 +840,17 @@ svtid:run-f19dbd0d109d687e
     earl:test svtid:testcase-end-feature-redefinition-bare ;
     prov:startedAtTime "2026-09-12T21:18:33+00:00"^^xsd:dateTime ;
     svt:hasInvocation svtid:invocation-f19dbd0d109d687e .
+
+svtid:run-fee04b11f4e49cd0
+    a svt:TestRun ;
+    earl:assertedBy svtid:agent-svt-cli ;
+    earl:mode earl:automatic ;
+    earl:result svtid:result-fee04b11f4e49cd0 ;
+    earl:subject svtid:version-ebc29af982364131 ;
+    earl:test svtid:testcase-membership-visibility-private-rejected ;
+    prov:startedAtTime "2026-09-25T13:09:43+00:00"^^xsd:dateTime ;
+    svt:hasInvocation svtid:invocation-fee04b11f4e49cd0 ;
+    svt:ranBy svtid:party-zargham-macbook .
 
 svtid:run-ff4d7b60f4e835e1
     a svt:TestRun ;

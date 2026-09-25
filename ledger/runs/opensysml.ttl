@@ -22,6 +22,17 @@ error <content>:22:9-22:16: Redefining feature must be an end feature
 warning <content>:22:9-22:15: Duplicate of inherited member name 'target' from BinaryConnection""" ;
     svt:stdout "" .
 
+svtid:invocation-0470fbc1b734fd53
+    a svt:Invocation ;
+    prov:startedAtTime "2026-09-25T13:09:55+00:00"^^xsd:dateTime ;
+    svt:command "Model.execute_state('StateDemo::Surface::condition', events=None)" ;
+    svt:exitCode "0"^^xsd:integer ;
+    svt:inputDigest "a42791bd6ee2f43cb1ef27ea1dd8197ff401212039cde225961d6167bd0e4d0a" ;
+    svt:stderr "" ;
+    svt:stdout "dormant" ;
+    svt:toolDigest "d2c0a5eeca4ffb8309712ae0f6da29e1a15dfdc3b2a201fa30920a76e863b166" ;
+    svt:toolVersion "v0.9.0" .
+
 svtid:invocation-124b82f1c1237e0b
     a svt:Invocation ;
     prov:startedAtTime "2026-09-13T00:20:59+00:00"^^xsd:dateTime ;
@@ -39,6 +50,26 @@ svtid:invocation-29d5c83c1e3dbdf2
     svt:inputDigest "a42791bd6ee2f43cb1ef27ea1dd8197ff401212039cde225961d6167bd0e4d0a" ;
     svt:stderr "" ;
     svt:stdout "dormant,active" .
+
+svtid:invocation-4693892674d04db5
+    a svt:Invocation ;
+    prov:startedAtTime "2026-09-25T13:09:47+00:00"^^xsd:dateTime ;
+    svt:command "(unsupported)" ;
+    svt:exitCode "-1"^^xsd:integer ;
+    svt:inputDigest "dd8e5e69f050f6548c2e6e2e7cb21b17e84b79019c80fd3ffacb29d95c05e35a" ;
+    svt:stderr "opensysml has no way to check reference-resolution facts for anonymous features: its Symbol/Query wire protocol's only identity field is the same colliding qualified-name string (confirmed via sysml_pb2.pyi), and its to_turtle() export's sysml:redefines predicate is a bare name string, not a link to the resolved target -- worth filing upstream" ;
+    svt:stdout "" .
+
+svtid:invocation-59a6db36afe5e097
+    a svt:Invocation ;
+    prov:startedAtTime "2026-09-25T13:09:57+00:00"^^xsd:dateTime ;
+    svt:command "Model.execute_state('StateDemo::Surface::condition', events=['EngagementEvent'])" ;
+    svt:exitCode "0"^^xsd:integer ;
+    svt:inputDigest "a42791bd6ee2f43cb1ef27ea1dd8197ff401212039cde225961d6167bd0e4d0a" ;
+    svt:stderr "" ;
+    svt:stdout "dormant,active" ;
+    svt:toolDigest "d2c0a5eeca4ffb8309712ae0f6da29e1a15dfdc3b2a201fa30920a76e863b166" ;
+    svt:toolVersion "v0.9.0" .
 
 svtid:invocation-59a9dc1ec284415e
     a svt:Invocation ;
@@ -67,6 +98,17 @@ svtid:invocation-5f1b01cbf2b5eb0f
     svt:stderr "error <content>:6:14-6:25: unresolved reference: Lib::Widget" ;
     svt:stdout "" .
 
+svtid:invocation-606664b011a77407
+    a svt:Invocation ;
+    prov:startedAtTime "2026-09-25T13:09:28+00:00"^^xsd:dateTime ;
+    svt:command "Connection.load_from_content(<input files>, strict=False)" ;
+    svt:exitCode "1"^^xsd:integer ;
+    svt:inputDigest "de9f631acd37024ea472b26f505839b98e889c27830b7dd738cb60aa56c5e4b2" ;
+    svt:stderr "error <content>:6:14-6:25: unresolved reference: Lib::Widget" ;
+    svt:stdout "" ;
+    svt:toolDigest "d2c0a5eeca4ffb8309712ae0f6da29e1a15dfdc3b2a201fa30920a76e863b166" ;
+    svt:toolVersion "v0.9.0" .
+
 svtid:invocation-648f3889d4a57b27
     a svt:Invocation ;
     prov:startedAtTime "2026-09-13T00:19:10+00:00"^^xsd:dateTime ;
@@ -75,6 +117,28 @@ svtid:invocation-648f3889d4a57b27
     svt:inputDigest "dd8e5e69f050f6548c2e6e2e7cb21b17e84b79019c80fd3ffacb29d95c05e35a" ;
     svt:stderr "opensysml has no way to check reference-resolution facts for anonymous features: its Symbol/Query wire protocol's only identity field is the same colliding qualified-name string (confirmed via sysml_pb2.pyi), and its to_turtle() export's sysml:redefines predicate is a bare name string, not a link to the resolved target -- worth filing upstream" ;
     svt:stdout "" .
+
+svtid:invocation-6956b2038bce09f8
+    a svt:Invocation ;
+    prov:startedAtTime "2026-09-25T13:09:40+00:00"^^xsd:dateTime ;
+    svt:command "Connection.load_from_content(<input files>, strict=False)" ;
+    svt:exitCode "1"^^xsd:integer ;
+    svt:inputDigest "9e0a09962391872bdfc341fc7f17a4e3cfed1a5c736d3b50a1318d49072f405c" ;
+    svt:stderr "error <content>:20:3-24:1: Must have at least two related elements" ;
+    svt:stdout "" ;
+    svt:toolDigest "d2c0a5eeca4ffb8309712ae0f6da29e1a15dfdc3b2a201fa30920a76e863b166" ;
+    svt:toolVersion "v0.9.0" .
+
+svtid:invocation-6b757d7a368efe27
+    a svt:Invocation ;
+    prov:startedAtTime "2026-09-25T13:09:35+00:00"^^xsd:dateTime ;
+    svt:command "Model.eval('source.controlled and target.controlled', subject='Usage::l')" ;
+    svt:exitCode "0"^^xsd:integer ;
+    svt:inputDigest "bba86b0291f9536718ccec38a52c692089862f2cfb5a24dd31ec4dc5adce9903" ;
+    svt:stderr "" ;
+    svt:stdout "false" ;
+    svt:toolDigest "d2c0a5eeca4ffb8309712ae0f6da29e1a15dfdc3b2a201fa30920a76e863b166" ;
+    svt:toolVersion "v0.9.0" .
 
 svtid:invocation-75c5822601fb66db
     a svt:Invocation ;
@@ -103,6 +167,30 @@ svtid:invocation-b7b02e6efabedc87
     svt:stderr "" ;
     svt:stdout "clean" .
 
+svtid:invocation-cda3e46eb6971005
+    a svt:Invocation ;
+    prov:startedAtTime "2026-09-25T13:09:44+00:00"^^xsd:dateTime ;
+    svt:command "Connection.load_from_content(<input files>, strict=False)" ;
+    svt:exitCode "0"^^xsd:integer ;
+    svt:inputDigest "dd8e5e69f050f6548c2e6e2e7cb21b17e84b79019c80fd3ffacb29d95c05e35a" ;
+    svt:stderr "" ;
+    svt:stdout "clean" ;
+    svt:toolDigest "d2c0a5eeca4ffb8309712ae0f6da29e1a15dfdc3b2a201fa30920a76e863b166" ;
+    svt:toolVersion "v0.9.0" .
+
+svtid:invocation-d0cdc80b1d89cfc1
+    a svt:Invocation ;
+    prov:startedAtTime "2026-09-25T13:09:38+00:00"^^xsd:dateTime ;
+    svt:command "Connection.load_from_content(<input files>, strict=False)" ;
+    svt:exitCode "1"^^xsd:integer ;
+    svt:inputDigest "dbe9caa07da73db2bb98c4e975eff68668bc8f26da33146eb367cb38f3a77fae" ;
+    svt:stderr """error <content>:20:3-24:1: Must have at least two related elements
+error <content>:21:9-21:16: Redefining feature must be an end feature
+error <content>:22:9-22:16: Redefining feature must be an end feature""" ;
+    svt:stdout "" ;
+    svt:toolDigest "d2c0a5eeca4ffb8309712ae0f6da29e1a15dfdc3b2a201fa30920a76e863b166" ;
+    svt:toolVersion "v0.9.0" .
+
 svtid:invocation-d7466e9771590b36
     a svt:Invocation ;
     prov:startedAtTime "2026-09-12T21:18:40+00:00"^^xsd:dateTime ;
@@ -112,6 +200,15 @@ svtid:invocation-d7466e9771590b36
     svt:stderr "" ;
     svt:stdout "clean" .
 
+svtid:invocation-dfd812789b851238
+    a svt:Invocation ;
+    prov:startedAtTime "2026-09-25T13:09:52+00:00"^^xsd:dateTime ;
+    svt:command "(unsupported)" ;
+    svt:exitCode "-1"^^xsd:integer ;
+    svt:inputDigest "918e05e1bc6e884e0ccd7463547e4d4fe50086c280ee5e28f5b37c0b614711ca" ;
+    svt:stderr "opensysml has no way to check reference-resolution facts for anonymous features: its Symbol/Query wire protocol's only identity field is the same colliding qualified-name string (confirmed via sysml_pb2.pyi), and its to_turtle() export's sysml:redefines predicate is a bare name string, not a link to the resolved target -- worth filing upstream" ;
+    svt:stdout "" .
+
 svtid:invocation-f522ad2df1c81c4c
     a svt:Invocation ;
     prov:startedAtTime "2026-09-16T02:50:39+00:00"^^xsd:dateTime ;
@@ -120,6 +217,17 @@ svtid:invocation-f522ad2df1c81c4c
     svt:inputDigest "a42791bd6ee2f43cb1ef27ea1dd8197ff401212039cde225961d6167bd0e4d0a" ;
     svt:stderr "" ;
     svt:stdout "dormant,active" .
+
+svtid:invocation-feb751c3f31fac24
+    a svt:Invocation ;
+    prov:startedAtTime "2026-09-25T13:09:49+00:00"^^xsd:dateTime ;
+    svt:command "Connection.load_from_content(<input files>, strict=False)" ;
+    svt:exitCode "0"^^xsd:integer ;
+    svt:inputDigest "918e05e1bc6e884e0ccd7463547e4d4fe50086c280ee5e28f5b37c0b614711ca" ;
+    svt:stderr "" ;
+    svt:stdout "clean" ;
+    svt:toolDigest "d2c0a5eeca4ffb8309712ae0f6da29e1a15dfdc3b2a201fa30920a76e863b166" ;
+    svt:toolVersion "v0.9.0" .
 
 svtid:invocation-fef0ff028c20bcfd
     a svt:Invocation ;
@@ -154,6 +262,12 @@ svtid:result-028809c427cb28e0
     earl:outcome earl:passed ;
     svt:actual "violated" .
 
+svtid:result-0470fbc1b734fd53
+    a earl:TestResult ;
+    earl:info "expected='dormant' actual='dormant'" ;
+    earl:outcome earl:passed ;
+    svt:actual "dormant" .
+
 svtid:result-124b82f1c1237e0b
     a earl:TestResult ;
     earl:info "expected='dormant' actual='dormant'" ;
@@ -161,6 +275,17 @@ svtid:result-124b82f1c1237e0b
     svt:actual "dormant" .
 
 svtid:result-29d5c83c1e3dbdf2
+    a earl:TestResult ;
+    earl:info "expected='dormant,active' actual='dormant,active'" ;
+    earl:outcome earl:passed ;
+    svt:actual "dormant,active" .
+
+svtid:result-4693892674d04db5
+    a earl:TestResult ;
+    earl:info "opensysml has no way to check reference-resolution facts for anonymous features: its Symbol/Query wire protocol's only identity field is the same colliding qualified-name string (confirmed via sysml_pb2.pyi), and its to_turtle() export's sysml:redefines predicate is a bare name string, not a link to the resolved target -- worth filing upstream" ;
+    earl:outcome earl:inapplicable .
+
+svtid:result-59a6db36afe5e097
     a earl:TestResult ;
     earl:info "expected='dormant,active' actual='dormant,active'" ;
     earl:outcome earl:passed ;
@@ -183,10 +308,28 @@ svtid:result-5f1b01cbf2b5eb0f
     earl:outcome earl:passed ;
     svt:actual "violated" .
 
+svtid:result-606664b011a77407
+    a earl:TestResult ;
+    earl:info "expected='violated' actual='violated'" ;
+    earl:outcome earl:passed ;
+    svt:actual "violated" .
+
 svtid:result-648f3889d4a57b27
     a earl:TestResult ;
     earl:info "opensysml has no way to check reference-resolution facts for anonymous features: its Symbol/Query wire protocol's only identity field is the same colliding qualified-name string (confirmed via sysml_pb2.pyi), and its to_turtle() export's sysml:redefines predicate is a bare name string, not a link to the resolved target -- worth filing upstream" ;
     earl:outcome earl:inapplicable .
+
+svtid:result-6956b2038bce09f8
+    a earl:TestResult ;
+    earl:info "expected='clean' actual='violated'" ;
+    earl:outcome earl:failed ;
+    svt:actual "violated" .
+
+svtid:result-6b757d7a368efe27
+    a earl:TestResult ;
+    earl:info "expected='false' actual='false'" ;
+    earl:outcome earl:passed ;
+    svt:actual "false" .
 
 svtid:result-75c5822601fb66db
     a earl:TestResult ;
@@ -206,17 +349,40 @@ svtid:result-b7b02e6efabedc87
     earl:outcome earl:passed ;
     svt:actual "clean" .
 
+svtid:result-cda3e46eb6971005
+    a earl:TestResult ;
+    earl:info "expected='clean' actual='clean'" ;
+    earl:outcome earl:passed ;
+    svt:actual "clean" .
+
+svtid:result-d0cdc80b1d89cfc1
+    a earl:TestResult ;
+    earl:info "expected='violated' actual='violated'" ;
+    earl:outcome earl:passed ;
+    svt:actual "violated" .
+
 svtid:result-d7466e9771590b36
     a earl:TestResult ;
     earl:info "expected='clean' actual='clean'" ;
     earl:outcome earl:passed ;
     svt:actual "clean" .
 
+svtid:result-dfd812789b851238
+    a earl:TestResult ;
+    earl:info "opensysml has no way to check reference-resolution facts for anonymous features: its Symbol/Query wire protocol's only identity field is the same colliding qualified-name string (confirmed via sysml_pb2.pyi), and its to_turtle() export's sysml:redefines predicate is a bare name string, not a link to the resolved target -- worth filing upstream" ;
+    earl:outcome earl:inapplicable .
+
 svtid:result-f522ad2df1c81c4c
     a earl:TestResult ;
     earl:info "expected='dormant,active' actual='dormant,active'" ;
     earl:outcome earl:passed ;
     svt:actual "dormant,active" .
+
+svtid:result-feb751c3f31fac24
+    a earl:TestResult ;
+    earl:info "expected='clean' actual='clean'" ;
+    earl:outcome earl:passed ;
+    svt:actual "clean" .
 
 svtid:result-fef0ff028c20bcfd
     a earl:TestResult ;
@@ -233,6 +399,17 @@ svtid:run-028809c427cb28e0
     earl:test svtid:testcase-end-feature-redefinition-bare ;
     prov:startedAtTime "2026-09-12T21:18:41+00:00"^^xsd:dateTime ;
     svt:hasInvocation svtid:invocation-028809c427cb28e0 .
+
+svtid:run-0470fbc1b734fd53
+    a svt:TestRun ;
+    earl:assertedBy svtid:agent-svt-cli ;
+    earl:mode earl:automatic ;
+    earl:result svtid:result-0470fbc1b734fd53 ;
+    earl:subject svtid:version-5e9d2b1c5465d5d0 ;
+    earl:test svtid:testcase-state-machine-settles-without-events ;
+    prov:startedAtTime "2026-09-25T13:09:55+00:00"^^xsd:dateTime ;
+    svt:hasInvocation svtid:invocation-0470fbc1b734fd53 ;
+    svt:ranBy svtid:party-zargham-macbook .
 
 svtid:run-124b82f1c1237e0b
     a svt:TestRun ;
@@ -255,6 +432,28 @@ svtid:run-29d5c83c1e3dbdf2
     svt:hasInvocation svtid:invocation-29d5c83c1e3dbdf2 ;
     svt:reconfirmedAt "2026-09-16T01:31:11+00:00"^^xsd:dateTime,
         "2026-09-16T03:40:05+00:00"^^xsd:dateTime .
+
+svtid:run-4693892674d04db5
+    a svt:TestRun ;
+    earl:assertedBy svtid:agent-svt-cli ;
+    earl:mode earl:automatic ;
+    earl:result svtid:result-4693892674d04db5 ;
+    earl:subject svtid:version-5e9d2b1c5465d5d0 ;
+    earl:test svtid:testcase-redefinition-ambiguity-2-resolution ;
+    prov:startedAtTime "2026-09-25T13:09:47+00:00"^^xsd:dateTime ;
+    svt:hasInvocation svtid:invocation-4693892674d04db5 ;
+    svt:ranBy svtid:party-zargham-macbook .
+
+svtid:run-59a6db36afe5e097
+    a svt:TestRun ;
+    earl:assertedBy svtid:agent-svt-cli ;
+    earl:mode earl:automatic ;
+    earl:result svtid:result-59a6db36afe5e097 ;
+    earl:subject svtid:version-5e9d2b1c5465d5d0 ;
+    earl:test svtid:testcase-state-machine-transitions-on-event ;
+    prov:startedAtTime "2026-09-25T13:09:57+00:00"^^xsd:dateTime ;
+    svt:hasInvocation svtid:invocation-59a6db36afe5e097 ;
+    svt:ranBy svtid:party-zargham-macbook .
 
 svtid:run-59a9dc1ec284415e
     a svt:TestRun ;
@@ -286,6 +485,17 @@ svtid:run-5f1b01cbf2b5eb0f
     prov:startedAtTime "2026-09-13T02:35:13+00:00"^^xsd:dateTime ;
     svt:hasInvocation svtid:invocation-5f1b01cbf2b5eb0f .
 
+svtid:run-606664b011a77407
+    a svt:TestRun ;
+    earl:assertedBy svtid:agent-svt-cli ;
+    earl:mode earl:automatic ;
+    earl:result svtid:result-606664b011a77407 ;
+    earl:subject svtid:version-5e9d2b1c5465d5d0 ;
+    earl:test svtid:testcase-membership-visibility-private-rejected ;
+    prov:startedAtTime "2026-09-25T13:09:28+00:00"^^xsd:dateTime ;
+    svt:hasInvocation svtid:invocation-606664b011a77407 ;
+    svt:ranBy svtid:party-zargham-macbook .
+
 svtid:run-648f3889d4a57b27
     a svt:TestRun ;
     earl:assertedBy svtid:agent-svt-cli ;
@@ -295,6 +505,28 @@ svtid:run-648f3889d4a57b27
     earl:test svtid:testcase-redefinition-ambiguity-2-resolution ;
     prov:startedAtTime "2026-09-13T00:19:10+00:00"^^xsd:dateTime ;
     svt:hasInvocation svtid:invocation-648f3889d4a57b27 .
+
+svtid:run-6956b2038bce09f8
+    a svt:TestRun ;
+    earl:assertedBy svtid:agent-svt-cli ;
+    earl:mode earl:automatic ;
+    earl:result svtid:result-6956b2038bce09f8 ;
+    earl:subject svtid:version-5e9d2b1c5465d5d0 ;
+    earl:test svtid:testcase-end-feature-redefinition-explicit ;
+    prov:startedAtTime "2026-09-25T13:09:40+00:00"^^xsd:dateTime ;
+    svt:hasInvocation svtid:invocation-6956b2038bce09f8 ;
+    svt:ranBy svtid:party-zargham-macbook .
+
+svtid:run-6b757d7a368efe27
+    a svt:TestRun ;
+    earl:assertedBy svtid:agent-svt-cli ;
+    earl:mode earl:automatic ;
+    earl:result svtid:result-6b757d7a368efe27 ;
+    earl:subject svtid:version-5e9d2b1c5465d5d0 ;
+    earl:test svtid:testcase-constraint-eval-declaration-site ;
+    prov:startedAtTime "2026-09-25T13:09:35+00:00"^^xsd:dateTime ;
+    svt:hasInvocation svtid:invocation-6b757d7a368efe27 ;
+    svt:ranBy svtid:party-zargham-macbook .
 
 svtid:run-75c5822601fb66db
     a svt:TestRun ;
@@ -316,6 +548,28 @@ svtid:run-b7b02e6efabedc87
     prov:startedAtTime "2026-09-12T21:18:41+00:00"^^xsd:dateTime ;
     svt:hasInvocation svtid:invocation-b7b02e6efabedc87 .
 
+svtid:run-cda3e46eb6971005
+    a svt:TestRun ;
+    earl:assertedBy svtid:agent-svt-cli ;
+    earl:mode earl:automatic ;
+    earl:result svtid:result-cda3e46eb6971005 ;
+    earl:subject svtid:version-5e9d2b1c5465d5d0 ;
+    earl:test svtid:testcase-redefinition-ambiguity-2 ;
+    prov:startedAtTime "2026-09-25T13:09:44+00:00"^^xsd:dateTime ;
+    svt:hasInvocation svtid:invocation-cda3e46eb6971005 ;
+    svt:ranBy svtid:party-zargham-macbook .
+
+svtid:run-d0cdc80b1d89cfc1
+    a svt:TestRun ;
+    earl:assertedBy svtid:agent-svt-cli ;
+    earl:mode earl:automatic ;
+    earl:result svtid:result-d0cdc80b1d89cfc1 ;
+    earl:subject svtid:version-5e9d2b1c5465d5d0 ;
+    earl:test svtid:testcase-end-feature-redefinition-bare ;
+    prov:startedAtTime "2026-09-25T13:09:38+00:00"^^xsd:dateTime ;
+    svt:hasInvocation svtid:invocation-d0cdc80b1d89cfc1 ;
+    svt:ranBy svtid:party-zargham-macbook .
+
 svtid:run-d7466e9771590b36
     a svt:TestRun ;
     earl:assertedBy svtid:agent-svt-cli ;
@@ -325,6 +579,17 @@ svtid:run-d7466e9771590b36
     earl:test svtid:testcase-redefinition-ambiguity-2 ;
     prov:startedAtTime "2026-09-12T21:18:40+00:00"^^xsd:dateTime ;
     svt:hasInvocation svtid:invocation-d7466e9771590b36 .
+
+svtid:run-dfd812789b851238
+    a svt:TestRun ;
+    earl:assertedBy svtid:agent-svt-cli ;
+    earl:mode earl:automatic ;
+    earl:result svtid:result-dfd812789b851238 ;
+    earl:subject svtid:version-5e9d2b1c5465d5d0 ;
+    earl:test svtid:testcase-redefinition-ambiguity-3plus-resolution ;
+    prov:startedAtTime "2026-09-25T13:09:52+00:00"^^xsd:dateTime ;
+    svt:hasInvocation svtid:invocation-dfd812789b851238 ;
+    svt:ranBy svtid:party-zargham-macbook .
 
 svtid:run-f522ad2df1c81c4c
     a svt:TestRun ;
@@ -336,3 +601,14 @@ svtid:run-f522ad2df1c81c4c
     prov:startedAtTime "2026-09-16T02:50:39+00:00"^^xsd:dateTime ;
     svt:hasInvocation svtid:invocation-f522ad2df1c81c4c ;
     svt:ranBy svtid:party-devin-linux-x86-64 .
+
+svtid:run-feb751c3f31fac24
+    a svt:TestRun ;
+    earl:assertedBy svtid:agent-svt-cli ;
+    earl:mode earl:automatic ;
+    earl:result svtid:result-feb751c3f31fac24 ;
+    earl:subject svtid:version-5e9d2b1c5465d5d0 ;
+    earl:test svtid:testcase-redefinition-ambiguity-3plus ;
+    prov:startedAtTime "2026-09-25T13:09:49+00:00"^^xsd:dateTime ;
+    svt:hasInvocation svtid:invocation-feb751c3f31fac24 ;
+    svt:ranBy svtid:party-zargham-macbook .
