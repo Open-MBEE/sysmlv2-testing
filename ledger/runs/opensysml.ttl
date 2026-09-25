@@ -51,6 +51,17 @@ svtid:invocation-29d5c83c1e3dbdf2
     svt:stderr "" ;
     svt:stdout "dormant,active" .
 
+svtid:invocation-41d21d273e58370f
+    a svt:Invocation ;
+    prov:startedAtTime "2026-09-25T13:36:59+00:00"^^xsd:dateTime ;
+    svt:command "Connection.load_from_content(<input files>, strict=False)" ;
+    svt:exitCode "0"^^xsd:integer ;
+    svt:inputDigest "48478296ec02d581e20244a326aee0284fd0240972f119559360935cbe10d5d2" ;
+    svt:stderr "" ;
+    svt:stdout "clean" ;
+    svt:toolDigest "d2c0a5eeca4ffb8309712ae0f6da29e1a15dfdc3b2a201fa30920a76e863b166" ;
+    svt:toolVersion "v0.9.0" .
+
 svtid:invocation-4693892674d04db5
     a svt:Invocation ;
     prov:startedAtTime "2026-09-25T13:09:47+00:00"^^xsd:dateTime ;
@@ -280,6 +291,12 @@ svtid:result-29d5c83c1e3dbdf2
     earl:outcome earl:passed ;
     svt:actual "dormant,active" .
 
+svtid:result-41d21d273e58370f
+    a earl:TestResult ;
+    earl:info "expected='clean' actual='clean'" ;
+    earl:outcome earl:passed ;
+    svt:actual "clean" .
+
 svtid:result-4693892674d04db5
     a earl:TestResult ;
     earl:info "opensysml has no way to check reference-resolution facts for anonymous features: its Symbol/Query wire protocol's only identity field is the same colliding qualified-name string (confirmed via sysml_pb2.pyi), and its to_turtle() export's sysml:redefines predicate is a bare name string, not a link to the resolved target -- worth filing upstream" ;
@@ -432,6 +449,17 @@ svtid:run-29d5c83c1e3dbdf2
     svt:hasInvocation svtid:invocation-29d5c83c1e3dbdf2 ;
     svt:reconfirmedAt "2026-09-16T01:31:11+00:00"^^xsd:dateTime,
         "2026-09-16T03:40:05+00:00"^^xsd:dateTime .
+
+svtid:run-41d21d273e58370f
+    a svt:TestRun ;
+    earl:assertedBy svtid:agent-svt-cli ;
+    earl:mode earl:automatic ;
+    earl:result svtid:result-41d21d273e58370f ;
+    earl:subject svtid:version-5e9d2b1c5465d5d0 ;
+    earl:test svtid:testcase-end-feature-redefinition-explicit-reference-binding ;
+    prov:startedAtTime "2026-09-25T13:36:59+00:00"^^xsd:dateTime ;
+    svt:hasInvocation svtid:invocation-41d21d273e58370f ;
+    svt:ranBy svtid:party-zargham-macbook .
 
 svtid:run-4693892674d04db5
     a svt:TestRun ;

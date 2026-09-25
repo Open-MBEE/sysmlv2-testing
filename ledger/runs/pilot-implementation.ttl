@@ -77,6 +77,20 @@ svtid:invocation-72e6f09687a691b6
     svt:stderr "pilot-implementation adapter has no handler for method 'state-execution' (the Pilot's SysMLInteractive engine exposes parse/validate and resolve()-based reference resolution; no constraint-eval or state-execution API reachable this way)" ;
     svt:stdout "" .
 
+svtid:invocation-8bb881d0f2ecd940
+    a svt:Invocation ;
+    prov:startedAtTime "2026-09-25T13:37:02+00:00"^^xsd:dateTime ;
+    svt:command "java -cp /Users/z/Documents/GitHub/sysmlv2-testing/.cache/pilot/692170b71867353b8f90341e61556f49a5beb0e5/interactive-all.jar:/Users/z/Documents/GitHub/sysmlv2-testing/.cache/pilot/692170b71867353b8f90341e61556f49a5beb0e5/classes svt.Main /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/end-feature-redefinition-explicit-reference-binding/lib.sysml /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/end-feature-redefinition-explicit-reference-binding/usage-end-reference.sysml" ;
+    svt:exitCode "0"^^xsd:integer ;
+    svt:inputDigest "48478296ec02d581e20244a326aee0284fd0240972f119559360935cbe10d5d2" ;
+    svt:stderr """log4j:WARN No appenders could be found for logger (org.eclipse.xtext.parser.antlr.AbstractInternalAntlrParser).
+log4j:WARN Please initialize the log4j system properly.
+log4j:WARN See http://logging.apache.org/log4j/1.2/faq.html#noconfig for more info.
+""" ;
+    svt:stdout """CLEAN
+""" ;
+    svt:toolDigest "891a0cbb55f956a059b762a38430f01ccc6aa1fd1aa81d1428b52ff9489307cc" .
+
 svtid:invocation-9dfe6a6dd68ddf79
     a svt:Invocation ;
     prov:startedAtTime "2026-09-12T21:18:54+00:00"^^xsd:dateTime ;
@@ -155,6 +169,12 @@ svtid:result-72e6f09687a691b6
     earl:info "pilot-implementation adapter has no handler for method 'state-execution' (the Pilot's SysMLInteractive engine exposes parse/validate and resolve()-based reference resolution; no constraint-eval or state-execution API reachable this way)" ;
     earl:outcome earl:inapplicable .
 
+svtid:result-8bb881d0f2ecd940
+    a earl:TestResult ;
+    earl:info "expected='clean' actual='clean'" ;
+    earl:outcome earl:passed ;
+    svt:actual "clean" .
+
 svtid:result-9dfe6a6dd68ddf79
     a earl:TestResult ;
     earl:info "expected='violated' actual='violated'" ;
@@ -222,6 +242,17 @@ svtid:run-72e6f09687a691b6
     earl:test svtid:testcase-state-machine-settles-without-events ;
     prov:startedAtTime "2026-09-13T00:21:11+00:00"^^xsd:dateTime ;
     svt:hasInvocation svtid:invocation-72e6f09687a691b6 .
+
+svtid:run-8bb881d0f2ecd940
+    a svt:TestRun ;
+    earl:assertedBy svtid:agent-svt-cli ;
+    earl:mode earl:automatic ;
+    earl:result svtid:result-8bb881d0f2ecd940 ;
+    earl:subject svtid:version-26283fd33076c9d6 ;
+    earl:test svtid:testcase-end-feature-redefinition-explicit-reference-binding ;
+    prov:startedAtTime "2026-09-25T13:37:02+00:00"^^xsd:dateTime ;
+    svt:hasInvocation svtid:invocation-8bb881d0f2ecd940 ;
+    svt:ranBy svtid:party-zargham-macbook .
 
 svtid:run-9dfe6a6dd68ddf79
     a svt:TestRun ;

@@ -169,6 +169,17 @@ svtid:invocation-a12af5ad367fb4b0
 UsageTwo::c::@1	UsageTwo::c::@1
 """ .
 
+svtid:invocation-a148e1b255286932
+    a svt:Invocation ;
+    prov:startedAtTime "2026-09-25T13:37:01+00:00"^^xsd:dateTime ;
+    svt:command "/Users/z/Documents/GitHub/sysmlv2-testing/.cache/sysml-toolkit/v0.9.1/sysmlv2-0.9.1-aarch64-apple-darwin/sysmlv2 check --lib /Users/z/Documents/GitHub/sysml-toolkit/spec-refs/SysML-v2-Release/sysml.library --strict /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/end-feature-redefinition-explicit-reference-binding/lib.sysml /Users/z/Documents/GitHub/sysmlv2-testing/ledger/fixtures/end-feature-redefinition-explicit-reference-binding/usage-end-reference.sysml" ;
+    svt:exitCode "0"^^xsd:integer ;
+    svt:inputDigest "48478296ec02d581e20244a326aee0284fd0240972f119559360935cbe10d5d2" ;
+    svt:stderr "" ;
+    svt:stdout "" ;
+    svt:toolDigest "af1c32f5108c3a671df0a38afd1b6264ca5ad0a8a215c36cc1d374d530957b4f" ;
+    svt:toolVersion "sysmlv2 0.9.1" .
+
 svtid:invocation-a8a1ca16a95a2126
     a svt:Invocation ;
     prov:startedAtTime "2026-09-12T21:18:33+00:00"^^xsd:dateTime ;
@@ -487,6 +498,12 @@ svtid:result-a12af5ad367fb4b0
     earl:outcome earl:failed ;
     svt:actual "UsageTwo::c::@0->UsageTwo::c::@2; UsageTwo::c::@1->UsageTwo::c::@1" .
 
+svtid:result-a148e1b255286932
+    a earl:TestResult ;
+    earl:info "expected='clean' actual='clean'" ;
+    earl:outcome earl:passed ;
+    svt:actual "clean" .
+
 svtid:result-a8a1ca16a95a2126
     a earl:TestResult ;
     earl:info "expected='clean' actual='violated'" ;
@@ -722,6 +739,17 @@ svtid:run-a12af5ad367fb4b0
     earl:test svtid:testcase-redefinition-ambiguity-2-resolution ;
     prov:startedAtTime "2026-09-13T00:19:09+00:00"^^xsd:dateTime ;
     svt:hasInvocation svtid:invocation-a12af5ad367fb4b0 .
+
+svtid:run-a148e1b255286932
+    a svt:TestRun ;
+    earl:assertedBy svtid:agent-svt-cli ;
+    earl:mode earl:automatic ;
+    earl:result svtid:result-a148e1b255286932 ;
+    earl:subject svtid:version-ebc29af982364131 ;
+    earl:test svtid:testcase-end-feature-redefinition-explicit-reference-binding ;
+    prov:startedAtTime "2026-09-25T13:37:01+00:00"^^xsd:dateTime ;
+    svt:hasInvocation svtid:invocation-a148e1b255286932 ;
+    svt:ranBy svtid:party-zargham-macbook .
 
 svtid:run-a8a1ca16a95a2126
     a svt:TestRun ;
