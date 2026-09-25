@@ -8,6 +8,7 @@
 svtid:implementation-opensysml
     a svt:Implementation ;
     svt:hasVersion svtid:version-43b25328b26cade7,
+        svtid:version-5e9d2b1c5465d5d0,
         svtid:version-f69111dc2adf2203 ;
     svt:name "opensysml" ;
     svt:primaryLanguage "Go" ;
@@ -23,7 +24,8 @@ svtid:implementation-pilot-implementation
 svtid:implementation-sysml-toolkit
     a svt:Implementation ;
     svt:hasVersion svtid:version-6039db9099bbd218,
-        svtid:version-cdc8cdb3385265b0 ;
+        svtid:version-cdc8cdb3385265b0,
+        svtid:version-ebc29af982364131 ;
     svt:name "sysml-toolkit" ;
     svt:primaryLanguage "Rust" ;
     svt:repositoryURL "https://github.com/Open-MBEE/sysml-toolkit"^^xsd:anyURI .
@@ -63,6 +65,14 @@ svtid:version-43b25328b26cade7
     svt:sourceURL "https://github.com/Open-MBEE/OpenSysML/releases/tag/v0.8.0"^^xsd:anyURI ;
     svt:versionLabel "v0.8.0" .
 
+svtid:version-5e9d2b1c5465d5d0
+    a svt:Version ;
+    svt:artifactDigest "d2c0a5eeca4ffb8309712ae0f6da29e1a15dfdc3b2a201fa30920a76e863b166" ;
+    svt:commitHash "ee54ea03ea3ca8fb2c796ecda364adf748c40304" ;
+    svt:ofImplementation svtid:implementation-opensysml ;
+    svt:sourceURL "https://github.com/Open-MBEE/OpenSysML/releases/tag/v0.9.0"^^xsd:anyURI ;
+    svt:versionLabel "v0.9.0" .
+
 svtid:version-6039db9099bbd218
     a svt:Version ;
     svt:artifactDigest "87da32dbe07aa2e982ade7bbb1b25d4aa576487a92ec6f18e3994d1296620cf1" ;
@@ -78,6 +88,14 @@ svtid:version-cdc8cdb3385265b0
     svt:ofImplementation svtid:implementation-sysml-toolkit ;
     svt:sourceURL "https://github.com/Open-MBEE/sysml-toolkit/releases/tag/v0.6.0"^^xsd:anyURI ;
     svt:versionLabel "v0.6.0" .
+
+svtid:version-ebc29af982364131
+    a svt:Version ;
+    svt:artifactDigest "af1c32f5108c3a671df0a38afd1b6264ca5ad0a8a215c36cc1d374d530957b4f" ;
+    svt:commitHash "3e38d071dcb773195aa563d752eccc9fafc354c9" ;
+    svt:ofImplementation svtid:implementation-sysml-toolkit ;
+    svt:sourceURL "https://github.com/Open-MBEE/sysml-toolkit/releases/tag/v0.9.1"^^xsd:anyURI ;
+    svt:versionLabel "v0.9.1" .
 
 svtid:version-f69111dc2adf2203
     a svt:Version ;
