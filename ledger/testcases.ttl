@@ -15,6 +15,11 @@ svtid:intent-anonymous-sibling-redefinition-well-formed
     svt:concerns "admissibility" ;
     svt:question "Must a model in which a multi-valued reference feature is redefined by several anonymous ':>> items' memberships be accepted as well-formed?" .
 
+svtid:intent-connection-end-value-binding-relates-connection
+    a svt:TestIntent ;
+    svt:concerns "admissibility" ;
+    svt:question "Does binding a connection's end features only by feature value ('end :>> source = a') give the connection the related features it needs to be well-formed?" .
+
 svtid:intent-constraint-evaluates-against-usage-bindings
     a svt:TestIntent ;
     svt:concerns "posterior-state" ;
@@ -108,6 +113,19 @@ svtid:testcase-end-feature-redefinition-explicit-reference-binding
         "usage-end-reference.sysml" ;
     svt:method "structural-check" ;
     svt:realizesIntent svtid:intent-end-feature-redefinition-requires-end-keyword .
+
+svtid:testcase-end-feature-redefinition-explicit-value-binding
+    a svt:TestCase ;
+    svt:description "A concrete connection usage whose end features are bound only by feature value ('end :>> source = a'/'end :>> target = b'), with no reference subsetting on either end, must be rejected: it has fewer than two related features." ;
+    svt:expected "violated" ;
+    svt:groundedIn svtid:citation-connection-usage-related-elements-via-reference-subsetting,
+        svtid:citation-connector-related-features-derivation,
+        svtid:citation-connector-related-features-minimum,
+        svtid:citation-feature-value-binding-connector ;
+    svt:hasInputFile "lib.sysml",
+        "usage-end-value.sysml" ;
+    svt:method "structural-check" ;
+    svt:realizesIntent svtid:intent-connection-end-value-binding-relates-connection .
 
 svtid:testcase-membership-visibility-private-rejected
     a svt:TestCase ;
