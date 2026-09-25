@@ -244,6 +244,12 @@ svtid:validation-d85b9abffc010770
     prov:wasAssociatedWith svtid:person-zargham ;
     svt:validates svtid:testcase-redefinition-ambiguity-3plus-resolution .
 
+svtid:validation-dc59939f0a7c3ea3
+    a svt:Validation ;
+    prov:startedAtTime "2026-09-25T13:34:22+00:00"^^xsd:dateTime ;
+    prov:wasAssociatedWith svtid:person-zargham ;
+    svt:validates svtid:testcase-end-feature-redefinition-explicit-reference-binding .
+
 svtid:validation-f9d239c463231d6f
     a svt:Validation ;
     prov:startedAtTime "2026-09-16T00:28:25+00:00"^^xsd:dateTime ;
