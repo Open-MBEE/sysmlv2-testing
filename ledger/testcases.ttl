@@ -268,6 +268,12 @@ svtid:validation-dc59939f0a7c3ea3
     prov:wasAssociatedWith svtid:person-zargham ;
     svt:validates svtid:testcase-end-feature-redefinition-explicit-reference-binding .
 
+svtid:validation-e13daa1fdbe28f35
+    a svt:Validation ;
+    prov:startedAtTime "2026-09-25T13:59:40+00:00"^^xsd:dateTime ;
+    prov:wasAssociatedWith svtid:person-zargham ;
+    svt:validates svtid:testcase-end-feature-redefinition-explicit-value-binding .
+
 svtid:validation-f9d239c463231d6f
     a svt:Validation ;
     prov:startedAtTime "2026-09-16T00:28:25+00:00"^^xsd:dateTime ;
