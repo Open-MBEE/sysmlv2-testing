@@ -419,16 +419,16 @@ wheels = [
 
 [[package]]
 name = "opensysml"
-version = "0.4.0"
+version = "0.9.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "grpcio" },
     { name = "protobuf" },
     { name = "sigstore" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/30/de/501eb5743d0de61f8ee97c4ea125e8136f176787118e84044d7f4777a1c9/opensysml-0.4.0.tar.gz", hash = "sha256:42e4dd5623b6f189425c2efc5bb62ecd13b5e3cdb5bfa5fbb9a865e35ca547a5", size = 208840, upload-time = "2026-09-01T13:27:04.327Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/61/cd/a09cc7de314d7a3e6da9f70f393ec7bf6c1942e6323db1856dcf4fc4216e/opensysml-0.9.0.tar.gz", hash = "sha256:22b69318f15692d529e3f2a5d96a38a4aad13a872020c601758f6bda5c26258c", size = 301018, upload-time = "2026-09-25T02:23:33.059Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/57/75/5291a2faa445148c7e0eb43839c5e1629521f76f087aace02e95d5b489cb/opensysml-0.4.0-py3-none-any.whl", hash = "sha256:d3a9cfea481818656ec2f30f432c85ac74c41ab22adb51c5d9095c7cc1da3fca", size = 117169, upload-time = "2026-09-01T13:27:03.32Z" },
+    { url = "https://files.pythonhosted.org/packages/d0/d5/a15f0ea5851aa6eac4a340a7c6574ffd82689d3584da6c5564a46ad94c1d/opensysml-0.9.0-py3-none-any.whl", hash = "sha256:da527865d372fb742b8a3bd21871f9651119dc1b6bb58b073725185968281ee4", size = 158790, upload-time = "2026-09-25T02:23:31.853Z" },
 ]
 
 [[package]]
@@ -864,7 +864,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "opensysml", specifier = "==0.4.0" },
+    { name = "opensysml", specifier = "==0.9.0" },
     { name = "pyshacl", specifier = ">=0.29" },
     { name = "rdflib", specifier = ">=7.0" },
     { name = "typer", specifier = ">=0.12" },

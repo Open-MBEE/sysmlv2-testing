@@ -1,7 +1,7 @@
 """Adapter for Open-MBEE/OpenSysML, via its Python client `opensysml`.
 
 The server version is pinned by OPENSYSML_VERSION (default matches the
-version BrandFootprintML's own fixtures were exercised against, "v0.4.0")
+release paired with the pinned `opensysml` client in pyproject.toml, "v0.9.0")
 — never "whatever's installed." Each call opens a fresh, version-pinned
 connection and closes it when done. No LLM anywhere in this path.
 """
@@ -12,7 +12,7 @@ import os
 
 from .base import Adapter, RawResult, TestCaseSpec, UnsupportedMethod, with_fingerprint
 
-DEFAULT_VERSION = "v0.4.0"
+DEFAULT_VERSION = "v0.9.0"
 
 
 def _requested_version() -> str:
