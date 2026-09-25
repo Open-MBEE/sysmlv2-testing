@@ -211,6 +211,17 @@ svtid:invocation-d7466e9771590b36
     svt:stderr "" ;
     svt:stdout "clean" .
 
+svtid:invocation-deb03309cf0587ea
+    a svt:Invocation ;
+    prov:startedAtTime "2026-09-25T14:09:17+00:00"^^xsd:dateTime ;
+    svt:command "Connection.load_from_content(<input files>, strict=False)" ;
+    svt:exitCode "1"^^xsd:integer ;
+    svt:inputDigest "73d00d2951d8ac6ed7f3667d1e2f85a3868a4040e6452c9da076b990a48eba30" ;
+    svt:stderr "error <content>:20:3-24:1: Must have at least two related elements" ;
+    svt:stdout "" ;
+    svt:toolDigest "d2c0a5eeca4ffb8309712ae0f6da29e1a15dfdc3b2a201fa30920a76e863b166" ;
+    svt:toolVersion "v0.9.0" .
+
 svtid:invocation-dfd812789b851238
     a svt:Invocation ;
     prov:startedAtTime "2026-09-25T13:09:52+00:00"^^xsd:dateTime ;
@@ -383,6 +394,12 @@ svtid:result-d7466e9771590b36
     earl:info "expected='clean' actual='clean'" ;
     earl:outcome earl:passed ;
     svt:actual "clean" .
+
+svtid:result-deb03309cf0587ea
+    a earl:TestResult ;
+    earl:info "expected='violated' actual='violated'" ;
+    earl:outcome earl:passed ;
+    svt:actual "violated" .
 
 svtid:result-dfd812789b851238
     a earl:TestResult ;
@@ -607,6 +624,17 @@ svtid:run-d7466e9771590b36
     earl:test svtid:testcase-redefinition-ambiguity-2 ;
     prov:startedAtTime "2026-09-12T21:18:40+00:00"^^xsd:dateTime ;
     svt:hasInvocation svtid:invocation-d7466e9771590b36 .
+
+svtid:run-deb03309cf0587ea
+    a svt:TestRun ;
+    earl:assertedBy svtid:agent-svt-cli ;
+    earl:mode earl:automatic ;
+    earl:result svtid:result-deb03309cf0587ea ;
+    earl:subject svtid:version-5e9d2b1c5465d5d0 ;
+    earl:test svtid:testcase-end-feature-redefinition-explicit-value-binding ;
+    prov:startedAtTime "2026-09-25T14:09:17+00:00"^^xsd:dateTime ;
+    svt:hasInvocation svtid:invocation-deb03309cf0587ea ;
+    svt:ranBy svtid:party-zargham-macbook .
 
 svtid:run-dfd812789b851238
     a svt:TestRun ;
